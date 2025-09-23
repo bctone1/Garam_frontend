@@ -95,6 +95,7 @@ body {
 
 .nav-item {
     margin-bottom: 0.25rem;
+    cursor: pointer;
 }
 
 .nav-link {
