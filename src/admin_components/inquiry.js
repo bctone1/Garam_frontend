@@ -119,57 +119,57 @@ export default function Inquiry() {
 
             </div>
 
-            <main class="inquiry-main-content">
-                <div class="page-header">
-                    <h1 class="page-title">문의 관리</h1>
-                    <p class="page-subtitle">챗봇을 통해 접수된 고객 문의를 관리합니다</p>
+            <main className="inquiry-main-content">
+                <div className="page-header">
+                    <h1 className="page-title">문의 관리</h1>
+                    <p className="page-subtitle">챗봇을 통해 접수된 고객 문의를 관리합니다</p>
 
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">전체 문의</div>
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <div className="stat-number">0</div>
+                            <div className="stat-label">전체 문의</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">신규 문의</div>
+                        <div className="stat-card">
+                            <div className="stat-number">0</div>
+                            <div className="stat-label">신규 문의</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">처리중</div>
+                        <div className="stat-card">
+                            <div className="stat-number">0</div>
+                            <div className="stat-label">처리중</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">처리 대기</div>
+                        <div className="stat-card">
+                            <div className="stat-number">0</div>
+                            <div className="stat-label">처리 대기</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">처리 완료</div>
+                        <div className="stat-card">
+                            <div className="stat-number">0</div>
+                            <div className="stat-label">처리 완료</div>
                         </div>
                     </div>
                 </div>
 
                 {/* 관리자 관리 섹션  */}
-                <div class="admin-management">
-                    <div class="section-header">
-                        <h3 class="section-title">관리자 관리</h3>
-                        <button class="btn btn-primary"
+                <div className="admin-management">
+                    <div className="section-header">
+                        <h3 className="section-title">관리자 관리</h3>
+                        <button className="btn btn-primary"
                             onClick={() => setopenAddAdminModal(true)}
                         >
-                            <i class="fas fa-user-plus"></i>
+                            <i className="fas fa-user-plus"></i>
                             관리자 추가
                         </button>
                     </div>
-                    <div class="admin-grid" id="adminGrid">
+                    <div className="admin-grid" id="adminGrid">
                         {/* 관리자 카드들이 동적으로 추가됩니다 */}
                         <RenderAdminGrid adminUsers={adminUsers} currentAdminUser={currentAdminUser} setcurrentAdminUser={setcurrentAdminUser} />
                     </div>
                 </div>
 
-                <div class="inquiry-section">
-                    <div class="section-header">
-                        <h3 class="section-title">문의 목록</h3>
+                <div className="inquiry-section">
+                    <div className="section-header">
+                        <h3 className="section-title">문의 목록</h3>
                     </div>
-                    <div class="inquiry-list" id="inquiryList">
+                    <div className="inquiry-list" id="inquiryList">
                         {/* 문의 목록이 여기에 동적으로 추가됩니다 */}
                         <RenderInquiries inquiries={inquiries} adminUsers={adminUsers} currentAdminUser={currentAdminUser} />
                     </div>
@@ -511,11 +511,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser }) 
 }
 
 function AddAdminModal({ setopenAddAdminModal }) {
-    const [NewUser, setNewUser] = useState({
-        name: null,
-        email: null,
-        group: null
-    });
+    const [NewUser, setNewUser] = useState({});
     return (
         <div className="modal-content" onClick={(event) => event.stopPropagation()}>
             <div className="modal-header">

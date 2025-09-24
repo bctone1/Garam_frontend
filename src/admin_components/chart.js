@@ -218,12 +218,12 @@ export default function Chart() {
                         <div className="date-selector">
                             <select className="date-select" id="dateRange">
                                 <option value="today">오늘</option>
-                                <option value="week" selected>지난 7일</option>
+                                <option value="week" >지난 7일</option>
                                 <option value="month">지난 30일</option>
                                 <option value="quarter">지난 90일</option>
                             </select>
 
-                            <button className="btn btn-primary" onclick="exportData()">
+                            <button className="btn btn-primary" >
                                 <i className="fas fa-download"></i>
                                 데이터 내보내기
                             </button>

@@ -118,7 +118,7 @@ export default function Assisstant() {
                                 <div className="setting-group">
                                     <label className="setting-label">응답 스타일</label>
                                     <select className="input-field" id="responseStyle">
-                                        <option value="professional" selected>전문적이고 정확한 답변</option>
+                                        <option value="professional">전문적이고 정확한 답변</option>
                                         <option value="friendly">친근하고 대화형 답변</option>
                                         <option value="concise">간결하고 핵심적인 답변</option>
                                     </select>
