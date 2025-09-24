@@ -1,4 +1,27 @@
+import { useState } from "react";
+import { assistant_showNotification } from '../utill/utill';
+
 export default function Assisstant() {
+    const [status, setStatus] = useState("idle"); // idle | saving | done
+
+    const handleClick = () => {
+        setStatus("saving");
+
+        // 저장 중 메시지
+        setTimeout(() => {
+            setStatus("done");
+
+            // 완료 후 다시 원래 상태로
+            setTimeout(() => {
+                setStatus("idle");
+            }, 2000);
+        }, 1500);
+
+        // 알림
+        assistant_showNotification("AI 모델 설정이 저장되었습니다. 변경사항이 즉시 적용됩니다.", "success");
+    };
+
+
     return (
         <>
 
@@ -23,7 +46,7 @@ export default function Assisstant() {
                     {/* 현재 상태 */}
                     <div className="status-card">
                         <div className="status-header">
-                            <h2 className="status-title">모델 운영 현황</h2> 
+                            <h2 className="status-title">모델 운영 현황</h2>
                             <div className="status-badge">
                                 <div className="status-dot"></div>
                                 <span>정상 운영중</span>
@@ -164,9 +187,30 @@ export default function Assisstant() {
                             <i className="fas fa-undo"></i>
                             기본값 복원
                         </button>
-                        <button className="assistant-btn assistant-btn-primary" id="saveBtn">
-                            <i className="fas fa-save"></i>
-                            설정 저장
+                        <button
+                            className="assistant-btn assistant-btn-primary"
+                            onClick={handleClick}
+                            disabled={status === "saving"}
+                            style={{
+                                background:
+                                    status === "done" ? "var(--accent-color)" : "var(--primary-color)",
+                            }}
+                        >
+                            {status === "idle" && (
+                                <>
+                                    <i className="fas fa-save"></i> 설정 저장
+                                </>
+                            )}
+                            {status === "saving" && (
+                                <>
+                                    <i className="fas fa-spinner fa-spin"></i> 저장 중...
+                                </>
+                            )}
+                            {status === "done" && (
+                                <>
+                                    <i className="fas fa-check"></i> 저장 완료!
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>

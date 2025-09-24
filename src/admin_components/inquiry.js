@@ -1,3 +1,6 @@
+import { showToast } from '../utill/utill';
+import { useState } from 'react';
+
 export default function Inquiry() {
     const adminUsers = [
         {
@@ -6,14 +9,14 @@ export default function Inquiry() {
             email: 'kim@garampos.com',
             department: '고객지원팀',
             assignedCount: 0,
-            completedCount: 0
+            completedCount: 1
         },
         {
             id: 'admin2',
             name: '이관리',
             email: 'lee@garampos.com',
             department: '기술지원팀',
-            assignedCount: 0,
+            assignedCount: 1,
             completedCount: 0
         },
         {
@@ -103,11 +106,19 @@ export default function Inquiry() {
             ]
         }
     ];
+    const [currentAdminUser, setcurrentAdminUser] = useState("김관리");
 
-    const currentAdminUser = '김관리';
+
+
+    const [openAddAdminModal, setopenAddAdminModal] = useState(false);
 
     return (
         <>
+            <div className={`modal ${openAddAdminModal ? "show" : ""}`} id="addAdminModal" onClick={() => setopenAddAdminModal(false)}>
+                <AddAdminModal setopenAddAdminModal={setopenAddAdminModal} />
+
+            </div>
+
             <main class="inquiry-main-content">
                 <div class="page-header">
                     <h1 class="page-title">문의 관리</h1>
@@ -141,14 +152,16 @@ export default function Inquiry() {
                 <div class="admin-management">
                     <div class="section-header">
                         <h3 class="section-title">관리자 관리</h3>
-                        <button class="btn btn-primary" onclick="openAddAdminModal()">
+                        <button class="btn btn-primary"
+                            onClick={() => setopenAddAdminModal(true)}
+                        >
                             <i class="fas fa-user-plus"></i>
                             관리자 추가
                         </button>
                     </div>
                     <div class="admin-grid" id="adminGrid">
                         {/* 관리자 카드들이 동적으로 추가됩니다 */}
-                        <RenderAdminGrid adminUsers={adminUsers} currentAdminUser={currentAdminUser} />
+                        <RenderAdminGrid adminUsers={adminUsers} currentAdminUser={currentAdminUser} setcurrentAdminUser={setcurrentAdminUser} />
                     </div>
                 </div>
 
@@ -412,7 +425,20 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser }) {
 
 
 
-function RenderAdminGrid({ adminUsers, currentAdminUser }) {
+function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser }) {
+    const switchToAdmin = (adminName) => {
+        setcurrentAdminUser(adminName)
+        // alert(adminName);
+        // currentAdminUser = adminName;
+        // const userNameElement = document.querySelector('.user-name');
+        // if (userNameElement) {
+        //     userNameElement.textContent = currentAdminUser;
+        // }
+
+
+        showToast(`${adminName}으로 전환되었습니다.`, 'info');
+
+    }
     return (
         <>
             {adminUsers.map((admin) => {
@@ -458,7 +484,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser }) {
                             {!isCurrentUser && (
                                 <button
                                     className="btn btn-sm btn-primary"
-
+                                    onClick={() => switchToAdmin(admin.name)}
                                 >
                                     <i className="fas fa-exchange-alt"></i> 전환
                                 </button>
@@ -481,5 +507,75 @@ function RenderAdminGrid({ adminUsers, currentAdminUser }) {
                 );
             })}
         </>
+    );
+}
+
+function AddAdminModal({ setopenAddAdminModal }) {
+    const [NewUser, setNewUser] = useState({
+        name: null,
+        email: null,
+        group: null
+    });
+    return (
+        <div className="modal-content" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+                <h3 className="modal-title">관리자 추가</h3>
+                <button className="modal-close" onClick={() => setopenAddAdminModal(false)}>
+                    &times;
+                </button>
+            </div>
+            <div id="addAdminForm">
+                <div className="form-group">
+                    <label className="form-label">이름</label>
+                    <input type="text" className="form-input" id="adminName" value={NewUser.name}
+                        onChange={(e) =>
+                            setNewUser((prev) => ({ ...prev, name: e.target.value }))
+                        }
+                    />
+                </div>
+                <div className="form-group">
+                    <label className="form-label">이메일</label>
+                    <input type="email" className="form-input" id="adminEmail" value={NewUser.email}
+                        onChange={(e) =>
+                            setNewUser((prev) => ({ ...prev, email: e.target.value }))
+                        }
+                    />
+                </div>
+                <div className="form-group">
+                    <label className="form-label">부서</label>
+                    <input
+                        type="text"
+                        className="form-input"
+                        id="adminDepartment"
+                        placeholder="예: 고객지원팀"
+                        value={NewUser.group}
+                        onChange={(e) =>
+                            setNewUser((prev) => ({ ...prev, group: e.target.value }))
+                        }
+                    />
+                </div>
+                <div
+                    style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        justifyContent: "flex-end",
+                        marginTop: "1.5rem",
+                    }}
+                >
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setopenAddAdminModal(false)}
+                    >
+                        취소
+                    </button>
+                    <button type="submit" className="btn btn-primary"
+                        onClick={() => showToast(`${NewUser.name} 관리자가 추가되었습니다.`, 'success')}
+                    >
+                        추가
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 }

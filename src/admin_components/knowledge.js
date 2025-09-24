@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { showToast } from '../utill/utill';
 
 export default function Knowledge() {
 
@@ -135,10 +136,37 @@ export default function Knowledge() {
     ];
 
 
+    const fileInputRef = useRef(null);
+
+    const handleFileSelect = async (e) => {
+        const selectedFile = e.target.files[0];
+        console.log("선택된 파일:", selectedFile);
+
+        if (!selectedFile) return;
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("user_id", 1);
+
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/knowledge`, {
+            method: "POST",
+            body: formData
+        });
+        const data = await response.json();
+        console.log(data);
+    };
+
+    const [showAddFaqModal, setshowAddFaqModal] = useState(false);
+
+
 
 
     return (
         <>
+            <div className={`modal ${showAddFaqModal ? "show" : ""}`} id="faqAddModal" style={{ display: `${showAddFaqModal ? "flex" : "none"}` }}>
+                <FaqModal setshowAddFaqModal={setshowAddFaqModal} />
+            </div>
+
+
             <main className="main-content">
                 {/* 상단 헤더 */}
                 <header className="top-header">
@@ -184,7 +212,7 @@ export default function Knowledge() {
                 <section className={`tab-content ${contentTap === "documentsTab" ? "active" : ""}`} id="documentsTab">
                     {/* 업로드 영역 */}
                     <div className="upload-section">
-                        <div className="upload-area" id="documentUploadArea" onclick="document.getElementById('documentFileInput').click()">
+                        <div className="upload-area" id="documentUploadArea" >
                             <div className="upload-overlay" id="uploadOverlay">
                                 <div className="spinner"></div>
                                 <p style={{ color: " var(--primary-color)", fontWeight: "500" }}>파일을 처리하고 있습니다...</p>
@@ -198,10 +226,16 @@ export default function Knowledge() {
                             </div>
                             <input type="file" id="documentFileInput" multiple accept=".pdf,.doc,.docx,.txt" style={{ display: "none" }} />
                             <div className="upload-buttons">
-                                <button className="btn btn-primary" onclick="document.getElementById('documentFileInput').click()">
+                                <button className="btn btn-primary" onClick={() => fileInputRef.current?.click()}>
                                     <i className="fas fa-file-upload"></i>
                                     파일 선택
                                 </button>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    style={{ display: "none" }}
+                                    onChange={handleFileSelect}
+                                />
                             </div>
                         </div>
                     </div>
@@ -216,9 +250,9 @@ export default function Knowledge() {
                             <div className="header-actions">
                                 <div className="search-box">
                                     <i className="fas fa-search"></i>
-                                    <input type="text" placeholder="문서 검색..." id="documentSearch" oninput="filterDocuments()" />
+                                    <input type="text" placeholder="문서 검색..." id="documentSearch" />
                                 </div>
-                                <button className="btn btn-danger" onclick="bulkDeleteDocuments()">
+                                <button className="btn btn-danger" >
                                     <i className="fas fa-trash"></i>
                                     선택 삭제
                                 </button>
@@ -230,7 +264,7 @@ export default function Knowledge() {
                                 <thead>
                                     <tr>
                                         <th style={{ width: "50px" }}>
-                                            <input type="checkbox" id="selectAllDocuments" onchange="toggleAllDocuments(this.checked)" />
+                                            <input type="checkbox" id="selectAllDocuments" />
                                         </th>
                                         <th style={{ width: "auto", minWidth: "300px" }}>문서명</th>
                                         <th style={{ width: "100px" }}>크기</th>
@@ -260,7 +294,7 @@ export default function Knowledge() {
                                 <p>고객이 자주 묻는 질문과 답변을 체계적으로 관리할 수 있습니다</p>
                             </div>
                             <div className="upload-buttons">
-                                <button className="btn btn-primary" onclick="showAddFaqModal()">
+                                <button className="btn btn-primary" onClick={() => setshowAddFaqModal(true)}>
                                     <i className="fas fa-plus"></i>
                                     FAQ 추가
                                 </button>
@@ -313,9 +347,9 @@ export default function Knowledge() {
                                                 <button
                                                     className="action-btn-small"
                                                     title="편집"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        console.log("edit", faq.id);
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        showToast('FAQ 편집 기능은 개발 중입니다.', 'info');
                                                     }}
                                                 >
                                                     <i className="fas fa-edit"></i>
@@ -323,24 +357,15 @@ export default function Knowledge() {
                                                 <button
                                                     className="action-btn-small delete"
                                                     title="삭제"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        console.log("delete", faq.id);
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        showToast('FAQ가 삭제되었습니다.', 'success');
                                                     }}
                                                 >
                                                     <i className="fas fa-trash"></i>
                                                 </button>
-                                                <button
-                                                    className="action-btn-small"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        toggleFAQ(faq.id);
-                                                    }}
-                                                >
-                                                    <i
-                                                        className={`fas fa-chevron-${openId === faq.id ? "up" : "down"
-                                                            }`}
-                                                    ></i>
+                                                <button className="action-btn-small">
+                                                    <i className={`fas fa-chevron-${openId === faq.id ? "up" : "down"}`}></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -375,7 +400,7 @@ function LoadDocuments({ documents }) {
     return (
         <>
             {documents.map(doc => (
-                <tr>
+                <tr key={doc.id}>
                     <td><input type="checkbox" className="document-checkbox" /></td>
                     <td>
                         <div className="document-info">
@@ -395,16 +420,17 @@ function LoadDocuments({ documents }) {
                     </td>
                     <td>
                         <div className="action-buttons">
-                            <button className="action-btn-small" title="문서 보기" >
+                            <button className="action-btn-small" title="문서 보기" onClick={() => showToast('문서 미리보기 기능은 개발 중입니다.', 'info')}>
                                 <i className="fas fa-eye"></i>
                             </button>
-                            <button className="action-btn-small delete" title="삭제">
+                            <button className="action-btn-small delete" title="삭제" onClick={() => showToast('문서가 삭제되었습니다.', 'success')}>
                                 <i className="fas fa-trash"></i>
                             </button>
                         </div>
                     </td>
-                </tr>
-            ))}
+                </tr >
+            ))
+            }
 
         </>
     )
@@ -422,4 +448,110 @@ function getFileIcon(type) {
         'image/gif': 'fa-file-image'
     };
     return iconMap[type] || 'fa-file';
+}
+
+function FaqModal({ setshowAddFaqModal }) {
+    return (
+        <>
+            <div className="modal-backdrop" onClick={() => setshowAddFaqModal(false)}></div>
+            <div className="modal-container" style={{ maxWidth: "700px" }}>
+                <div className="modal-header">
+                    <h3 className="modal-title">새 FAQ 추가</h3>
+                    <button className="modal-close" onClick={() => setshowAddFaqModal(false)}>
+                        <i className="fas fa-times"></i>
+                    </button>
+                </div>
+                <div className="modal-body">
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                        <div>
+                            <label
+                                style={{
+                                    display: "block",
+                                    fontWeight: 600,
+                                    marginBottom: "0.5rem",
+                                    color: "var(--text-primary)",
+                                }}
+                            >
+                                질문 <span style={{ color: "var(--danger-color)" }}>*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="faqQuestion"
+                                placeholder="자주 묻는 질문을 입력하세요..."
+                                style={{
+                                    width: "100%",
+                                    padding: "0.75rem",
+                                    border: "1px solid var(--border-color)",
+                                    borderRadius: "var(--border-radius)",
+                                    fontSize: "1rem",
+                                }}
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                style={{
+                                    display: "block",
+                                    fontWeight: 600,
+                                    marginBottom: "0.5rem",
+                                    color: "var(--text-primary)",
+                                }}
+                            >
+                                답변 <span style={{ color: "var(--danger-color)" }}>*</span>
+                            </label>
+                            <textarea
+                                id="faqAnswer"
+                                placeholder="상세한 답변을 입력하세요..."
+                                rows={6}
+                                style={{
+                                    width: "100%",
+                                    padding: "0.75rem",
+                                    border: "1px solid var(--border-color)",
+                                    borderRadius: "var(--border-radius)",
+                                    fontSize: "1rem",
+                                    resize: "vertical",
+                                    fontFamily: "inherit",
+                                }}
+                            />
+                        </div>
+
+                        <div
+                            style={{
+                                background: "var(--secondary-color)",
+                                padding: "1rem",
+                                borderRadius: "var(--border-radius)",
+                                borderLeft: "4px solid var(--primary-color)",
+                            }}
+                        >
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                                <i className="fas fa-lightbulb" style={{ color: "var(--primary-color)" }}></i>
+                                <strong style={{ color: "var(--text-primary)" }}>작성 팁</strong>
+                            </div>
+                            <ul
+                                style={{
+                                    margin: 0,
+                                    paddingLeft: "1.2rem",
+                                    color: "var(--text-secondary)",
+                                    fontSize: "0.875rem",
+                                    lineHeight: 1.4,
+                                }}
+                            >
+                                <li>구체적이고 명확한 질문으로 작성해주세요</li>
+                                <li>답변은 단계별로 나누어 설명하면 좋습니다</li>
+                                <li>필요시 연락처 정보를 포함해주세요</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal-footer">
+                    <button className="btn btn-secondary" onClick={() => setshowAddFaqModal(false)}>
+                        취소
+                    </button>
+                    <button className="btn btn-primary" >
+                        <i className="fas fa-plus"></i> FAQ 추가
+                    </button>
+                </div>
+            </div>
+        </>
+    );
 }

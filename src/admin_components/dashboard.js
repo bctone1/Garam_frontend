@@ -207,7 +207,25 @@ export default function Dashboard() {
   }, []);
 
   const [refreshStatus, setrefreshStatus] = useState(false);
-  const handlerefresh = () => {
+  const handlerefresh = async () => {
+    console.log("ENV:", process.env.REACT_APP_API_URL);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/system/referesh_dashboard`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // body: JSON.stringify({ user_id: session?.user?.id }),
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+
+    } catch (error) {
+
+    }
     setrefreshStatus(true);
     setTimeout(() => {
       showNotification('데이터가 새로고침되었습니다.', 'success');
