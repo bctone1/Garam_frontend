@@ -6,6 +6,7 @@ import Assistant from "../admin_components/assistant";
 import Chart from '../admin_components/chart';
 import Chatbot from '../admin_components/chatbot';
 import Inquiry from '../admin_components/inquiry';
+// import Admin_login from '../admin_components/admin_login';
 
 import "../admin_styles/dashboard.css";
 import "../admin_styles/knowledge.css";
@@ -15,9 +16,24 @@ import "../admin_styles/chatbot.css";
 import "../admin_styles/inquiry.css";
 
 
-export default function Adminpage() {
 
-    const [view, setView] = useState('dashboard');
+export default function Adminpage() {
+    const [role, setRole] = useState(sessionStorage.getItem("role") || "guest");
+    const [admin_email, setadmin_email] = useState(sessionStorage.getItem("admin_email"));
+    const [admin_name, setadmin_name] = useState(sessionStorage.getItem("admin_name"));
+
+    const [view, setView] = useState('inquiry');
+
+
+    // useEffect(() => {
+    //     if (role === "admin") {
+    //         setView("admin_login");
+    //     } else {
+    //         setView("dashboard");
+    //     }
+    // }, [role]); // role 값이 바뀔 때만 실행됨
+
+
     const [loading, setLoading] = useState(false);
 
     const handleMenuClick = (newView) => {
@@ -28,7 +44,6 @@ export default function Adminpage() {
             setLoading(false);
         }, 500);
     };
-
 
 
     const renderView = () => {
@@ -44,7 +59,14 @@ export default function Adminpage() {
             case 'chatbot':
                 return <Chatbot />;
             case 'inquiry':
-                return <Inquiry />;
+                return <Inquiry
+                    setRole={setRole}
+                    role={role}
+                    setadmin_email={setadmin_email}
+                    setadmin_name={setadmin_name}
+                />;
+            // case 'admin_login':
+            //     return <Admin_login handleMenuClick={handleMenuClick} />;
             default:
                 return <div>준비 중입니다: {view}</div>;
         }
@@ -61,7 +83,11 @@ export default function Adminpage() {
 
             {/* 관리자 페이지 */}
             < div className="admin-wrapper" >
-                <Sidebar view={view} handleMenuClick={handleMenuClick} />
+                {view !== "admin_login" && (
+                    <Sidebar view={view} handleMenuClick={handleMenuClick} role={role} admin_email={admin_email} admin_name={admin_name} />
+                )}
+
+
                 {renderView()}
             </div >
         </>

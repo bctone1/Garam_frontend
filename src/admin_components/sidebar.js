@@ -1,4 +1,6 @@
-export default function Sidebar({ view, handleMenuClick }) {
+export default function Sidebar({ view, handleMenuClick, role, admin_email, admin_name }) {
+    
+
     // 메뉴 데이터 정의
     const menuItems = [
         { key: "dashboard", icon: "fas fa-tachometer-alt", label: "대시보드" },
@@ -8,6 +10,17 @@ export default function Sidebar({ view, handleMenuClick }) {
         { key: "chatbot", icon: "fas fa-comments", label: "챗봇 운영 설정" },
         { key: "inquiry", icon: "fas fa-comments", label: "문의 관리" },
     ];
+
+    // role이 admin이면 "문의 관리"만 보이도록 필터링
+    const visibleMenu = role === "admin"
+        ? menuItems.filter(item => item.key === "inquiry")
+        : menuItems;
+
+
+    const handleLogout = () => {
+        sessionStorage.clear();
+        window.location.href = "/"
+    };
 
     return (
         <aside className="sidebar" id="sidebar">
@@ -28,7 +41,7 @@ export default function Sidebar({ view, handleMenuClick }) {
             {/* 네비게이션 */}
             <nav className="sidebar-nav">
                 <ul className="nav-menu">
-                    {menuItems.map((item) => (
+                    {visibleMenu.map((item) => (
                         <li key={item.key} className="nav-item">
                             <a
                                 className={`nav-link ${view === item.key ? "active" : ""}`}
@@ -49,13 +62,14 @@ export default function Sidebar({ view, handleMenuClick }) {
                         <i className="fas fa-user-tie"></i>
                     </div>
                     <div className="user-info">
-                        <div className="user-name">관리자</div>
-                        <div className="user-email">admin@garampos.com</div>
+                        {/* <div className="user-name">{role === "admin" ? "일반 관리자" : "최종 관리자"}</div> */}
+                        <div className="user-name">{admin_name}</div>
+                        <div className="user-email">{admin_email}</div>
                     </div>
                 </div>
                 <div className="sidebar-actions">
                     <button className="action-btn" title="로그아웃"
-                        onClick={() => window.location.href = "/"}>
+                        onClick={() => handleLogout()}>
                         <i className="fas fa-sign-out-alt"></i>
                     </button>
                 </div>

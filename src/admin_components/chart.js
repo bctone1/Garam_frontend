@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Chart as ChartJS, LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend, Filler } from "chart.js";
 import { Line, Doughnut, Bar } from "react-chartjs-2";
@@ -7,6 +8,32 @@ ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Title, T
 
 
 export default function Chart() {
+
+    useEffect(() => {
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/faqs`, {
+                params: {
+                    offset: 0,
+                    limit: 5,
+                },
+            })
+            .then((res) => {
+                setfaqs(res.data);
+                console.log("📌 관리자 목록:", res.data);
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                    alert("해당 setting을 찾을 수 없습니다.");
+                } else {
+                    console.error("❌ 요청 실패:", err);
+                }
+            });
+    }, []);
+
+    const [faqs, setfaqs] = useState([]);
+
+
+
     // 일별 대화 트렌드
     const [ConversationChart, setConversationChart] = useState(null);
     const [ConversationchartOptions, setConversationChartOptions] = useState({});
@@ -354,42 +381,17 @@ export default function Chart() {
                             <div className="chart-header">
                                 <h3 className="chart-title">인기 질문 TOP 5</h3>
                             </div>
+
                             <div className="questions-content">
-                                <div className="question-item">
-                                    <div className="question-rank">1</div>
-                                    <div className="question-content">
-                                        <div className="question-text">POS 시스템이 작동하지 않아요</div>
-                                        <div className="question-count">124회 질문 (+15%)</div>
+                                {faqs.map((faq, index) => (
+                                    <div className="question-item" key={index}>
+                                        <div className="question-rank">{index + 1}</div>
+                                        <div className="question-content">
+                                            <div className="question-text">{faq.question}</div>
+                                            <div className="question-count">{faq.views}회 질문 (+{faq.satisfaction_rate}%)</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="question-item">
-                                    <div className="question-rank">2</div>
-                                    <div className="question-content">
-                                        <div className="question-text">키오스크 사용법을 알려주세요</div>
-                                        <div className="question-count">89회 질문 (+8%)</div>
-                                    </div>
-                                </div>
-                                <div className="question-item">
-                                    <div className="question-rank">3</div>
-                                    <div className="question-content">
-                                        <div className="question-text">결제가 안 됩니다</div>
-                                        <div className="question-count">67회 질문 (-5%)</div>
-                                    </div>
-                                </div>
-                                <div className="question-item">
-                                    <div className="question-rank">4</div>
-                                    <div className="question-content">
-                                        <div className="question-text">영업시간이 언제인가요?</div>
-                                        <div className="question-count">54회 질문 (+2%)</div>
-                                    </div>
-                                </div>
-                                <div className="question-item">
-                                    <div className="question-rank">5</div>
-                                    <div className="question-content">
-                                        <div className="question-text">환불 절차를 알려주세요</div>
-                                        <div className="question-count">43회 질문 (+12%)</div>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
 

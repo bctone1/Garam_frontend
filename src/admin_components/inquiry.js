@@ -1,38 +1,46 @@
+import axios from "axios";
 import { showToast } from '../utill/utill';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function Inquiry() {
-    const adminUsers = [
-        {
-            id: 'admin1',
-            name: '김관리',
-            email: 'kim@garampos.com',
-            department: '고객지원팀',
-            assignedCount: 0,
-            completedCount: 1
-        },
-        {
-            id: 'admin2',
-            name: '이관리',
-            email: 'lee@garampos.com',
-            department: '기술지원팀',
-            assignedCount: 1,
-            completedCount: 0
-        },
-        {
-            id: 'admin3',
-            name: '박관리',
-            email: 'park@garampos.com',
-            department: '운영팀',
-            assignedCount: 0,
-            completedCount: 0
-        }
-    ];
+export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }) {
+    const admin_name = sessionStorage.getItem("admin_name");
+    useEffect(() => {
+        console.log(role);
+        console.log(admin_name);
+        setcurrentAdminUser(admin_name);
+    }, [admin_name]);
+
+
+    useEffect(() => {
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/admin_users`, {
+                params: {
+                    offset: 0,
+                    limit: 50,
+                    // 필요하다면 department, q도 추가 가능
+                    // department: "HR",
+                    // q: "홍길동"
+                },
+            })
+            .then((res) => {
+                setadminUsers(res.data);
+                console.log("📌 관리자 목록:", res.data);
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                    alert("해당 setting을 찾을 수 없습니다.");
+                } else {
+                    console.error("❌ 요청 실패:", err);
+                }
+            });
+    }, []);
+
+    const [adminUsers, setadminUsers] = useState([]);
 
     const inquiries = [
         {
             id: 1,
-            name: '홍길동',
+            name: '문의자1',
             company: '가람포스텍',
             phone: '010-1234-5678',
             content: 'POS 시스템이 갑자기 꺼져서 재부팅을 해도 계속 같은 문제가 발생합니다. 긴급히 해결이 필요합니다.',
@@ -50,13 +58,13 @@ export default function Inquiry() {
         },
         {
             id: 2,
-            name: '김영희',
+            name: '문의자2',
             company: '스마트카페',
             phone: '010-2345-6789',
             content: '키오스크 터치 반응이 느려서 고객들이 불편해하고 있습니다. 설정 방법을 알려주세요.',
             status: 'processing',
             createdDate: '2024-12-20 13:15',
-            assignee: '이관리',
+            assignee: '임영빈',
             assignedDate: '2024-12-20 13:45',
             history: [
                 {
@@ -67,7 +75,7 @@ export default function Inquiry() {
                 },
                 {
                     action: '담당자 배정',
-                    admin: '이관리',
+                    admin: '임영빈',
                     timestamp: '2024-12-20 13:45',
                     details: '이관리님이 문의를 담당하게 되었습니다.'
                 }
@@ -75,13 +83,13 @@ export default function Inquiry() {
         },
         {
             id: 3,
-            name: '박철수',
+            name: '문의자3',
             company: '베이커리하우스',
             phone: '010-3456-7890',
             content: '프린터에서 영수증이 출력되지 않습니다. 용지는 충분한 상태인데 어떻게 해야 할까요?',
             status: 'completed',
             createdDate: '2024-12-19 16:20',
-            assignee: '김관리',
+            assignee: '박인식',
             assignedDate: '2024-12-19 16:30',
             completedDate: '2024-12-20 09:30',
             history: [
@@ -93,22 +101,20 @@ export default function Inquiry() {
                 },
                 {
                     action: '담당자 배정',
-                    admin: '김관리',
+                    admin: '박인식',
                     timestamp: '2024-12-19 16:30',
                     details: '김관리님이 문의를 담당하게 되었습니다.'
                 },
                 {
                     action: '처리 완료',
-                    admin: '김관리',
+                    admin: '박인식',
                     timestamp: '2024-12-20 09:30',
                     details: '프린터 드라이버 재설치로 문제가 해결되었습니다.'
                 }
             ]
         }
     ];
-    const [currentAdminUser, setcurrentAdminUser] = useState("김관리");
-
-
+    const [currentAdminUser, setcurrentAdminUser] = useState("");
 
     const [openAddAdminModal, setopenAddAdminModal] = useState(false);
 
@@ -116,7 +122,6 @@ export default function Inquiry() {
         <>
             <div className={`modal ${openAddAdminModal ? "show" : ""}`} id="addAdminModal" onClick={() => setopenAddAdminModal(false)}>
                 <AddAdminModal setopenAddAdminModal={setopenAddAdminModal} />
-
             </div>
 
             <main className="inquiry-main-content">
@@ -126,7 +131,7 @@ export default function Inquiry() {
 
                     <div className="stats-grid">
                         <div className="stat-card">
-                            <div className="stat-number">0</div>
+                            <div className="stat-number">{inquiries.length}</div>
                             <div className="stat-label">전체 문의</div>
                         </div>
                         <div className="stat-card">
@@ -152,16 +157,32 @@ export default function Inquiry() {
                 <div className="admin-management">
                     <div className="section-header">
                         <h3 className="section-title">관리자 관리</h3>
-                        <button className="btn btn-primary"
-                            onClick={() => setopenAddAdminModal(true)}
-                        >
-                            <i className="fas fa-user-plus"></i>
-                            관리자 추가
-                        </button>
+
+                        {role === "superadmin" && (
+                            <button className="btn btn-primary"
+                                onClick={() => setopenAddAdminModal(true)}
+                            >
+                                <i className="fas fa-user-plus"></i>
+                                관리자 추가
+                            </button>
+                        )}
+
+
+
+
+
                     </div>
                     <div className="admin-grid" id="adminGrid">
                         {/* 관리자 카드들이 동적으로 추가됩니다 */}
-                        <RenderAdminGrid adminUsers={adminUsers} currentAdminUser={currentAdminUser} setcurrentAdminUser={setcurrentAdminUser} />
+                        <RenderAdminGrid
+                            adminUsers={adminUsers}
+                            currentAdminUser={currentAdminUser}
+                            setcurrentAdminUser={setcurrentAdminUser}
+                            setRole={setRole}
+                            role={role}
+                            setadmin_email={setadmin_email}
+                            setadmin_name={setadmin_name}
+                        />
                     </div>
                 </div>
 
@@ -171,14 +192,18 @@ export default function Inquiry() {
                     </div>
                     <div className="inquiry-list" id="inquiryList">
                         {/* 문의 목록이 여기에 동적으로 추가됩니다 */}
-                        <RenderInquiries inquiries={inquiries} adminUsers={adminUsers} currentAdminUser={currentAdminUser} />
+                        <RenderInquiries inquiries={inquiries} adminUsers={adminUsers} currentAdminUser={currentAdminUser} role={role} />
                     </div>
                 </div>
             </main>
         </>
     )
 }
-function RenderInquiries({ inquiries, adminUsers, currentAdminUser }) {
+
+function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role }) {
+
+    const sudo = role === "superadmin" ? true : false
+
     const statusText = {
         new: "신규",
         processing: "처리중",
@@ -193,6 +218,11 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser }) {
         completed: "status-completed",
     };
 
+    const filteredInquiries = inquiries.filter((inquiry) => {
+        if (sudo) return true; // superadmin은 모든 항목 표시
+        return inquiry.assignee && inquiry.assignee === currentAdminUser;
+    });
+
     if (inquiries.length === 0) {
         return (
             <div className="empty-state">
@@ -206,9 +236,8 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser }) {
 
     return (
         <>
-            {inquiries.map((inquiry) => {
+            {filteredInquiries.map((inquiry) => {
                 const isCurrentUser = inquiry.assignee === currentAdminUser;
-
                 const processorInfo = inquiry.assignee && (
                     <div className="processor-info">
                         <div className="assignee-avatar">{inquiry.assignee.charAt(0)}</div>
@@ -241,19 +270,12 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser }) {
                 if (inquiry.status === "new") {
                     actionButtons = (
                         <div className="assign-dropdown">
-                            <button
-                                className="btn btn-warning btn-sm"
-
-                            >
+                            <button className="btn btn-warning btn-sm">
                                 <i className="fas fa-user-plus"></i> 담당자 지정
                             </button>
                             <div className="assign-dropdown-menu" id={`dropdown-${inquiry.id}`}>
                                 {adminUsers.map((admin) => (
-                                    <div
-                                        key={admin.name}
-                                        className="assign-dropdown-item"
-
-                                    >
+                                    <div key={admin.name} className="assign-dropdown-item">
                                         <div className="admin-avatar">{admin.name.charAt(0)}</div>
                                         <div>
                                             <div style={{ fontWeight: 600 }}>{admin.name}</div>
@@ -271,7 +293,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser }) {
                             </div>
                         </div>
                     );
-                } else if (inquiry.status === "processing" && isCurrentUser) {
+                } else if (inquiry.status === "processing" && (isCurrentUser || sudo)) {
                     actionButtons = (
                         <div className="action-buttons">
                             <button
@@ -335,7 +357,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser }) {
                             </button>
                         </div>
                     );
-                } else if (inquiry.status === "on_hold" && isCurrentUser) {
+                } else if (inquiry.status === "on_hold" && (isCurrentUser || sudo)) {
                     actionButtons = (
                         <div className="action-buttons">
                             <button
@@ -425,20 +447,32 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser }) {
 
 
 
-function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser }) {
-    const switchToAdmin = (adminName) => {
-        setcurrentAdminUser(adminName)
-        // alert(adminName);
-        // currentAdminUser = adminName;
-        // const userNameElement = document.querySelector('.user-name');
-        // if (userNameElement) {
-        //     userNameElement.textContent = currentAdminUser;
-        // }
+function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name }) {
+    const switchToAdmin = (admin) => {
+        // alert(admin.email);
+        const inputPassword = prompt(`"${admin.name}" 계정의 비밀번호를 입력하세요:`);
+
+        if (!inputPassword) return;
 
 
-        showToast(`${adminName}으로 전환되었습니다.`, 'info');
+        if (inputPassword === admin.password) {
+            const newRole = admin.id === 0 ? "superadmin" : "admin";
+            sessionStorage.setItem("role", newRole);
+            sessionStorage.setItem("admin_name", admin.name);
+            sessionStorage.setItem("admin_email", admin.email);
+            sessionStorage.setItem("admin_id", admin.id);
 
-    }
+            setRole(newRole); // <-- React state 갱신
+            setadmin_email(admin.email);
+            setadmin_name(admin.name);
+
+            setcurrentAdminUser(admin.name);
+            showToast(`${admin.name}으로 전환되었습니다.`, "info");
+        } else {
+            alert("❌ 비밀번호가 틀립니다.");
+        }
+    };
+
     return (
         <>
             {adminUsers.map((admin) => {
@@ -484,24 +518,28 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser }) 
                             {!isCurrentUser && (
                                 <button
                                     className="btn btn-sm btn-primary"
-                                    onClick={() => switchToAdmin(admin.name)}
+                                    onClick={() => switchToAdmin(admin)}
                                 >
                                     <i className="fas fa-exchange-alt"></i> 전환
                                 </button>
                             )}
 
-                            <button
-                                className="btn btn-sm btn-danger"
+                            {role === "superadmin" && (
+                                <button
+                                    className="btn btn-sm btn-danger"
 
-                                disabled={isCurrentUser}
-                                style={
-                                    isCurrentUser
-                                        ? { opacity: 0.5, cursor: "not-allowed" }
-                                        : {}
-                                }
-                            >
-                                <i className="fas fa-trash"></i> 삭제
-                            </button>
+                                    disabled={isCurrentUser}
+                                    style={
+                                        isCurrentUser
+                                            ? { opacity: 0.5, cursor: "not-allowed" }
+                                            : {}
+                                    }
+                                >
+                                    <i className="fas fa-trash"></i> 삭제
+                                </button>
+
+                            )}
+
                         </div>
                     </div>
                 );
@@ -512,14 +550,25 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser }) 
 
 function AddAdminModal({ setopenAddAdminModal }) {
     const [NewUser, setNewUser] = useState({});
+
+    const create_admin = () => {
+
+
+        showToast(`${NewUser.name} 관리자가 추가되었습니다.`, 'success')
+        setopenAddAdminModal(false)
+    }
+
+
     return (
         <div className="modal-content" onClick={(event) => event.stopPropagation()}>
+
             <div className="modal-header">
                 <h3 className="modal-title">관리자 추가</h3>
                 <button className="modal-close" onClick={() => setopenAddAdminModal(false)}>
                     &times;
                 </button>
             </div>
+
             <div id="addAdminForm">
                 <div className="form-group">
                     <label className="form-label">이름</label>
@@ -566,7 +615,7 @@ function AddAdminModal({ setopenAddAdminModal }) {
                         취소
                     </button>
                     <button type="submit" className="btn btn-primary"
-                        onClick={() => showToast(`${NewUser.name} 관리자가 추가되었습니다.`, 'success')}
+                        onClick={() => create_admin()}
                     >
                         추가
                     </button>

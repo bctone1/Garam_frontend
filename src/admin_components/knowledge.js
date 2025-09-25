@@ -1,7 +1,36 @@
-import { useState, useRef } from 'react';
+import axios from "axios";
+import { useState, useRef, useEffect } from 'react';
 import { showToast } from '../utill/utill';
 
 export default function Knowledge() {
+
+    const fetch_FAQ = () => {
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/faqs`, {
+                params: {
+                    offset: 0,
+                    limit: 50,
+                    // 필요하다면 department, q도 추가 가능
+                    // department: "HR",
+                    // q: "홍길동"
+                },
+            })
+            .then((res) => {
+                setfaqs(res.data);
+                console.log("📌 관리자 목록:", res.data);
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                    alert("해당 setting을 찾을 수 없습니다.");
+                } else {
+                    console.error("❌ 요청 실패:", err);
+                }
+            });
+    }
+    useEffect(() => {
+        fetch_FAQ();
+    }, []);
+
 
     const [contentTap, setcontentTap] = useState("documentsTab");
 
@@ -41,13 +70,13 @@ export default function Knowledge() {
         setOpenId(openId === id ? null : id); // 이미 열려있으면 닫기
     };
 
-    const faqs = [
+    const [faqs, setfaqs] = useState([
         {
             id: 1,
             question: "POS 시스템이 갑자기 꺼졌을 때는 어떻게 해야 하나요?",
             views: 127,
-            satisfaction: "94%",
-            created: "2024-06-20",
+            satisfaction_rate: "94%",
+            created_at: "2024-06-20",
             answer: (
                 <>
                     <p>POS 시스템이 갑자기 꺼진 경우 다음 단계를 따라주세요:</p>
@@ -63,8 +92,8 @@ export default function Knowledge() {
             id: 2,
             question: "카드 결제가 안될 때 해결방법은 무엇인가요?",
             views: 98,
-            satisfaction: "89%",
-            created: "2024-06-18",
+            satisfaction_rate: "89%",
+            created_at: "2024-06-18",
             answer: (
                 <>
                     <p>카드 결제 문제 해결 방법:</p>
@@ -81,8 +110,8 @@ export default function Knowledge() {
             id: 3,
             question: "키오스크 화면이 멈췄을 때 대처방법을 알려주세요",
             views: 76,
-            satisfaction: "92%",
-            created: "2024-06-18",
+            satisfaction_rate: "92%",
+            created_at: "2024-06-18",
             answer: (
                 <>
                     <p>키오스크 화면 멈춤 현상 해결:</p>
@@ -99,8 +128,8 @@ export default function Knowledge() {
             id: 4,
             question: "시스템 초기 설정은 어떻게 하나요?",
             views: 145,
-            satisfaction: "96%",
-            created: "2024-06-18",
+            satisfaction_rate: "96%",
+            created_at: "2024-06-18",
             answer: (
                 <>
                     <p>시스템 초기 설정 방법:</p>
@@ -117,8 +146,8 @@ export default function Knowledge() {
             id: 5,
             question: "시스템 백업은 어떻게 하나요?",
             views: 63,
-            satisfaction: "88%",
-            created: "2024-06-18",
+            satisfaction_rate: "88%",
+            created_at: "2024-06-18",
             answer: (
                 <>
                     <p>시스템 백업 절차:</p>
@@ -131,9 +160,7 @@ export default function Knowledge() {
                 </>
             ),
         },
-
-
-    ];
+    ]);
 
 
     const fileInputRef = useRef(null);
@@ -163,7 +190,7 @@ export default function Knowledge() {
     return (
         <>
             <div className={`modal ${showAddFaqModal ? "show" : ""}`} id="faqAddModal" style={{ display: `${showAddFaqModal ? "flex" : "none"}` }}>
-                <FaqModal setshowAddFaqModal={setshowAddFaqModal} />
+                <FaqModal setshowAddFaqModal={setshowAddFaqModal} fetch_FAQ={fetch_FAQ} />
             </div>
 
 
@@ -341,7 +368,7 @@ export default function Knowledge() {
                                                         <i className="fas fa-eye"></i> {faq.views}회
                                                     </span>
                                                     <span>
-                                                        <i className="fas fa-thumbs-up"></i> {faq.satisfaction}
+                                                        <i className="fas fa-thumbs-up"></i> {faq.satisfaction_rate}
                                                     </span>
                                                 </div>
                                                 <button
@@ -376,10 +403,10 @@ export default function Knowledge() {
                                             <div className="faq-answer">{faq.answer}</div>
                                             <div className="faq-meta">
                                                 <span>
-                                                    <strong>생성일:</strong> {faq.created}
+                                                    <strong>생성일:</strong> {new Date(faq.created_at).toISOString().split('T')[0]}
                                                 </span>
                                                 <span>
-                                                    <strong>만족도:</strong> {faq.satisfaction}
+                                                    <strong>만족도:</strong> {faq.satisfaction_rate}
                                                 </span>
                                             </div>
                                         </div>
@@ -450,7 +477,25 @@ function getFileIcon(type) {
     return iconMap[type] || 'fa-file';
 }
 
-function FaqModal({ setshowAddFaqModal }) {
+function FaqModal({ setshowAddFaqModal, fetch_FAQ }) {
+    const [newFAQ, setnewFAQ] = useState({
+        question: "",
+        answer: "",
+    });
+
+    const createFAQ = () => {
+        console.log(newFAQ);
+        axios.post(`${process.env.REACT_APP_API_URL}/faqs`, newFAQ)
+            .then((res) => {
+                console.log("생성된 FAQ:", res.data);
+                setshowAddFaqModal(false);
+                fetch_FAQ();
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }
+
     return (
         <>
             <div className="modal-backdrop" onClick={() => setshowAddFaqModal(false)}></div>
@@ -485,6 +530,10 @@ function FaqModal({ setshowAddFaqModal }) {
                                     borderRadius: "var(--border-radius)",
                                     fontSize: "1rem",
                                 }}
+                                value={newFAQ.question}
+                                onChange={(e) =>
+                                    setnewFAQ((prev) => ({ ...prev, question: e.target.value }))
+                                }
                             />
                         </div>
 
@@ -512,6 +561,10 @@ function FaqModal({ setshowAddFaqModal }) {
                                     resize: "vertical",
                                     fontFamily: "inherit",
                                 }}
+                                value={newFAQ.answer}
+                                onChange={(e) =>
+                                    setnewFAQ((prev) => ({ ...prev, answer: e.target.value }))
+                                }
                             />
                         </div>
 
@@ -547,7 +600,9 @@ function FaqModal({ setshowAddFaqModal }) {
                     <button className="btn btn-secondary" onClick={() => setshowAddFaqModal(false)}>
                         취소
                     </button>
-                    <button className="btn btn-primary" >
+                    <button className="btn btn-primary"
+                        onClick={() => createFAQ()}
+                    >
                         <i className="fas fa-plus"></i> FAQ 추가
                     </button>
                 </div>

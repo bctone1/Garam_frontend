@@ -4,11 +4,44 @@ import { showNotification } from '../utill/utill';
 
 
 export default function Chatbot() {
-    const settingId = 1;
+    // useEffect(() => {
+    //     axios
+    //         .get(`${process.env.REACT_APP_API_URL}/system/settings/${settingId}/quick-categories`, {
+    //             params: {
+    //                 offset: 0,
+    //                 limit: 50,
+    //             },
+    //         })
+    //         .then((res) => {
+    //             setCategories(res.data);
+    //             console.log(res.data);
+    //         })
+    //         .catch((err) => {
+    //             if (err.response && err.response.status === 404) {
+    //                 alert("해당 setting을 찾을 수 없습니다.");
+    //             } else {
+    //                 console.error(err);
+    //             }
+    //         });
+    // }, [settingId]);
 
     useEffect(() => {
         axios
-            .get(`${process.env.REACT_APP_API_URL}/system/settings/${settingId}/quick-categories`, {
+            .get(`${process.env.REACT_APP_API_URL}/system/setting`)
+            .then((res) => {
+                setsystemSettings(res.data); // 단일 객체 반환
+                console.log(res.data);
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                    alert("해당 setting을 찾을 수 없습니다.");
+                } else {
+                    console.error(err);
+                }
+            });
+
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/system/quick-categories`, {
                 params: {
                     offset: 0,
                     limit: 50,
@@ -25,12 +58,16 @@ export default function Chatbot() {
                     console.error(err);
                 }
             });
-    }, [settingId]);
+    }, []);
 
+    const [systemSettings, setsystemSettings] = useState({
+        welcome_title: "",
+        welcome_message: "",
+        emergency_phone: "",
+        emergency_email: "",
+        operating_hours: "",
 
-
-
-
+    });
     const [categories, setCategories] = useState([]);
 
     const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
@@ -111,7 +148,18 @@ export default function Chatbot() {
 
                         <div className="form-group">
                             <label className="form-label">환영 제목</label>
-                            <input type="text" className="form-input" value="안녕하세요! 가람포스텍 AI 지원센터입니다" id="welcomeTitle" readOnly />
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={systemSettings?.welcome_title}
+                                id="welcomeTitle"
+                                onChange={(e) =>
+                                    setsystemSettings((prev) => ({
+                                        ...prev,
+                                        welcome_title: e.target.value
+                                    }))
+                                }
+                            />
                             <div className="form-help">사용자가 처음 보는 메시지 제목</div>
                         </div>
 
@@ -120,8 +168,13 @@ export default function Chatbot() {
                             <textarea
                                 className="form-input form-textarea"
                                 id="welcomeMessage"
-                                readOnly
-                                value="POS 시스템, 키오스크, 결제 단말기 관련 궁금한 점이나 문제가 있으시면 언제든지 말씀해 주세요!"
+                                value={systemSettings?.welcome_message}
+                                onChange={(e) =>
+                                    setsystemSettings((prev) => ({
+                                        ...prev,
+                                        welcome_message: e.target.value
+                                    }))
+                                }
                             />
 
                             <div className="form-help">환영 제목 아래 표시되는 설명</div>
@@ -225,20 +278,41 @@ export default function Chatbot() {
                     <div className="contact-grid">
                         <div className="form-group">
                             <label className="form-label">기술지원 전화번호</label>
-                            <input type="tel" className="form-input" value="1588-1234" id="emergencyPhone" readOnly />
+                            <input type="tel" className="form-input" value={systemSettings?.emergency_phone} id="emergencyPhone"
+                                onChange={(e) =>
+                                    setsystemSettings((prev) => ({
+                                        ...prev,
+                                        emergency_phone: e.target.value
+                                    }))
+                                }
+                            />
                             <div className="form-help">긴급 상황 시 연결될 번호</div>
                         </div>
 
                         <div className="form-group">
                             <label className="form-label">기술지원 이메일</label>
-                            <input type="email" className="form-input" value="tech@garampos.com" id="emergencyEmail" readOnly />
+                            <input type="email" className="form-input" value={systemSettings?.emergency_email} id="emergencyEmail"
+                                onChange={(e) =>
+                                    setsystemSettings((prev) => ({
+                                        ...prev,
+                                        emergency_email: e.target.value
+                                    }))
+                                }
+                            />
                             <div className="form-help">문의 접수용 이메일</div>
                         </div>
                     </div>
 
                     <div className="form-group">
                         <label className="form-label">운영 시간</label>
-                        <select className="form-input" id="operatingHours">
+                        <select className="form-input" id="operatingHours" value={systemSettings?.operating_hours}
+                            onChange={(e) =>
+                                setsystemSettings((prev) => ({
+                                    ...prev,
+                                    operating_hours: e.target.value
+                                }))
+                            }
+                        >
                             <option value="24/7">연중무휴 24시간</option>
                             <option value="business">평일 09:00-18:00</option>
                             <option value="extended">평일 08:00-22:00</option>
@@ -258,7 +332,14 @@ export default function Chatbot() {
 
                     <div className="form-group">
                         <label className="form-label">파일 업로드 허용</label>
-                        <select className="form-input" id="fileUpload">
+                        <select className="form-input" id="fileUpload" value={systemSettings?.file_upload_mode}
+                            onChange={(e) =>
+                                setsystemSettings((prev) => ({
+                                    ...prev,
+                                    file_upload_mode: e.target.value
+                                }))
+                            }
+                        >
                             <option value="true">허용 (이미지, 문서)</option>
                             <option value="images">이미지만 허용</option>
                             <option value="false">차단</option>
@@ -268,7 +349,14 @@ export default function Chatbot() {
 
                     <div className="form-group">
                         <label className="form-label">세션 유지 시간</label>
-                        <select className="form-input" id="sessionDuration">
+                        <select className="form-input" id="sessionDuration" value={systemSettings?.session_duration}
+                            onChange={(e) =>
+                                setsystemSettings((prev) => ({
+                                    ...prev,
+                                    session_duration: e.target.value
+                                }))
+                            }
+                        >
                             <option value="30">30분</option>
                             <option value="60" >1시간</option>
                             <option value="120">2시간</option>
@@ -279,7 +367,14 @@ export default function Chatbot() {
 
                     <div className="form-group">
                         <label className="form-label">최대 메시지 수</label>
-                        <select className="form-input" id="maxMessages">
+                        <select className="form-input" id="maxMessages" value={systemSettings?.max_messages}
+                            onChange={(e) =>
+                                setsystemSettings((prev) => ({
+                                    ...prev,
+                                    max_messages: e.target.value
+                                }))
+                            }
+                        >
                             <option value="10">10개</option>
                             <option value="30" >30개</option>
                             <option value="50">50개</option>
