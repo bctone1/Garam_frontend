@@ -5,13 +5,11 @@ import { useState, useEffect } from 'react';
 export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }) {
     const admin_name = sessionStorage.getItem("admin_name");
     useEffect(() => {
-        console.log(role);
-        console.log(admin_name);
         setcurrentAdminUser(admin_name);
     }, [admin_name]);
 
 
-    useEffect(() => {
+    const fetch_admin_users = () => {
         axios
             .get(`${process.env.REACT_APP_API_URL}/admin_users`, {
                 params: {
@@ -33,11 +31,34 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                     console.error("❌ 요청 실패:", err);
                 }
             });
+    }
+
+    useEffect(() => {
+        fetch_admin_users();
+        fetch_inquiry_list();
+
     }, []);
+
+
+    const fetch_inquiry_list = () => {
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/inquiries/get_inquiry_list`)
+            .then((res) => {
+                setinquiries(res.data);
+                console.log("📌 문의 목록:", res.data);
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                    alert("해당 setting을 찾을 수 없습니다.");
+                } else {
+                    console.error("❌ 요청 실패:", err);
+                }
+            });
+    }
 
     const [adminUsers, setadminUsers] = useState([]);
 
-    const inquiries = [
+    const [inquiries, setinquiries] = useState([
         {
             id: 1,
             name: '문의자1',
@@ -113,7 +134,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                 }
             ]
         }
-    ];
+    ]);
     const [currentAdminUser, setcurrentAdminUser] = useState("");
 
     const [openAddAdminModal, setopenAddAdminModal] = useState(false);
@@ -121,7 +142,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     return (
         <>
             <div className={`modal ${openAddAdminModal ? "show" : ""}`} id="addAdminModal" onClick={() => setopenAddAdminModal(false)}>
-                <AddAdminModal setopenAddAdminModal={setopenAddAdminModal} />
+                <AddAdminModal setopenAddAdminModal={setopenAddAdminModal} fetch_admin_users={fetch_admin_users} />
             </div>
 
             <main className="inquiry-main-content">
@@ -173,7 +194,6 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
 
                     </div>
                     <div className="admin-grid" id="adminGrid">
-                        {/* 관리자 카드들이 동적으로 추가됩니다 */}
                         <RenderAdminGrid
                             adminUsers={adminUsers}
                             currentAdminUser={currentAdminUser}
@@ -182,6 +202,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                             role={role}
                             setadmin_email={setadmin_email}
                             setadmin_name={setadmin_name}
+                            inquiries={inquiries}
                         />
                     </div>
                 </div>
@@ -191,8 +212,13 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                         <h3 className="section-title">문의 목록</h3>
                     </div>
                     <div className="inquiry-list" id="inquiryList">
-                        {/* 문의 목록이 여기에 동적으로 추가됩니다 */}
-                        <RenderInquiries inquiries={inquiries} adminUsers={adminUsers} currentAdminUser={currentAdminUser} role={role} />
+                        <RenderInquiries
+                            inquiries={inquiries}
+                            adminUsers={adminUsers}
+                            currentAdminUser={currentAdminUser}
+                            role={role}
+                            setinquiries={setinquiries}
+                        />
                     </div>
                 </div>
             </main>
@@ -200,7 +226,8 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     )
 }
 
-function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role }) {
+function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries }) {
+    const [openDropdownId, setOpenDropdownId] = useState(null);
 
     const sudo = role === "superadmin" ? true : false
 
@@ -233,6 +260,62 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role }) {
             </div>
         );
     }
+    const toggleDropdown = (id) => {
+        setOpenDropdownId((prev) => (prev === id ? null : id));
+    };
+
+    const handleSelectAdmin = ({ admin, inquiry, action }) => {
+        if (action === "신규배정") {
+            setinquiries((prevInquiries) =>
+                prevInquiries.map((item) =>
+                    item.id === inquiry.id
+                        ? {
+                            ...item,
+                            status: "processing",
+                            assignee: admin.name,          // 담당자 교체
+                            assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "), // 배정 시간도 업데이트 가능
+                            history: [
+                                ...(item.history || []),
+                                {
+                                    action: "assign",
+                                    admin: admin.name,
+                                    timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+                                    details: `${admin.name}님이 문의를 담당하게 되었습니다.`,
+                                },
+                            ],
+                        }
+                        : item
+                )
+            );
+        } else {
+            setinquiries((prevInquiries) =>
+                prevInquiries.map((item) =>
+                    item.id === inquiry.id
+                        ? {
+                            ...item,
+                            status: "processing",
+                            assignee: admin.name,
+                            assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+                            history: [
+                                ...(item.history || []),
+                                {
+                                    action: "assign",
+                                    admin: admin.name,
+                                    timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+                                    details: `${admin.name}님이 문의를 담당하게 되었습니다.`,
+                                },
+                            ],
+                        }
+                        : item
+                )
+            );
+
+        }
+
+        showToast(`${admin.name}문의가 ${action}되었습니다.`, "info");
+        toggleDropdown(inquiry.id); // 드롭다운 닫기
+    };
+
 
     return (
         <>
@@ -270,12 +353,21 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role }) {
                 if (inquiry.status === "new") {
                     actionButtons = (
                         <div className="assign-dropdown">
-                            <button className="btn btn-warning btn-sm">
+                            <button
+                                className="btn btn-warning btn-sm"
+                                onClick={() => toggleDropdown(inquiry.id)}
+                            >
                                 <i className="fas fa-user-plus"></i> 담당자 지정
                             </button>
-                            <div className="assign-dropdown-menu" id={`dropdown-${inquiry.id}`}>
+
+                            <div
+                                className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`}
+                                id={`dropdown-${inquiry.id}`}
+                            >
                                 {adminUsers.map((admin) => (
-                                    <div key={admin.name} className="assign-dropdown-item">
+                                    <div key={admin.name} className="assign-dropdown-item"
+                                        onClick={() => handleSelectAdmin({ admin, inquiry, action: "신규배정" })}
+                                    >
                                         <div className="admin-avatar">{admin.name.charAt(0)}</div>
                                         <div>
                                             <div style={{ fontWeight: 600 }}>{admin.name}</div>
@@ -317,36 +409,32 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role }) {
                             <div className="assign-dropdown">
                                 <button
                                     className="btn btn-primary btn-sm"
-
+                                    onClick={() => toggleDropdown(inquiry.id)}
                                 >
                                     <i className="fas fa-exchange-alt"></i> 이관
                                 </button>
                                 <div
-                                    className="assign-dropdown-menu"
-                                    id={`transfer-dropdown-${inquiry.id}`}
+                                    className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`}
+                                    id={`dropdown-${inquiry.id}`}
                                 >
-                                    {adminUsers
-                                        .filter((a) => a.name !== currentAdminUser)
-                                        .map((admin) => (
-                                            <div
-                                                key={admin.name}
-                                                className="assign-dropdown-item"
-
-                                            >
-                                                <div className="admin-avatar">{admin.name.charAt(0)}</div>
-                                                <div>
-                                                    <div style={{ fontWeight: 600 }}>{admin.name}</div>
-                                                    <div
-                                                        style={{
-                                                            fontSize: "0.75rem",
-                                                            color: "var(--text-secondary)",
-                                                        }}
-                                                    >
-                                                        {admin.department}
-                                                    </div>
+                                    {adminUsers.map((admin) => (
+                                        <div key={admin.name} className="assign-dropdown-item"
+                                            onClick={() => handleSelectAdmin({ admin, inquiry, action: "이관" })}
+                                        >
+                                            <div className="admin-avatar">{admin.name.charAt(0)}</div>
+                                            <div>
+                                                <div style={{ fontWeight: 600 }}>{admin.name}</div>
+                                                <div
+                                                    style={{
+                                                        fontSize: "0.75rem",
+                                                        color: "var(--text-secondary)",
+                                                    }}
+                                                >
+                                                    {admin.department}
                                                 </div>
                                             </div>
-                                        ))}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                             <button
@@ -373,34 +461,32 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role }) {
                             <div className="assign-dropdown">
                                 <button
                                     className="btn btn-primary btn-sm"
+                                    onClick={() => toggleDropdown(inquiry.id)}
                                 >
                                     <i className="fas fa-exchange-alt"></i> 이관
                                 </button>
                                 <div
-                                    className="assign-dropdown-menu"
-                                    id={`transfer-dropdown-${inquiry.id}`}
+                                    className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`}
+                                    id={`dropdown-${inquiry.id}`}
                                 >
-                                    {adminUsers
-                                        .filter((a) => a.name !== currentAdminUser)
-                                        .map((admin) => (
-                                            <div
-                                                key={admin.name}
-                                                className="assign-dropdown-item"
-                                            >
-                                                <div className="admin-avatar">{admin.name.charAt(0)}</div>
-                                                <div>
-                                                    <div style={{ fontWeight: 600 }}>{admin.name}</div>
-                                                    <div
-                                                        style={{
-                                                            fontSize: "0.75rem",
-                                                            color: "var(--text-secondary)",
-                                                        }}
-                                                    >
-                                                        {admin.department}
-                                                    </div>
+                                    {adminUsers.map((admin) => (
+                                        <div key={admin.name} className="assign-dropdown-item"
+                                            onClick={() => handleSelectAdmin({ admin, inquiry, action: "이관" })}
+                                        >
+                                            <div className="admin-avatar">{admin.name.charAt(0)}</div>
+                                            <div>
+                                                <div style={{ fontWeight: 600 }}>{admin.name}</div>
+                                                <div
+                                                    style={{
+                                                        fontSize: "0.75rem",
+                                                        color: "var(--text-secondary)",
+                                                    }}
+                                                >
+                                                    {admin.department}
                                                 </div>
                                             </div>
-                                        ))}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                             <button
@@ -447,14 +533,18 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role }) {
 
 
 
-function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name }) {
+function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries }) {
+
+    const getAssignedCount = (adminName) =>
+        inquiries.filter(i => i.assignee === adminName && i.status === "processing").length;
+
+    const getCompletedCount = (adminName) =>
+        inquiries.filter(i => i.assignee === adminName && i.status === "completed").length;
+
+
     const switchToAdmin = (admin) => {
-        // alert(admin.email);
         const inputPassword = prompt(`"${admin.name}" 계정의 비밀번호를 입력하세요:`);
-
         if (!inputPassword) return;
-
-
         if (inputPassword === admin.password) {
             const newRole = admin.id === 0 ? "superadmin" : "admin";
             sessionStorage.setItem("role", newRole);
@@ -477,9 +567,8 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
         <>
             {adminUsers.map((admin) => {
                 const isCurrentUser = admin.name === currentAdminUser;
-
-
-
+                const assignedCount = getAssignedCount(admin.name);
+                const completedCount = getCompletedCount(admin.name);
                 return (
                     <div
                         key={admin.id}
@@ -503,16 +592,18 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
                             </div>
                         </div>
 
+
                         <div className="admin-stats">
                             <div className="admin-stat">
-                                <div className="admin-stat-number">{admin.assignedCount}</div>
+                                <div className="admin-stat-number">{assignedCount}</div>
                                 <div className="admin-stat-label">담당 중</div>
                             </div>
                             <div className="admin-stat">
-                                <div className="admin-stat-number">{admin.completedCount}</div>
+                                <div className="admin-stat-number">{completedCount}</div>
                                 <div className="admin-stat-label">완료</div>
                             </div>
                         </div>
+
 
                         <div className="admin-actions">
                             {!isCurrentUser && (
@@ -548,14 +639,20 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
     );
 }
 
-function AddAdminModal({ setopenAddAdminModal }) {
+function AddAdminModal({ setopenAddAdminModal, fetch_admin_users }) {
     const [NewUser, setNewUser] = useState({});
 
     const create_admin = () => {
-
-
-        showToast(`${NewUser.name} 관리자가 추가되었습니다.`, 'success')
-        setopenAddAdminModal(false)
+        axios.post(`${process.env.REACT_APP_API_URL}/admin_users`, NewUser)
+            .then((res) => {
+                console.log("생성된 관리자:", res.data);
+                showToast(`${NewUser.name} 관리자가 추가되었습니다.`, 'success');
+                setopenAddAdminModal(false);
+                fetch_admin_users();
+            })
+            .catch((err) => {
+                showToast("관리자 추가중 오류가 발생했습니다.", 'error');
+            });
     }
 
 
@@ -586,6 +683,16 @@ function AddAdminModal({ setopenAddAdminModal }) {
                         }
                     />
                 </div>
+
+                <div className="form-group">
+                    <label className="form-label">비밀번호</label>
+                    <input type="password" className="form-input" id="adminPassword" value={NewUser.password}
+                        onChange={(e) =>
+                            setNewUser((prev) => ({ ...prev, password: e.target.value }))
+                        }
+                    />
+                </div>
+
                 <div className="form-group">
                     <label className="form-label">부서</label>
                     <input
@@ -593,9 +700,9 @@ function AddAdminModal({ setopenAddAdminModal }) {
                         className="form-input"
                         id="adminDepartment"
                         placeholder="예: 고객지원팀"
-                        value={NewUser.group}
+                        value={NewUser.department}
                         onChange={(e) =>
-                            setNewUser((prev) => ({ ...prev, group: e.target.value }))
+                            setNewUser((prev) => ({ ...prev, department: e.target.value }))
                         }
                     />
                 </div>

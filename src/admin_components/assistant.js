@@ -25,7 +25,7 @@ export default function Assisstant() {
     return (
         <>
 
-            <main className="main-content">
+            <main className="assistant-main-content">
                 {/* 상단 헤더 */}
                 <header className="top-header">
                     <div className="header-left">
@@ -42,7 +42,7 @@ export default function Assisstant() {
                     </div>
                 </header>
 
-                <div className="main-container">
+                <div className="assistant-main-container">
                     {/* 현재 상태 */}
                     <div className="status-card">
                         <div className="status-header">

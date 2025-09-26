@@ -12,7 +12,7 @@ export default function Sidebar({ view, handleMenuClick, role, admin_email, admi
     ];
 
     // role이 admin이면 "문의 관리"만 보이도록 필터링
-    const visibleMenu = role === "admin"
+    const visibleMenu = role !== "superadmin" 
         ? menuItems.filter(item => item.key === "inquiry")
         : menuItems;
 

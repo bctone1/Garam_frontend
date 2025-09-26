@@ -233,7 +233,7 @@ export default function Chart() {
 
     return (
         <>
-            <main className="main-content">
+            <main className="chart-main-content">
                 <header className="top-header">
                     <div className="header-left">
                         <div className="page-title">
@@ -258,7 +258,7 @@ export default function Chart() {
                     </div>
                 </header>
 
-                <div className="main-container">
+                <div className="chart-main-container">
                     {/* 상단 성능 지표 카드들  */}
                     <div className="metrics-row">
                         <div className="metric-card">

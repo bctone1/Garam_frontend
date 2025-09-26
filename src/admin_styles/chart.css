@@ -183,7 +183,7 @@
  }
 
  /* 메인 콘텐츠 */
- .main-content {
+ .chart-main-content {
      flex: 1;
      margin-left: 280px;
      background: #f8fafc;
@@ -262,7 +262,7 @@
      background: var(--primary-dark);
  }
 
- .main-container {
+ .chart-main-container {
      padding: 2rem;
  }
 
@@ -548,7 +548,7 @@
  }
 
  @media (max-width: 1024px) {
-     .main-content {
+     .chart-main-content {
          margin-left: 0;
      }
 
@@ -566,7 +566,7 @@
          padding: 1rem;
      }
 
-     .main-container {
+     .chart-main-container {
          padding: 1rem;
      }
 
