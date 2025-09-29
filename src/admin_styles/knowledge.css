@@ -384,6 +384,7 @@ body {
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    min-height: 200px;
 }
 
 .upload-area:hover,

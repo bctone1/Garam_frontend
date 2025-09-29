@@ -27,164 +27,77 @@ export default function Knowledge() {
                 }
             });
     }
+
+    const fetch_Knowledge = () => {
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/knowledge`, {
+                params: {
+                    offset: 0,
+                    limit: 50,
+                },
+            })
+            .then((res) => {
+                setdocuments(res.data);
+                console.log("📌 지식베이스 목록:", res.data);
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                    alert("해당 setting을 찾을 수 없습니다.");
+                } else {
+                    console.error("❌ 요청 실패:", err);
+                }
+            });
+    }
+
     useEffect(() => {
+        fetch_Knowledge();
         fetch_FAQ();
     }, []);
 
+    const [uploadStatus, setuploadStatus] = useState(false);
 
     const [contentTap, setcontentTap] = useState("documentsTab");
 
-    const documents = [
-        {
-            id: 1,
-            name: 'POS 시스템 사용 매뉴얼.pdf',
-            size: '2.4 MB',
-            type: 'application/pdf',
-            uploadDate: '2024-12-20',
-            status: 'active',
-            excerpt: 'POS 시스템의 기본 사용법과 문제 해결 방법...'
-        },
-        {
-            id: 2,
-            name: '키오스크 운영 가이드.docx',
-            size: '1.8 MB',
-            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            uploadDate: '2024-12-19',
-            status: 'active',
-            excerpt: '키오스크 설치 및 운영에 관한 상세 가이드...'
-        },
-        {
-            id: 3,
-            name: '결제 시스템 정책.txt',
-            size: '0.3 MB',
-            type: 'text/plain',
-            uploadDate: '2024-12-18',
-            status: 'active',
-            excerpt: '결제 시스템 사용 정책 및 보안 가이드라인...'
-        }
-    ];
+    const [documents, setdocuments] = useState([]);
 
     const [openId, setOpenId] = useState(null);
 
     const toggleFAQ = (id) => {
         setOpenId(openId === id ? null : id); // 이미 열려있으면 닫기
     };
-
-    const [faqs, setfaqs] = useState([
-        {
-            id: 1,
-            question: "POS 시스템이 갑자기 꺼졌을 때는 어떻게 해야 하나요?",
-            views: 127,
-            satisfaction_rate: "94%",
-            created_at: "2024-06-20",
-            answer: (
-                <>
-                    <p>POS 시스템이 갑자기 꺼진 경우 다음 단계를 따라주세요:</p>
-                    <ol style={{ marginLeft: "1.5rem", marginTop: "0.5rem" }}>
-                        <li>전원 버튼을 5초간 눌러 완전히 종료한 후 다시 켜보세요</li>
-                        <li>전원 케이블과 연결 상태를 확인하세요</li>
-                        <li>문제가 지속되면 고객지원팀(1588-1234)으로 연락하세요</li>
-                    </ol>
-                </>
-            ),
-        },
-        {
-            id: 2,
-            question: "카드 결제가 안될 때 해결방법은 무엇인가요?",
-            views: 98,
-            satisfaction_rate: "89%",
-            created_at: "2024-06-18",
-            answer: (
-                <>
-                    <p>카드 결제 문제 해결 방법:</p>
-                    <ol style={{ marginLeft: "1.5rem", marginTop: "0.5rem" }}>
-                        <li>카드 리더기 연결 상태를 확인하세요</li>
-                        <li>카드를 다시 삽입하거나 터치해보세요</li>
-                        <li>다른 카드로 결제를 시도해보세요</li>
-                        <li>POS 시스템을 재시작해보세요</li>
-                    </ol>
-                </>
-            ),
-        },
-        {
-            id: 3,
-            question: "키오스크 화면이 멈췄을 때 대처방법을 알려주세요",
-            views: 76,
-            satisfaction_rate: "92%",
-            created_at: "2024-06-18",
-            answer: (
-                <>
-                    <p>키오스크 화면 멈춤 현상 해결:</p>
-                    <ol style={{ marginLeft: "1.5rem", marginTop: "0.5rem" }}>
-                        <li>화면을 10초간 터치하지 마세요</li>
-                        <li>전원 버튼을 길게 눌러 재시작하세요</li>
-                        <li>네트워크 연결 상태를 확인하세요</li>
-                        <li>문제가 반복되면 기술지원팀에 연락하세요</li>
-                    </ol>
-                </>
-            ),
-        },
-        {
-            id: 4,
-            question: "시스템 초기 설정은 어떻게 하나요?",
-            views: 145,
-            satisfaction_rate: "96%",
-            created_at: "2024-06-18",
-            answer: (
-                <>
-                    <p>시스템 초기 설정 방법:</p>
-                    <ol style={{ marginLeft: "1.5rem", marginTop: "0.5rem" }}>
-                        <li>네트워크 연결 설정을 먼저 완료하세요</li>
-                        <li>관리자 계정을 생성하세요</li>
-                        <li>매장 정보를 정확히 입력하세요</li>
-                        <li>주변기기 연동을 테스트해보세요</li>
-                    </ol>
-                </>
-            ),
-        },
-        {
-            id: 5,
-            question: "시스템 백업은 어떻게 하나요?",
-            views: 63,
-            satisfaction_rate: "88%",
-            created_at: "2024-06-18",
-            answer: (
-                <>
-                    <p>시스템 백업 절차:</p>
-                    <ol style={{ marginLeft: "1.5rem", marginTop: "0.5rem" }}>
-                        <li>관리자 메뉴에서 '시스템 관리'를 선택하세요</li>
-                        <li>'데이터 백업' 메뉴를 클릭하세요</li>
-                        <li>백업할 데이터 범위를 선택하세요</li>
-                        <li>'백업 시작' 버튼으로 백업을 실행하세요</li>
-                    </ol>
-                </>
-            ),
-        },
-    ]);
-
-
+    const [faqs, setfaqs] = useState([]);
     const fileInputRef = useRef(null);
 
     const handleFileSelect = async (e) => {
+        setuploadStatus(true);
         const selectedFile = e.target.files[0];
-        console.log("선택된 파일:", selectedFile);
-
+        // console.log("선택된 파일:", selectedFile);
         if (!selectedFile) return;
         const formData = new FormData();
         formData.append("file", selectedFile);
-        formData.append("user_id", 1);
-
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/knowledge`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/knowledge/upload`, {
             method: "POST",
             body: formData
         });
         const data = await response.json();
         console.log(data);
+        fetch_Knowledge();
+        setuploadStatus(false);
     };
 
     const [showAddFaqModal, setshowAddFaqModal] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const filteredKnowledge = documents.filter((p) => {
+        const matchesSearch = p.original_name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesSearch;
+    });
 
+    const [FAQquery, setFAQquery] = useState('');
+    const filteredFAQ = faqs.filter((p) => {
+        const matchesSearch = p.question.toLowerCase().includes(FAQquery.toLowerCase());
+        return matchesSearch;
+    });
 
 
     return (
@@ -240,30 +153,33 @@ export default function Knowledge() {
                     {/* 업로드 영역 */}
                     <div className="upload-section">
                         <div className="upload-area" id="documentUploadArea" >
-                            <div className="upload-overlay" id="uploadOverlay">
+                            <div className={`upload-overlay ${uploadStatus ? "show" : ""}`} id="uploadOverlay">
                                 <div className="spinner"></div>
                                 <p style={{ color: " var(--primary-color)", fontWeight: "500" }}>파일을 처리하고 있습니다...</p>
                             </div>
-                            <div className="upload-icon">
-                                <i className="fas fa-cloud-upload-alt"></i>
+                            <div style={{ display: `${uploadStatus ? "none" : ""}` }}>
+                                <div className="upload-icon">
+                                    <i className="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div className="upload-text">
+                                    <h3>파일을 드래그하거나 클릭해서 업로드</h3>
+                                    <p>PDF, Word, 텍스트 파일 지원 • 업로드 즉시 챗봇에서 사용 가능</p>
+                                </div>
+                                <input type="file" id="documentFileInput" multiple accept=".pdf,.doc,.docx,.txt" style={{ display: "none" }} />
+                                <div className="upload-buttons">
+                                    <button className="btn btn-primary" onClick={() => fileInputRef.current?.click()}>
+                                        <i className="fas fa-file-upload"></i>
+                                        파일 선택
+                                    </button>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        style={{ display: "none" }}
+                                        onChange={handleFileSelect}
+                                    />
+                                </div>
                             </div>
-                            <div className="upload-text">
-                                <h3>파일을 드래그하거나 클릭해서 업로드</h3>
-                                <p>PDF, Word, 텍스트 파일 지원 • 업로드 즉시 챗봇에서 사용 가능</p>
-                            </div>
-                            <input type="file" id="documentFileInput" multiple accept=".pdf,.doc,.docx,.txt" style={{ display: "none" }} />
-                            <div className="upload-buttons">
-                                <button className="btn btn-primary" onClick={() => fileInputRef.current?.click()}>
-                                    <i className="fas fa-file-upload"></i>
-                                    파일 선택
-                                </button>
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    style={{ display: "none" }}
-                                    onChange={handleFileSelect}
-                                />
-                            </div>
+
                         </div>
                     </div>
 
@@ -277,7 +193,10 @@ export default function Knowledge() {
                             <div className="header-actions">
                                 <div className="search-box">
                                     <i className="fas fa-search"></i>
-                                    <input type="text" placeholder="문서 검색..." id="documentSearch" />
+                                    <input type="text" placeholder="문서 검색..." id="documentSearch"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
                                 </div>
                                 <button className="btn btn-danger" >
                                     <i className="fas fa-trash"></i>
@@ -296,13 +215,13 @@ export default function Knowledge() {
                                         <th style={{ width: "auto", minWidth: "300px" }}>문서명</th>
                                         <th style={{ width: "100px" }}>크기</th>
                                         <th style={{ width: "120px" }}>업로드일</th>
-                                        <th style={{ width: "100px" }}>상태</th>
+                                        {/* <th style={{ width: "100px" }}>상태</th> */}
                                         <th style={{ width: "100px" }}>관리</th>
                                     </tr>
                                 </thead>
                                 <tbody id="documentsTableBody">
                                     {/* 문서 목록이 여기에 동적으로 로드됩니다 */}
-                                    <LoadDocuments documents={documents} />
+                                    <LoadDocuments documents={filteredKnowledge} />
                                 </tbody>
                             </table>
                         </div>
@@ -338,7 +257,10 @@ export default function Knowledge() {
                             <div className="header-actions">
                                 <div className="search-box">
                                     <i className="fas fa-search"></i>
-                                    <input type="text" placeholder="FAQ 검색..." id="faqSearch" />
+                                    <input type="text" placeholder="FAQ 검색..." id="faqSearch"
+                                        vlaue={FAQquery}
+                                        onChange={(e) => setFAQquery(e.target.value)}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -348,7 +270,7 @@ export default function Knowledge() {
 
                         <div style={{ padding: "2rem" }}>
                             <div className="faq-list">
-                                {faqs.map((faq) => (
+                                {filteredFAQ.map((faq) => (
                                     <div className="faq-item" key={faq.id}>
                                         <div
                                             className="faq-header"
@@ -432,19 +354,20 @@ function LoadDocuments({ documents }) {
                     <td>
                         <div className="document-info">
                             <i className={`fas ${getFileIcon(doc.type)} document-icon`}></i>
-                            <div className="document-details">
-                                <span className="document-name">{doc.name}</span>
-                                <span className="document-excerpt">{doc.excerpt}</span>
+                            <div className="document-details" style={{ maxWidth: "900px" }}>
+                                <span className="document-name">{doc.original_name}</span>
+                                <span className="document-excerpt">{doc.preview}</span>
                             </div>
                         </div>
                     </td>
-                    <td>{doc.size}</td>
-                    <td>{doc.uploadDate}</td>
-                    <td>
+                    <td>{formatBytes(doc.size)}</td>
+                    <td>{new Date(doc.created_at).toISOString().split("T")[0]}</td>
+
+                    {/* <td>
                         <span className={`status-badge ${doc.status}`}>
                             {doc.status === 'active' ? '사용중' : doc.status === 'processing' ? '처리중' : '오류'}
                         </span>
-                    </td>
+                    </td> */}
                     <td>
                         <div className="action-buttons">
                             <button className="action-btn-small" title="문서 보기" onClick={() => showToast('문서 미리보기 기능은 개발 중입니다.', 'info')}>
@@ -462,6 +385,15 @@ function LoadDocuments({ documents }) {
         </>
     )
 }
+
+function formatBytes(bytes) {
+    if (bytes >= 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
+    if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    if (bytes >= 1024) return (bytes / 1024).toFixed(2) + " KB";
+    return bytes + " B";
+}
+
+
 
 function getFileIcon(type) {
     const iconMap = {

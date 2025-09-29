@@ -288,6 +288,8 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 )
             );
         } else {
+            const inputreason = prompt("이관사유를 입력해주세요");
+
             setinquiries((prevInquiries) =>
                 prevInquiries.map((item) =>
                     item.id === inquiry.id
@@ -299,10 +301,10 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                             history: [
                                 ...(item.history || []),
                                 {
-                                    action: "assign",
+                                    action: "transfer",
                                     admin: admin.name,
                                     timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
-                                    details: `${admin.name}님이 문의를 담당하게 되었습니다.`,
+                                    details: `${item.assignee || "미지정"} -> ${admin.name} (사유:${inputreason})`,
                                 },
                             ],
                         }
