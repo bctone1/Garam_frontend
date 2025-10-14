@@ -7,14 +7,17 @@ import Main from "../src/user_components/Main";
 
 function App() {
   return (
-    // <Router>
-    //   <Routes>
-    //     <Route path="/" element={<Login />} /> {/* 로그인 페이지 */}
-    //     <Route path="/user" element={<User />} />
-    //     <Route path="/admin" element={<Admin />} />
-    //   </Routes>
-    // </Router>
-    <Main />
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Main />} /> {/* 로그인 페이지 */}
+          <Route path="/user" element={<User />} />
+          <Route path="/admin" element={<Admin />} />
+        </Routes>
+      </Router>
+      {/* <Main /> */}
+    </>
+
 
   );
 }
