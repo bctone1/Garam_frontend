@@ -321,6 +321,14 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
     return (
         <>
+            {filteredInquiries.length === 0 && (
+                <div className="empty-state">
+                    <div className="empty-icon">
+                        <i className="fas fa-inbox"></i>
+                    </div>
+                    <p>아직 접수된 문의가 없습니다.</p>
+                </div>
+            )}
             {filteredInquiries.map((inquiry) => {
                 const isCurrentUser = inquiry.assignee === currentAdminUser;
                 const processorInfo = inquiry.assignee && (

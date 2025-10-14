@@ -4,6 +4,8 @@ export default function Loginpage() {
 
         if (role === "admin" || role === "superadmin") {
             window.location.href = "/admin";
+        }else{
+            window.location.href = "/user";
         }
     };
 
