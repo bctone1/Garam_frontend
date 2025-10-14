@@ -8,16 +8,9 @@ export default function Main() {
         return Math.floor(1000 + Math.random() * 9000).toString();
     };
 
-    const [state, setState] = useState({
-        baseUrl: "http://localhost:5002",
-        // sessionId: generateSessionId(),
-        sessionId: 42,
-    });
-
-
     const [messageInput, setMessageInput] = useState("");
-    const [topK, setTopK] = useState(5); // 선택된 Top-K 값
-    const [knowledgeId, setKnowledgeId] = useState(""); // 선택된 지식베이스
+    const [topK, setTopK] = useState(5);
+    const [knowledgeId, setKnowledgeId] = useState("");
     const [loading, setLoading] = useState(false);
 
 
@@ -30,7 +23,7 @@ export default function Main() {
         };
 
         const response = await fetch(
-            `${state.baseUrl}/chat/sessions/${state.sessionId}/qa`,
+            `${process.env.REACT_APP_API_URL}/chat/sessions/42/qa`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -64,12 +57,12 @@ export default function Main() {
             const start = performance.now();
             const latencyMs = Math.round(performance.now() - start);
             const response = await fetch(
-                `${state.baseUrl}/chat/sessions/${state.sessionId}/messages`,
+                `${process.env.REACT_APP_API_URL}/chat/sessions/42/messages`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        session_id: state.sessionId,
+                        session_id: 42,
                         role: "user",
                         content,
                         response_latency_ms: latencyMs,
@@ -118,14 +111,24 @@ export default function Main() {
                             <h1>AI 상담 챗봇</h1>
                             <div className="session-meta">
                                 <span>세션</span>
-                                <span className="session-id">{state.sessionId}</span>
-                                <span className="connection-status">
+                                <span className="session-id">#42</span>
+                                <span className="connection-status success">
                                     <span className="status-dot"></span>
-                                    <span>연결됨</span>
+                                    <span>API 연결 성공</span>
                                 </span>
                             </div>
                         </div>
                     </div>
+
+                    <div className="header-right">
+                        <input className="text-input" id="sessionTitleInput" type="text" placeholder="세션 제목을 입력하세요" autocomplete="off" />
+                        <div className="input-chip">
+                            <label for="apiBaseInput">API</label>
+                            <input id="apiBaseInput" type="text" placeholder="http://localhost:5002" autocomplete="off" />
+                        </div>
+                        <button className="ghost-button" id="checkConnectionButton">연결 확인</button>
+                    </div>
+
                 </header>
 
                 <main className="chat-main" id="chatMain">
@@ -176,6 +179,36 @@ export default function Main() {
                                 <span>전송</span>
                             </button>
                         </div>
+
+
+                        <div className="footer-bottom">
+                            <div className="options">
+                                <div className="option-chip">
+                                    <span>검색 Top-K</span>
+                                    <select id="topKSelect">
+                                        <option value="3">3</option>
+                                        <option value="5" selected="">5</option>
+                                        <option value="7">7</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                </div>
+                                <div className="option-chip">
+                                    <span>지식베이스</span>
+                                    <select id="knowledgeSelect"><option value="">전체</option><option value="6">#6 · 기본_고객응대 매뉴얼.pdf</option><option value="5">#5 · 고객응대관련법규.pdf</option><option value="4">#4 · 고객응대근로자.pdf</option><option value="2">#2 · 정부AI정책방향.pdf</option><option value="1">#1 · 가람포스텍전문AS매뉴얼_20250714.pdf</option></select>
+                                </div>
+                            </div>
+                            <div className="options">
+                                <div className="option-chip">
+                                    <span>응답 언어</span>
+                                    <span>한국어</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
                     </div>
                 </footer>
             </div>
