@@ -4,33 +4,13 @@ import { showNotification } from '../utill/utill';
 
 
 export default function Chatbot() {
-    // useEffect(() => {
-    //     axios
-    //         .get(`${process.env.REACT_APP_API_URL}/system/settings/${settingId}/quick-categories`, {
-    //             params: {
-    //                 offset: 0,
-    //                 limit: 50,
-    //             },
-    //         })
-    //         .then((res) => {
-    //             setCategories(res.data);
-    //             console.log(res.data);
-    //         })
-    //         .catch((err) => {
-    //             if (err.response && err.response.status === 404) {
-    //                 alert("해당 setting을 찾을 수 없습니다.");
-    //             } else {
-    //                 console.error(err);
-    //             }
-    //         });
-    // }, [settingId]);
 
     useEffect(() => {
         axios
             .get(`${process.env.REACT_APP_API_URL}/system/setting`)
             .then((res) => {
                 setsystemSettings(res.data); // 단일 객체 반환
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => {
                 if (err.response && err.response.status === 404) {
@@ -49,7 +29,7 @@ export default function Chatbot() {
             })
             .then((res) => {
                 setCategories(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => {
                 if (err.response && err.response.status === 404) {
@@ -66,7 +46,9 @@ export default function Chatbot() {
         emergency_phone: "",
         emergency_email: "",
         operating_hours: "",
-
+        file_upload_mode: "",
+        session_duration: "",
+        max_messages: ""
     });
     const [categories, setCategories] = useState([]);
 
@@ -81,7 +63,6 @@ export default function Chatbot() {
             setActiveCategoryId(null);
             return;
         }
-
         setPickerPosition({
             top: rect.bottom + 5 + window.scrollY,
             left: rect.left + window.scrollX,
@@ -93,13 +74,13 @@ export default function Chatbot() {
         setCategories((prevCategories) =>
             prevCategories.map((category) =>
                 category.id === activeCategoryId
-                    ? { ...category, icon: emoji } // 선택된 카테고리만 업데이트
+                    ? { ...category, icon_emoji: emoji } // ✅ 속성 이름 수정
                     : category
             )
         );
-        // alert(`선택한 이모지: ${emoji} (카테고리 ${activeCategoryId})`);
         setActiveCategoryId(null);
     };
+
 
 
     const addCategory = () => {
@@ -119,6 +100,80 @@ export default function Chatbot() {
             return [...prevCategories, newCategory];
         });
     };
+
+    const handleSettings = async () => {
+        alert("정보저장");
+        try {
+            const settingPayload = {
+                welcome_title: systemSettings.welcome_title,
+                welcome_message: systemSettings.welcome_message,
+                operating_hours: systemSettings.operating_hours,
+                file_upload_mode: systemSettings.file_upload_mode,
+                session_duration: systemSettings.session_duration,
+                max_messages: systemSettings.max_messages,
+                emergency_phone: systemSettings.emergency_phone,
+                emergency_email: systemSettings.emergency_email,
+            };
+
+            // 두 요청을 동시에 실행
+            const [settingRes, categoryRes] = await Promise.all([
+                fetch(`${process.env.REACT_APP_API_URL}/system/setting`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(settingPayload),
+                }),
+                fetch(`${process.env.REACT_APP_API_URL}/system/quick-categories-list`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(categories),
+                }),
+            ]);
+
+            const [settingData, categoryData] = await Promise.all([
+                settingRes.json(),
+                categoryRes.json(),
+            ]);
+
+            console.log("System setting saved:", settingData);
+            console.log("Categories saved:", categoryData);
+
+            alert("저장 완료!");
+
+        } catch (error) {
+            console.error(error);
+            alert("오류발생");
+        }
+    };
+
+    const handleDelete = async (category_id) => {
+        if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/system/quick-categories/${category_id}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`삭제 실패: ${response.status}`);
+            }
+
+            // 상태에서 삭제된 카테고리 제거
+            setCategories((prev) =>
+                prev.filter((category) => category.id !== category_id)
+            );
+
+            alert("카테고리 삭제 완료!");
+
+        } catch (error) {
+            console.error(error);
+            alert("카테고리 삭제 중 오류 발생");
+        }
+    };
+
+
 
     return (
         <>
@@ -197,30 +252,52 @@ export default function Chatbot() {
                                     >
                                         {category.icon_emoji}
                                     </div>
+
                                     <div className="category-info">
+                                        {/* 이름 수정 */}
                                         <input
                                             type="text"
                                             className="category-input"
                                             value={category.name}
                                             id={`category${category.id}Name`}
-                                            readOnly
+                                            onChange={(e) =>
+                                                setCategories((prev) =>
+                                                    prev.map((cat) =>
+                                                        cat.id === category.id
+                                                            ? { ...cat, name: e.target.value }
+                                                            : cat
+                                                    )
+                                                )
+                                            }
                                         />
+
+                                        {/* 설명 수정 */}
                                         <input
                                             type="text"
                                             className="category-desc-input"
-                                            value={category.description}
+                                            value={category.description || ""}
                                             id={`category${category.id}Desc`}
-                                            readOnly
+                                            onChange={(e) =>
+                                                setCategories((prev) =>
+                                                    prev.map((cat) =>
+                                                        cat.id === category.id
+                                                            ? { ...cat, description: e.target.value }
+                                                            : cat
+                                                    )
+                                                )
+                                            }
                                         />
                                     </div>
+
                                     <div className="category-actions">
-                                        <button
+                                        {/* <button
                                             className="category-action-btn btn-edit"
                                             title="수정"
                                         >
                                             <i className="fas fa-edit"></i>
-                                        </button>
+                                        </button> */}
                                         <button
+                                            onClick={() => handleDelete(category.id)}
                                             className="category-action-btn btn-delete"
                                             title="삭제"
                                         >
@@ -229,6 +306,7 @@ export default function Chatbot() {
                                     </div>
                                 </div>
                             ))}
+
                         </div>
                     </div>
 
@@ -390,7 +468,9 @@ export default function Chatbot() {
                         <i className="fas fa-undo"></i>
                         기본값으로 되돌리기
                     </button>
-                    <button className="btn btn-primary" >
+                    <button className="btn btn-primary"
+                        onClick={() => handleSettings()}
+                    >
                         <i className="fas fa-save"></i>
                         설정 저장
                     </button>

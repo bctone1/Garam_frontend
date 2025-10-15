@@ -203,6 +203,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                             setadmin_email={setadmin_email}
                             setadmin_name={setadmin_name}
                             inquiries={inquiries}
+                            fetch_admin_users={fetch_admin_users}
                         />
                     </div>
                 </div>
@@ -543,7 +544,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
 
 
-function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries }) {
+function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries, fetch_admin_users }) {
 
     const getAssignedCount = (adminName) =>
         inquiries.filter(i => i.assignee === adminName && i.status === "processing").length;
@@ -568,8 +569,33 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
 
             setcurrentAdminUser(admin.name);
             showToast(`${admin.name}으로 전환되었습니다.`, "info");
+
         } else {
             alert("❌ 비밀번호가 틀립니다.");
+        }
+    };
+
+    const handleDelete = async (admin) => {
+        if (!window.confirm(`${admin.name}번 사용자를 삭제하시겠습니까?`)) return;
+
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/admin_users/${admin.id}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            if (response.status === 204) {
+                alert("삭제되었습니다 ✅");
+                fetch_admin_users();
+            } else if (response.status === 404) {
+                alert("해당 사용자를 찾을 수 없습니다 ❌");
+            } else {
+                alert("삭제 중 오류가 발생했습니다 ⚠️");
+            }
+        } catch (err) {
+            console.error("삭제 요청 오류:", err);
         }
     };
 
@@ -628,13 +654,13 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
                             {role === "superadmin" && (
                                 <button
                                     className="btn btn-sm btn-danger"
-
                                     disabled={isCurrentUser}
                                     style={
                                         isCurrentUser
                                             ? { opacity: 0.5, cursor: "not-allowed" }
                                             : {}
                                     }
+                                    onClick={() => handleDelete(admin)}
                                 >
                                     <i className="fas fa-trash"></i> 삭제
                                 </button>
@@ -653,10 +679,16 @@ function AddAdminModal({ setopenAddAdminModal, fetch_admin_users }) {
     const [NewUser, setNewUser] = useState({});
 
     const create_admin = () => {
-        axios.post(`${process.env.REACT_APP_API_URL}/admin_users`, NewUser)
+        axios.post(`${process.env.REACT_APP_API_URL}/admin_users/`, NewUser)
             .then((res) => {
                 console.log("생성된 관리자:", res.data);
                 showToast(`${NewUser.name} 관리자가 추가되었습니다.`, 'success');
+                setNewUser({
+                    name: "",
+                    email: "",
+                    password: "",
+                    department: ""
+                });
                 setopenAddAdminModal(false);
                 fetch_admin_users();
             })
