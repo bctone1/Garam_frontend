@@ -1,24 +1,49 @@
-import { useState } from "react";
-import { assistant_showNotification } from '../utill/utill';
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { assistant_showNotification, showToast } from '../utill/utill';
 
 export default function Assisstant() {
-    const [status, setStatus] = useState("idle"); // idle | saving | done
+    const [status, setStatus] = useState("idle");
+
+
+    const [modelSetting, setmodelSetting] = useState({});
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_URL}/model`).then((res) => {
+            setmodelSetting(res.data); // 단일 객체 반환
+            console.log(res.data);
+        }).catch((err) => {
+            if (err.response && err.response.status === 404) {
+                alert("해당 setting을 찾을 수 없습니다.");
+            } else {
+                console.error(err);
+            }
+        });
+    }, []);
 
     const handleClick = () => {
         setStatus("saving");
-
-        // 저장 중 메시지
-        setTimeout(() => {
-            setStatus("done");
-
-            // 완료 후 다시 원래 상태로
+        axios.put(`${process.env.REACT_APP_API_URL}/model`, modelSetting).then((res) => {
+            console.log(res.data);
             setTimeout(() => {
-                setStatus("idle");
-            }, 2000);
-        }, 1500);
+                setStatus("done");
+                setTimeout(() => {
+                    setStatus("idle");
+                }, 2000);
+            }, 1500);
+            assistant_showNotification("AI 모델 설정이 저장되었습니다. 변경사항이 즉시 적용됩니다.", "success");
+        }).catch((err) => {
+            showToast("설정변경 중 오류가 발생했습니다.", 'error');
+        });
 
-        // 알림
-        assistant_showNotification("AI 모델 설정이 저장되었습니다. 변경사항이 즉시 적용됩니다.", "success");
+    };
+
+    const handleSettings = (key) => {
+        // alert(`${key} 토글 클릭`);
+        setmodelSetting((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+        }));
     };
 
 
@@ -54,19 +79,21 @@ export default function Assisstant() {
                         </div>
                         <div className="simple-metrics">
                             <div className="metric-item">
-                                <div className="metric-value">94%</div>
+                                <div className="metric-value">{modelSetting.accuracy}%</div>
                                 <div className="metric-label">응답 정확도</div>
                             </div>
                             <div className="metric-item">
-                                <div className="metric-value">1.2초</div>
+                                <div className="metric-value">
+                                    {(modelSetting.avg_response_time_ms / 1000).toFixed(3)}초
+                                </div>
                                 <div className="metric-label">평균 응답시간</div>
                             </div>
                             <div className="metric-item">
-                                <div className="metric-value">847</div>
+                                <div className="metric-value">{modelSetting.month_conversations}</div>
                                 <div className="metric-label">이번 달 처리 문의</div>
                             </div>
                             <div className="metric-item">
-                                <div className="metric-value">99.8%</div>
+                                <div className="metric-value">{modelSetting.uptime_percent}%</div>
                                 <div className="metric-label">모델 가동률</div>
                             </div>
                         </div>
@@ -117,7 +144,7 @@ export default function Assisstant() {
                                 </div>
                                 <div className="setting-group">
                                     <label className="setting-label">응답 스타일</label>
-                                    <select className="input-field" id="responseStyle">
+                                    <select className="input-field" id="responseStyle" value={modelSetting.response_style}>
                                         <option value="professional">전문적이고 정확한 답변</option>
                                         <option value="friendly">친근하고 대화형 답변</option>
                                         <option value="concise">간결하고 핵심적인 답변</option>
@@ -147,14 +174,18 @@ export default function Assisstant() {
                                         <h4>부적절한 질문 차단</h4>
                                         <div className="toggle-description">욕설, 스팸 자동 차단</div>
                                     </div>
-                                    <div className="toggle active"></div>
+                                    <div className={`toggle ${modelSetting.block_inappropriate ? "active" : ""}`}
+                                        onClick={() => handleSettings("block_inappropriate")}
+                                    ></div>
                                 </div>
                                 <div className="toggle-switch">
                                     <div className="toggle-info">
                                         <h4>기술 외 문의 제한</h4>
                                         <div className="toggle-description">기술지원 외 주제 응답 제한</div>
                                     </div>
-                                    <div className="toggle active"></div>
+                                    <div className={`toggle ${modelSetting.restrict_non_tech ? "active" : ""}`}
+                                        onClick={() => handleSettings("restrict_non_tech")}
+                                    ></div>
                                 </div>
                             </div>
 
@@ -168,14 +199,18 @@ export default function Assisstant() {
                                         <h4>빠른 응답 모드</h4>
                                         <div className="toggle-description">간단한 질문에 즉시 답변</div>
                                     </div>
-                                    <div className="toggle active"></div>
+                                    <div className={`toggle ${modelSetting.fast_response_mode ? "active" : ""}`}
+                                        onClick={() => handleSettings("fast_response_mode")}
+                                    ></div>
                                 </div>
                                 <div className="toggle-switch">
                                     <div className="toggle-info">
                                         <h4>상담원 연결 추천</h4>
                                         <div className="toggle-description">복잡한 문의시 상담원 연결 안내</div>
                                     </div>
-                                    <div className="toggle active"></div>
+                                    <div className={`toggle ${modelSetting.suggest_agent_handoff ? "active" : ""}`}
+                                        onClick={() => handleSettings("suggest_agent_handoff")}
+                                    ></div>
                                 </div>
                             </div>
                         </div>

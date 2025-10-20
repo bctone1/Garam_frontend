@@ -221,7 +221,7 @@ export default function Knowledge() {
                                 </thead>
                                 <tbody id="documentsTableBody">
                                     {/* 문서 목록이 여기에 동적으로 로드됩니다 */}
-                                    <LoadDocuments documents={filteredKnowledge} />
+                                    <LoadDocuments documents={filteredKnowledge} fetch_Knowledge={fetch_Knowledge} />
                                 </tbody>
                             </table>
                         </div>
@@ -345,7 +345,24 @@ export default function Knowledge() {
     )
 }
 
-function LoadDocuments({ documents }) {
+function LoadDocuments({ documents, fetch_Knowledge }) {
+
+    const handleDelete = async (doc) => {
+        if (!window.confirm(doc.id + "." + doc.original_name + " 정말 삭제하시겠습니까?")) return;
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/knowledge/${doc.id}`,
+                {
+                    method: "DELETE",
+                }
+            );
+            fetch_Knowledge();
+            showToast('문서가 삭제되었습니다.', 'success')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <>
             {documents.map(doc => (
@@ -370,10 +387,15 @@ function LoadDocuments({ documents }) {
                     </td> */}
                     <td>
                         <div className="action-buttons">
-                            <button className="action-btn-small" title="문서 보기" onClick={() => showToast('문서 미리보기 기능은 개발 중입니다.', 'info')}>
+                            <button
+                                className="action-btn-small" title="문서 보기" onClick={() => showToast('문서 미리보기 기능은 개발 중입니다.', 'info')}
+                            >
                                 <i className="fas fa-eye"></i>
                             </button>
-                            <button className="action-btn-small delete" title="삭제" onClick={() => showToast('문서가 삭제되었습니다.', 'success')}>
+
+                            <button
+                                className="action-btn-small delete" title="삭제" onClick={() => handleDelete(doc)}
+                            >
                                 <i className="fas fa-trash"></i>
                             </button>
                         </div>

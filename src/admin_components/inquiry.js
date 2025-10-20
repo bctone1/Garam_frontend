@@ -22,7 +22,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
             })
             .then((res) => {
                 setadminUsers(res.data);
-                console.log("📌 관리자 목록:", res.data);
+                // console.log("📌 관리자 목록:", res.data);
             })
             .catch((err) => {
                 if (err.response && err.response.status === 404) {
@@ -45,7 +45,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
             .get(`${process.env.REACT_APP_API_URL}/inquiries/get_inquiry_list`)
             .then((res) => {
                 setinquiries(res.data);
-                console.log("📌 문의 목록:", res.data);
+                // console.log("📌 문의 목록:", res.data);
             })
             .catch((err) => {
                 if (err.response && err.response.status === 404) {
@@ -679,22 +679,20 @@ function AddAdminModal({ setopenAddAdminModal, fetch_admin_users }) {
     const [NewUser, setNewUser] = useState({});
 
     const create_admin = () => {
-        axios.post(`${process.env.REACT_APP_API_URL}/admin_users/`, NewUser)
-            .then((res) => {
-                console.log("생성된 관리자:", res.data);
-                showToast(`${NewUser.name} 관리자가 추가되었습니다.`, 'success');
-                setNewUser({
-                    name: "",
-                    email: "",
-                    password: "",
-                    department: ""
-                });
-                setopenAddAdminModal(false);
-                fetch_admin_users();
-            })
-            .catch((err) => {
-                showToast("관리자 추가중 오류가 발생했습니다.", 'error');
+        axios.post(`${process.env.REACT_APP_API_URL}/admin_users/`, NewUser).then((res) => {
+            console.log("생성된 관리자:", res.data);
+            showToast(`${NewUser.name} 관리자가 추가되었습니다.`, 'success');
+            setNewUser({
+                name: "",
+                email: "",
+                password: "",
+                department: ""
             });
+            setopenAddAdminModal(false);
+            fetch_admin_users();
+        }).catch((err) => {
+            showToast("관리자 추가중 오류가 발생했습니다.", 'error');
+        });
     }
 
 

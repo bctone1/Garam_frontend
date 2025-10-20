@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Line, Doughnut, Bar } from "react-chartjs-2";
 import { showNotification } from '../utill/utill';
@@ -34,38 +35,50 @@ export default function Dashboard() {
   // 일일 문의량 차트
   const [period, setPeriod] = useState(30);
   const [TrendChart, setTrendChart] = useState(null);
-  const buildTrendChartData = (days) => {
-    const chatbotMetrics = JSON.parse(localStorage.getItem("chatbotMetrics") || "{}");
-    const dailyData = chatbotMetrics.dailyData || {};
-    const labels = [];
-    const data = [];
+  const buildTrendChartData = async (days) => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/analytics/timeseries/daily?days=${days}`);
+      const apiData = res.data;
 
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toDateString();
+      // 날짜순 정렬 (혹시 서버에서 순서가 뒤죽이면 대비)
+      apiData.sort((a, b) => new Date(a.ts) - new Date(b.ts));
 
-      labels.push(date.toLocaleDateString("ko-KR", { month: "short", day: "numeric" }));
-      data.push(dailyData[dateStr] || Math.floor(Math.random() * 50) + 10);
+      // ✅ labels: 날짜 문자열
+      const labels = apiData.map(item =>
+        new Date(item.ts).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })
+      );
+
+      // ✅ data: 세션 수 (혹은 avg_response_ms)
+      const data = apiData.map(item => item.sessions); // 🔹 또는 item.avg_response_ms
+
+      return {
+        labels,
+        datasets: [
+          {
+            label: "일일 문의 수",
+            data,
+            borderColor: "#1e60e1",
+            backgroundColor: "rgba(30, 96, 225, 0.1)",
+            tension: 0.4,
+            fill: true,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error("데이터 불러오기 오류:", error);
+      return {
+        labels: [],
+        datasets: [],
+      };
     }
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: "일일 문의 수",
-          data,
-          borderColor: "#1e60e1",
-          backgroundColor: "rgba(30, 96, 225, 0.1)",
-          tension: 0.4,
-          fill: true,
-        },
-      ],
-    };
   };
 
   useEffect(() => {
-    setTrendChart(buildTrendChartData(period));
+    const fetchTrendChart = async () => {
+      const chartData = await buildTrendChartData(period);
+      setTrendChart(chartData);
+    };
+    fetchTrendChart();
   }, [period]);
 
   const Trendoptions = {
@@ -128,82 +141,116 @@ export default function Dashboard() {
   const [HourlyChart, setHourlyChart] = useState(null);
   const [HourlyOptions, setHourlyOptions] = useState({});
 
-  useEffect(() => {
-    const chatbotMetrics = JSON.parse(localStorage.getItem("chatbotMetrics") || "{}");
-    const hourlyData = chatbotMetrics.hourlyData || {};
-    const hours = [];
-    const inquiries = [];
-    const satisfactionRates = [];
-    for (let i = 0; i < 24; i++) {
-      hours.push(`${i}:00`);
-      inquiries.push(hourlyData[i] || Math.floor(Math.random() * 30) + 5);
-      satisfactionRates.push(Math.floor(Math.random() * 20) + 80);
-    }
-    setHourlyChart({
-      labels: hours,
-      datasets: [
-        {
-          label: "문의량",
-          data: inquiries,
-          backgroundColor: "rgba(30, 96, 225, 0.8)",
-          yAxisID: "y",
-        },
-        {
-          label: "만족도 (%)",
-          data: satisfactionRates,
-          type: "line",
-          borderColor: "#28a745",
-          backgroundColor: "rgba(40, 167, 69, 0.1)",
-          yAxisID: "y1",
-          tension: 0.4,
-        },
-      ],
-    });
+  const fetchData = async () => {
+    try {
+      const hours = [];
+      const inquiries = [];
 
-    setHourlyOptions({
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        mode: "index",
-        intersect: false,
-      },
-      scales: {
-        x: {
-          grid: {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/analytics/timeseries/hourly?days=7`);
+      const apiData = res.data;
+      const hourlyTotals = Array.from({ length: 24 }, (_, i) => ({ hour: i, total: 0 }));
+
+      apiData.forEach((item) => {
+        const hour = new Date(item.ts).getHours(); // 시 추출 (한국시간 기반)
+        hourlyTotals[hour].total += item.messages; // 시별 합산
+      });
+
+      // 3️⃣ inquiries 배열 구성
+      hourlyTotals.forEach((h) => {
+        hours.push(`${h.hour}:00`);
+        inquiries.push(h.total);
+      });
+
+      setHourlyChart({
+        labels: hours,
+        datasets: [
+          {
+            label: "문의량",
+            data: inquiries,
+            backgroundColor: "rgba(30, 96, 225, 0.8)",
+            yAxisID: "y",
+          },
+          {
+            label: "만족도 (%)",
+            data: [10, 10, 10, 10, 60, 80, 90, 60, 10, 10, 11, 10, 1, 10, 10, 10, 10, 10, 1, 10, 10, 10, 10, 10, 1, 10, 10],
+            type: "line",
+            borderColor: "#28a745",
+            backgroundColor: "rgba(40, 167, 69, 0.1)",
+            yAxisID: "y1",
+            tension: 0.4,
+          },
+        ],
+      });
+
+      setHourlyOptions({
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: "index",
+          intersect: false,
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false,
+            },
+          },
+          y: {
+            type: "linear",
+            display: true,
+            position: "left",
+            grid: {
+              color: "#e9ecef",
+            },
+            title: {
+              display: true,
+              text: "문의 수",
+            },
+          },
+          y1: {
+            type: "linear",
+            display: true,
+            position: "right",
+            grid: {
+              drawOnChartArea: false,
+            },
+            title: {
+              display: true,
+              text: "만족도 (%)",
+            },
+          },
+
+        },
+        plugins: {
+          legend: {
             display: false,
           },
         },
-        y: {
-          type: "linear",
-          display: true,
-          position: "left",
-          grid: {
-            color: "#e9ecef",
-          },
-          title: {
-            display: true,
-            text: "문의 수",
-          },
-        },
-        y1: {
-          type: "linear",
-          display: true,
-          position: "right",
-          grid: {
-            drawOnChartArea: false,
-          },
-          title: {
-            display: true,
-            text: "만족도 (%)",
-          },
-        },
-      },
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    });
+      });
+
+      console.log(apiData);
+    } catch (error) {
+      console.error("데이터 불러오기 오류:", error);
+    }
+  };
+
+  const [dashboard, setDashabord] = useState({});
+
+  const fetchDashboard = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/analytics/dashboard`);
+      const apiData = res.data;
+      console.log(apiData);
+      setDashabord(apiData);
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+
+  useEffect(() => {
+    fetchDashboard();
+    fetchData();
   }, []);
 
   const [refreshStatus, setrefreshStatus] = useState(false);
@@ -280,13 +327,13 @@ export default function Dashboard() {
                 <i className="fas fa-comments"></i>
               </div>
               <div className="metric-content">
-                <div className="dashboard-metric-value" id="totalConversations">1,247</div>
-                <div className="metric-label">이 문의 수</div>
-                <div className="metric-change positive">
+                <div className="dashboard-metric-value" id="totalConversations">{dashboard.total_sessions}</div>
+                <div className="metric-label">문의 수</div>
+                {/* <div className="metric-change positive">
                   <i className="fas fa-arrow-up"></i>
                   <span>+15.3%</span>
                   <small>지난주 대비</small>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -295,13 +342,13 @@ export default function Dashboard() {
                 <i className="fas fa-thumbs-up"></i>
               </div>
               <div className="metric-content">
-                <div className="dashboard-metric-value" id="satisfactionRate">91.4%</div>
+                <div className="dashboard-metric-value" id="satisfactionRate">{(dashboard.satisfaction_rate * 100).toFixed(0)}%</div>
                 <div className="metric-label">사용자 만족도</div>
-                <div className="metric-change positive">
+                {/* <div className="metric-change positive">
                   <i className="fas fa-arrow-up"></i>
                   <span>+3.2%</span>
                   <small>지난주 대비</small>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -310,13 +357,13 @@ export default function Dashboard() {
                 <i className="fas fa-clock"></i>
               </div>
               <div className="metric-content">
-                <div className="dashboard-metric-value" id="avgResponseTime">1.8초</div>
+                <div className="dashboard-metric-value" id="avgResponseTime">{(dashboard.avg_response_ms / 1000).toFixed(2)}초</div>
                 <div className="metric-label">평균 응답시간</div>
-                <div className="metric-change neutral">
+                {/* <div className="metric-change neutral">
                   <i className="fas fa-minus"></i>
                   <span>-0.2초</span>
                   <small>지난주 대비</small>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -382,10 +429,10 @@ export default function Dashboard() {
                     <span className="legend-color" style={{ background: "#1e60e1" }}></span>
                     문의량
                   </span>
-                  <span className="legend-item">
+                  {/* <span className="legend-item">
                     <span className="legend-color" style={{ background: "#28a745" }}></span>
                     만족도
-                  </span>
+                  </span> */}
                 </div>
                 <button className="chart-action" title="차트 다운로드">
                   <i className="fas fa-download"></i>

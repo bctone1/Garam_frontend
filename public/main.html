@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가람포스텍 AI 지원센터</title>
+  <style>
+    
+    /* 상단 바 */
+    .bct_header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      border-bottom: 1px solid #eee;
+      background: #fff;
+    }
+
+    .bct_header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #111;
+    }
+
+    .bct_header-right {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #666;
+    }
+
+    .bct_icon {
+      width: 18px;
+      height: 18px;
+      opacity: 0.8;
+      cursor: pointer;
+    }
+
+    /* 메인 영역 */
+    .bct_main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px 120px;
+    }
+
+    .bct_title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #f59e0b, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .bct_subtitle {
+      font-size: 15px;
+      color: #333;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    /* 버튼 카드 영역 */
+    .bct_card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .bct_card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: left;
+      background: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .bct_card:hover {
+      border-color: #c7d2fe;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .bct_card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bct_card-desc {
+      font-size: 13px;
+      color: #555;
+    }
+
+    /* 하단 입력창 */
+    .bct_chatbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #fff;
+      border-top: 1px solid #e5e7eb;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bct_inputbox {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 720px;
+      border: 1px solid #d1d5db;
+      border-radius: 20px;
+      padding: 10px 14px;
+      gap: 10px;
+    }
+
+    .bct_input {
+      border: none;
+      outline: none;
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .bct_send {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .bct_title {
+        font-size: 20px;
+      }
+      .bct_card-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 헤더 -->
+  <header class="bct_header">
+    <div class="bct_header-left">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/OOjs_UI_icon_chat-ltr-progressive.svg" class="bct_icon" alt="logo">
+      가람포스텍 AI 지원센터
+      <span style="font-weight:400; color:#666;">24시간 스마트 고객지원 서비스</span>
+    </div>
+    <div class="bct_header-right">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/9/9e/OOjs_UI_icon_home-ltr.svg" class="bct_icon" alt="home">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/OOjs_UI_icon_phone-ltr.svg" class="bct_icon" alt="phone">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/OOjs_UI_icon_close-ltr.svg" class="bct_icon" alt="close">
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="bct_main">
+    <h1 class="bct_title">안녕하세요! 가람포스텍 AI 지원센터입니다.</h1>
+    <p class="bct_subtitle">
+      POS 시스템, 키오스크, 결제 단말기 관련 궁금한 점이나 문제가 있으시면<br>
+      언제든지 말씀해 주세요!
+    </p>
+
+    <div class="bct_card-grid">
+      <div class="bct_card">
+        <div class="bct_card-title">💻 POS 시스템</div>
+        <div class="bct_card-desc">운영 및 기술 지원</div>
+      </div>
+
+      <div class="bct_card">
+        <div class="bct_card-title">🖥️ 키오스크</div>
+        <div class="bct_card-desc">터치스크린 및 주문 시스템</div>
+      </div>
+
+      <div class="bct_card">
+        <div class="bct_card-title">💳 결제 단말기</div>
+        <div class="bct_card-desc">카드 및 전자결제</div>
+      </div>
+
+      <div class="bct_card">
+        <div class="bct_card-title">⚙️ 설치/설정</div>
+        <div class="bct_card-desc">초기 설치 및 구성</div>
+      </div>
+
+      <div class="bct_card">
+        <div class="bct_card-title">🎧 문의하기</div>
+        <div class="bct_card-desc">직접 상담 및 지원 요청</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 하단 입력창 -->
+  <div class="bct_chatbar">
+    <div class="bct_inputbox">
+      <input class="bct_input" type="text" placeholder="메세지를 입력하세요.">
+      <button class="bct_send">↑</button>
+    </div>
+  </div>
+
+</body>
+</html>

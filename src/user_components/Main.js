@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 export default function Main() {
     const [messages, setMessages] = useState([]);
@@ -70,9 +71,6 @@ export default function Main() {
                 }
             );
 
-
-
-
             const data = await requestAssistantAnswer(content);
             // const data = await response.json();
             const answer = data.answer?.trim?.() ? data.answer.trim() : "응답을 가져올 수 없습니다.";
@@ -99,119 +97,94 @@ export default function Main() {
         }
     };
 
+    const [knowledgeList, setknowledgeList] = useState([]);
+
+
+    useEffect(() => {
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/knowledge/`, {
+                params: {
+                    offset: 0,
+                    limit: 5,
+                },
+            })
+            .then((res) => {
+                setknowledgeList(res.data);
+                console.log("📌 지식베이스 목록:", res.data);
+            })
+            .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                    alert("해당 setting을 찾을 수 없습니다.");
+                } else {
+                    console.error("❌ 요청 실패:", err);
+                }
+            });
+    }, []);
+
     return (
         <>
-            <div className="chat-app">
-                <header className="chat-header">
-                    <div className="header-left">
-                        <button className="ghost-button" id="newSessionButton">
-                            + 새 대화
-                        </button>
-                        <div className="title-group">
-                            <h1>AI 상담 챗봇</h1>
-                            <div className="session-meta">
-                                <span>세션</span>
-                                <span className="session-id">#42</span>
-                                <span className="connection-status success">
-                                    <span className="status-dot"></span>
-                                    <span>API 연결 성공</span>
-                                </span>
-                            </div>
-                        </div>
+            <div className="chatbot-service">
+                <header className="chatbot-header">
+                    <div className="chatbot-header-inner">
+                        <div className="chatbot-logo"></div>
+                        <div className="chatbot-header-title">가람포스텍 AI 지원센터</div>
+                        <div className="chatbot-header-subtitle">24시간 스마트 고객지원 서비스</div>
                     </div>
-
-                    <div className="header-right">
-                        <input className="text-input" id="sessionTitleInput" type="text" placeholder="세션 제목을 입력하세요" autocomplete="off" />
-                        <div className="input-chip">
-                            <label for="apiBaseInput">API</label>
-                            <input id="apiBaseInput" type="text" placeholder="http://localhost:5002" autocomplete="off" />
-                        </div>
-                        <button className="ghost-button" id="checkConnectionButton">연결 확인</button>
+                    <div className="chatbot-header-buttons">
+                        <button className="chatbot-header-button"><i className="icon-home"></i></button>
+                        <button className="chatbot-header-button"><i className="icon-call"></i></button>
+                        <button className="chatbot-header-button"><i className="icon-close"></i></button>
                     </div>
-
                 </header>
 
-                <main className="chat-main" id="chatMain">
-                    <div className="chat-main-inner">
-                        <div className="messages" id="messages">
-                            {messages.map((msg, index) => (
-                                <div
-                                    key={index}
-                                    className={`message-row ${msg.role === "user" ? "user" : "assistant"}`}
-                                >
-                                    <div className="avatar">
-                                        {msg.role === "user" ? "나" : "AI"}
-                                    </div>
-                                    <div className="message-bubble">{msg.content}</div>
-                                </div>
-                            ))}
-
-                            {loading && (
-                                <div className="message-row assistant">
-                                    <div className="avatar">AI</div>
-                                    <div className="message-bubble typing">
-                                        <span className="typing-dot"></span>
-                                        <span className="typing-dot"></span>
-                                        <span className="typing-dot"></span>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </main>
-
-                <footer className="chat-footer">
-                    <div className="footer-inner">
-                        <div className="footer-top">
-                            <textarea
-                                id="messageInput"
-                                value={messageInput}
-                                onChange={(e) => setMessageInput(e.target.value)}
-                                placeholder="메시지를 입력하고 Enter 키로 전송해보세요."
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleSend();
-                                    }
-                                }}
-                            />
-                            <button className="primary-button" onClick={handleSend}>
-                                <span>전송</span>
-                            </button>
-                        </div>
 
 
-                        <div className="footer-bottom">
-                            <div className="options">
-                                <div className="option-chip">
-                                    <span>검색 Top-K</span>
-                                    <select id="topKSelect">
-                                        <option value="3">3</option>
-                                        <option value="5" selected="">5</option>
-                                        <option value="7">7</option>
-                                        <option value="10">10</option>
-                                    </select>
-                                </div>
-                                <div className="option-chip">
-                                    <span>지식베이스</span>
-                                    <select id="knowledgeSelect"><option value="">전체</option><option value="6">#6 · 기본_고객응대 매뉴얼.pdf</option><option value="5">#5 · 고객응대관련법규.pdf</option><option value="4">#4 · 고객응대근로자.pdf</option><option value="2">#2 · 정부AI정책방향.pdf</option><option value="1">#1 · 가람포스텍전문AS매뉴얼_20250714.pdf</option></select>
-                                </div>
-                            </div>
-                            <div className="options">
-                                <div className="option-chip">
-                                    <span>응답 언어</span>
-                                    <span>한국어</span>
-                                </div>
+
+
+                <div className="chatbot-chat-area">
+                    <div className="chatbot-chat-section">
+                        <h1 className="chatbot-intro-title">안녕하세요! 가람포스텍 AI 지원센터입니다.</h1>
+                        <p className="chatbot-intro-text">
+                            POS 시스템, 키오스크, 결제 단말기 관련 궁금한 점이나 문제가 있으시면 언제든지 말씀해 주세요!
+                        </p>
+
+                        <div className="chatbot-button chatbot-button--monitor">
+                            <div className="chatbot-button-icon"></div>
+                            <div>
+                                <div className="chatbot-button-title">POS 시스템</div>
+                                <div className="chatbot-button-desc">설치 및 문제 해결</div>
                             </div>
                         </div>
-
-
-
-
-
                     </div>
-                </footer>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+                <div className="chatbot-input-area">
+                    <div className="chatbot-input-box">
+                        <input className="chatbot-input-message" placeholder="메시지를 입력하세요..." />
+                        <div className="chatbot-input-tools">
+                            <div className="chatbot-input-tools-left">
+                                <button className="chatbot-input-button"><i className="icon-attachment"></i></button>
+                            </div>
+                            <div className="chatbot-input-tools-right">
+                                <button className="chatbot-input-button"><i className="icon-mic"></i></button>
+                                <button className="chatbot-input-button send"><i className="icon-send"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+
         </>
     );
 }
