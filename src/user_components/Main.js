@@ -121,42 +121,99 @@ export default function Main() {
             });
     }, []);
 
+    const [plusmenu, setplusmenu] = useState(true);
+
     return (
         <>
             <div className="chatbot-service">
+
                 <header className="chatbot-header">
                     <div className="chatbot-header-inner">
-                        <div className="chatbot-logo"></div>
-                        <div className="chatbot-header-title">가람포스텍 AI 지원센터</div>
-                        <div className="chatbot-header-subtitle">24시간 스마트 고객지원 서비스</div>
+                        <i className="chatbot-logo"></i>
+                        <div style={{ display: "flex" }}>
+                            <div className="chatbot-header-title">가람포스텍 AI 지원센터</div>
+                            <div className="chatbot-header-subtitle">24시간 스마트 고객지원 서비스</div>
+                        </div>
                     </div>
                     <div className="chatbot-header-buttons">
                         <button className="chatbot-header-button"><i className="icon-home"></i></button>
                         <button className="chatbot-header-button"><i className="icon-call"></i></button>
-                        <button className="chatbot-header-button"><i className="icon-close"></i></button>
+                        {/* <button className="chatbot-header-button"><i className="icon-close"></i></button> */}
                     </div>
                 </header>
 
 
+                <main className="chatbot-chat-area">
+                    <section className="chatbot-chat-section">
+
+                        <div className="chatbot-welecome-section">
+                            <h1 className="chatbot-intro-title">안녕하세요! 가람포스텍 AI 지원센터입니다.</h1>
+                            <p className="chatbot-intro-text">
+                                POS 시스템, 키오스크, 결제 단말기 관련 궁금한 점이나 문제가 있으시면 <br /> 언제든지 말씀해 주세요!
+                            </p>
+                        </div>
 
 
+                        <div className="chatbot-button-grid">
+                            <div className="chatbot-button">
+                                <div className="chatbot-button-icon icon-monitor"></div>
+                                <div>
+                                    <div className="chatbot-button-title">POS 시스템</div>
+                                    <div className="chatbot-button-desc">설치 및 문제 해결</div>
+                                </div>
+                            </div>
 
-                <div className="chatbot-chat-area">
-                    <div className="chatbot-chat-section">
-                        <h1 className="chatbot-intro-title">안녕하세요! 가람포스텍 AI 지원센터입니다.</h1>
-                        <p className="chatbot-intro-text">
-                            POS 시스템, 키오스크, 결제 단말기 관련 궁금한 점이나 문제가 있으시면 언제든지 말씀해 주세요!
-                        </p>
+                            <div className="chatbot-button">
+                                <div className="chatbot-button-icon icon-kiosk"></div>
+                                <div>
+                                    <div className="chatbot-button-title">키오스크</div>
+                                    <div className="chatbot-button-desc">터치스크링 및 주문 시스템</div>
+                                </div>
+                            </div>
 
-                        <div className="chatbot-button chatbot-button--monitor">
-                            <div className="chatbot-button-icon"></div>
-                            <div>
-                                <div className="chatbot-button-title">POS 시스템</div>
-                                <div className="chatbot-button-desc">설치 및 문제 해결</div>
+                            <div className="chatbot-button">
+                                <div className="chatbot-button-icon icon-card"></div>
+                                <div>
+                                    <div className="chatbot-button-title">결제 단말기</div>
+                                    <div className="chatbot-button-desc">카드 및 전자결제</div>
+                                </div>
+                            </div>
+
+                            <div className="chatbot-button">
+                                <div className="chatbot-button-icon icon-code"></div>
+                                <div>
+                                    <div className="chatbot-button-title">설치/설정</div>
+                                    <div className="chatbot-button-desc">초기 설치 및 구성</div>
+                                </div>
+                            </div>
+
+                            <div className="chatbot-button">
+                                <div className="chatbot-button-icon icon-headset"></div>
+                                <div>
+                                    <div className="chatbot-button-title ">문의하기</div>
+                                    <div className="chatbot-button-desc">직접 상담 및 지원 요청</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+
+
+                        <div className="chatbot-underline"></div>
+
+                        <div className="chatbot-submenu-wrap">
+                            <h5 className="chatbot-submenu-title">POS 시스템 지원</h5>
+
+                            <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
+
+                            <div className="chatbot-submenu-single">
+                                <div>1</div>
+                                <div>
+                                    <h3>시스템 부팅/시작 오류</h3>
+                                    <p>POS가 켜지지 않거나 시작 중 멈춤</p>
+                                </div>
+                            </div>
+
+
+                        </div>
 
 
 
@@ -165,24 +222,40 @@ export default function Main() {
 
 
 
+                    </section>
+                </main>
 
 
-
-                <div className="chatbot-input-area">
+                <footer className="chatbot-input-area">
                     <div className="chatbot-input-box">
                         <input className="chatbot-input-message" placeholder="메시지를 입력하세요..." />
                         <div className="chatbot-input-tools">
                             <div className="chatbot-input-tools-left">
-                                <button className="chatbot-input-button"><i className="icon-attachment"></i></button>
+                                <button className="chatbot-input-button-active"><i className="icon-attachment-active"></i></button>
+
+                                <div className={`plus-menu ${plusmenu ? "open" : ""}`}>
+                                    <div className="menu-section">
+                                        <div className="menu-item" >
+                                            <div className="menu-item-icon"><i className="icon-clip"></i></div>
+                                            <div className="menu-item-text">
+                                                <div className="menu-item-title">사진 및 파일 첨부</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+
+
                             <div className="chatbot-input-tools-right">
-                                <button className="chatbot-input-button"><i className="icon-mic"></i></button>
+                                <button className="chatbot-input-button mic-active"><i className="icon-mic-active"></i></button>
                                 <button className="chatbot-input-button send"><i className="icon-send"></i></button>
                             </div>
                         </div>
                     </div>
-                </div>
+                </footer>
             </div>
+
 
 
         </>

@@ -1,11 +1,23 @@
+:root {
+    --Chatbot-Button-Stroke: linear-gradient(92deg, #C2D93D 0.29%, #5289FF 51.51%, #FF8FB3 99.85%);
+    --Grey---Button-BG: #F5F5F5;
+    --Mic-Active: linear-gradient(156deg, #B14EB7 23.38%, #3B82F6 130.13%);
+}
+
+
+
+
+
 /* ================================================
    Chatbot Service - PC Layout
    ================================================ */
 
 .chatbot-service {
-    position: relative;
-    min-height: 100vh;
-    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* 전체 화면 높이 */
+    background: #FFFFFF;
 }
 
 /* ================================================
@@ -14,19 +26,14 @@
 
 .chatbot-header {
     display: flex;
-    flex-direction: row;
+    height: 3.125rem;
+    padding: 0 1.25rem;
     justify-content: space-between;
     align-items: center;
-    padding: 0px 20px;
-
-    position: absolute;
-    height: 50px;
-    left: 0px;
-    right: 0px;
-    top: 0px;
-
-    background: #ffffff;
-    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.09);
+    flex-shrink: 0;
+    background: #FFF;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.09);
+    margin-bottom: 30px;
 }
 
 .chatbot-header-inner {
@@ -71,19 +78,28 @@
 }
 
 .chatbot-header-title {
-    font-family: 'Pretendard';
+    color: var(--Black---323232, #323232);
+
+    /* Chatbot Header Bar - Title */
+    font-family: Pretendard;
+    font-size: 1.125rem;
+    font-style: normal;
     font-weight: 700;
-    font-size: 18px;
-    line-height: 21px;
-    color: #323232;
+    line-height: normal;
+    margin-right: 10px;
 }
 
 .chatbot-header-subtitle {
-    font-family: 'Pretendard';
+    overflow: hidden;
+    color: var(--Black---323232, #323232);
+    text-overflow: ellipsis;
+
+    /* Chatbot Header Bar - Sub title */
+    font-family: Pretendard;
+    font-size: 1.125rem;
+    font-style: normal;
     font-weight: 400;
-    font-size: 18px;
-    line-height: 21px;
-    color: #323232;
+    line-height: normal;
 }
 
 .chatbot-header-buttons {
@@ -102,342 +118,10 @@
     background: #ffffff;
     border-radius: 8px;
     display: flex;
-    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-
-    :root {
-        --blue-primary: #3B82F6;
-        --grey-inactive: #777;
-        --gradient-text: linear-gradient(90deg, #F3AE2F 0%, #AD61EF 99.99%);
-        --button-stroke: #C2D93D;
-        --button-bg: #F5F5F5;
-        --black-text: #323232;
-    }
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: Pretendard, -apple-system, Roboto, Helvetica, sans-serif;
-    }
-
-    .welcome-container {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        background: #FFF;
-    }
-
-    .welcome-header {
-        position: relative;
-        width: 100%;
-    }
-
-    .header-image {
-        width: 100%;
-        height: 50px;
-        object-fit: cover;
-        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.09);
-        display: block;
-    }
-
-    .welcome-main {
-        flex: 1;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 40px 20px 180px;
-        overflow-y: auto;
-    }
-
-    .welcome-content {
-        max-width: 800px;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 32px;
-    }
-
-    .welcome-title {
-        font-size: 32px;
-        font-weight: 700;
-        line-height: 1.2;
-        background: var(--gradient-text);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-align: center;
-    }
-
-    .welcome-subtitle {
-        color: #000;
-        font-size: 20px;
-        font-weight: 400;
-        line-height: 1.6;
-        text-align: center;
-    }
-
-    .menu-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .menu-button {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 12px 20px;
-        border-radius: 16px;
-        border: 1px solid var(--button-stroke);
-        background: var(--button-bg);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        min-height: 72px;
-    }
-
-    .menu-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(194, 217, 61, 0.3);
-        background: #FAFAFA;
-    }
-
-    .menu-button:active {
-        transform: translateY(0);
-    }
-
-    .menu-icon {
-        flex-shrink: 0;
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .menu-icon svg {
-        width: 36px;
-        height: 36px;
-    }
-
-    .menu-text {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        text-align: left;
-    }
-
-    .menu-title {
-        color: var(--black-text);
-        font-size: 17px;
-        font-weight: 700;
-        line-height: 1.2;
-    }
-
-    .menu-description {
-        color: var(--black-text);
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 1.25;
-    }
-
-    .welcome-footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(255, 255, 255, 0.98);
-        padding: 20px;
-        display: flex;
-        justify-content: center;
-        backdrop-filter: blur(10px);
-    }
-
-    .input-container {
-        width: 100%;
-        max-width: 768px;
-    }
-
-    .input-box {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        padding: 20px;
-        border-radius: 28px;
-        border: 1px solid var(--blue-primary);
-        background: #FFF;
-        box-shadow: 0 4px 12px 2px rgba(0, 0, 0, 0.10);
-    }
-
-    .message-input-wrapper {
-        width: 100%;
-    }
-
-    .message-input {
-        width: 100%;
-        padding: 10px 0;
-        border: none;
-        outline: none;
-        font-family: Pretendard, -apple-system, Roboto, Helvetica, sans-serif;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 2;
-        color: var(--black-text);
-        background: transparent;
-    }
-
-    .message-input::placeholder {
-        color: var(--grey-inactive);
-    }
-
-    .input-tools {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .input-left-tools {
-        display: flex;
-        gap: 8px;
-    }
-
-    .input-right-tools {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-
-    .tool-button {
-        width: 40px;
-        height: 40px;
-        border: none;
-        background: transparent;
-        cursor: pointer;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.2s ease;
-    }
-
-    .tool-button:hover {
-        transform: scale(1.05);
-    }
-
-    .tool-button:active {
-        transform: scale(0.95);
-    }
-
-    .tool-button svg {
-        display: block;
-    }
-
-    @media (max-width: 768px) {
-        .welcome-main {
-            padding: 30px 16px 200px;
-        }
-
-        .welcome-title {
-            font-size: 24px;
-        }
-
-        .welcome-subtitle {
-            font-size: 16px;
-        }
-
-        .menu-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .menu-button {
-            min-height: 64px;
-            padding: 10px 16px;
-        }
-
-        .menu-icon {
-            width: 32px;
-            height: 32px;
-        }
-
-        .menu-icon svg {
-            width: 32px;
-            height: 32px;
-        }
-
-        .menu-title {
-            font-size: 16px;
-        }
-
-        .menu-description {
-            font-size: 14px;
-        }
-
-        .input-box {
-            padding: 16px;
-            border-radius: 24px;
-        }
-
-        .message-input {
-            font-size: 14px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .welcome-content {
-            gap: 24px;
-        }
-
-        .welcome-title {
-            font-size: 20px;
-        }
-
-        .welcome-subtitle {
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .menu-grid {
-            margin-top: 12px;
-        }
-
-        .welcome-footer {
-            padding: 12px;
-        }
-
-        .input-box {
-            padding: 12px;
-            border-radius: 20px;
-        }
-
-        .tool-button {
-            width: 36px;
-            height: 36px;
-        }
-
-        .tool-button svg {
-            width: 36px;
-            height: 36px;
-        }
-    }
-
-    @media (min-width: 1200px) {
-        .menu-grid {
-            grid-template-columns: repeat(2, minmax(300px, 354px));
-            gap: 24px;
-            justify-content: center;
-        }
-    }
-
     justify-content: center;
     align-items: center;
-
     border: 0px;
+    cursor: pointer;
 }
 
 .chatbot-header-button svg,
@@ -450,51 +134,83 @@
    Intro Text
    ================================================ */
 
-.chatbot-chat-area {}
+.chatbot-chat-area {
+    /* max-width: 768px; */
+    flex: 1;
+    /* 남은 공간 모두 차지 */
+    overflow-y: auto;
+    padding: 20px;
+    background: #fff;
+}
 
 .chatbot-chat-section {
-    width: 768px;
-    max-width: 768px;
-    background: red;
-
+    width: 50rem;
+    max-width: 50rem;
+    margin: 0 auto;
 }
 
 .chatbot-intro-title {
-    position: absolute;
-    left: 596px;
-    top: 90px;
 
-    font-family: 'Pretendard';
+    /* Chatbot - TXT - Hello */
+    font-family: Pretendard;
+    font-size: 2rem;
+    font-style: normal;
     font-weight: 600;
-    font-size: 32px;
-    line-height: 38px;
-
-    background: linear-gradient(90.01deg, #f3ae2f 0%, #ad61ef 99.99%);
+    line-height: normal;
+    background: var(--Text-Gradient, linear-gradient(90deg, #F3AE2F 0%, #AD61EF 99.99%));
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .chatbot-intro-text {
-    position: absolute;
-    width: 561px;
-    height: 64px;
-    left: 596px;
-    top: 146px;
+    color: #000;
 
-    font-family: 'Pretendard';
+    /* Chatbot - TXT - Introduction */
+    font-family: Pretendard;
+    font-size: 1.25rem;
+    font-style: normal;
     font-weight: 400;
-    font-size: 20px;
-    line-height: 32px;
-    color: #000000;
+    line-height: 2rem;
+    /* 160% */
+    margin: 20px 0px;
+}
+
+.chatbot-welecome-section {
+    padding-left: 20px;
 }
 
 
 
+/* ================================================
+   Chatbot Submenu
+   ================================================ */
+
+.chatbot-underline {
+    width: 100%;
+    height: 0.0625rem;
+    background: #BDBDBD;
+    margin: 20px auto;
+}
+
+.chatbot-submenu-wrap {}
 
 
+.chatbot-submenu-title {
+    /* H5 */
+    font-family: Pretendard;
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 1.625rem;
+    /* 130% */
+    color: #000000;
+}
 
 
-
+.chatbot-submenu-single {
+    display: flex;
+}
 
 
 /* ================================================
@@ -506,31 +222,60 @@
 }
 
 .chatbot-button {
-    box-sizing: border-box;
     display: flex;
-    flex-direction: row;
+    width: 22.125rem;
+    padding: 0.75rem 1.25rem;
     align-items: flex-start;
-    padding: 12px 20px;
-    gap: 16px;
-    position: absolute;
-    width: 354px;
-    height: 72px;
-
-    background: #f5f5f5;
-    border-radius: 16px;
-
+    gap: 1rem;
+    border-radius: 1rem;
+    border: 1px solid transparent;
+    background:
+        linear-gradient(var(--Grey---Button-BG), var(--Grey---Button-BG)) padding-box,
+        var(--Chatbot-Button-Stroke) border-box;
+    transition: all 0.3s ease-in;
     cursor: pointer;
-    transition: background 0.2s ease;
+    margin: auto;
 }
 
 .chatbot-button:hover {
-    background: #e8e8e8;
+    border: 1px solid var(--Purple---Active, #B14EB7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+    background: var(--Grey---Button-BG, #F5F5F5);
+}
+
+.chatbot-button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 1rem;
+    /* 버튼 간 간격 */
+    padding: 1rem 0;
 }
 
 .chatbot-button-icon {
     width: 36px;
     height: 36px;
     flex: none;
+}
+
+.icon-monitor {
+    background: url('/public/icon\ -\ monitor.png') no-repeat center center / cover;
+}
+
+.icon-kiosk {
+    background: url('/public/icon\ -\ kiosk.png') no-repeat center center / cover;
+}
+
+.icon-card {
+    background: url('/public/icon\ -\ credit\ card.png') no-repeat center center / cover;
+}
+
+.icon-code {
+    background: url('/public/icon\ -\ code.png') no-repeat center center / cover;
+}
+
+.icon-headset {
+    background: url('/public/icon\ -\ headset.png') no-repeat center center / cover;
 }
 
 .chatbot-button-title {
@@ -549,31 +294,6 @@
     color: #323232;
 }
 
-/* 위치 지정 (피그마 원본 좌표 유지) */
-.chatbot-button--monitor {
-    left: 596px;
-    top: 230px;
-}
-
-.chatbot-button--card {
-    left: 596px;
-    top: 322px;
-}
-
-.chatbot-button--headset {
-    left: 596px;
-    top: 414px;
-}
-
-.chatbot-button--kiosk {
-    left: 970px;
-    top: 230px;
-}
-
-.chatbot-button--code {
-    left: 970px;
-    top: 322px;
-}
 
 /* ================================================
    Input Box Area
@@ -583,16 +303,12 @@
 
 .chatbot-input-area {
     display: flex;
+
+    padding: 0 1.25rem 1.25rem 1.25rem;
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
-    padding: 0px 20px 20px;
-
-    position: absolute;
-    height: 160px;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
+    background: rgba(255, 255, 255, 0.00);
 }
 
 .chatbot-input-box {
@@ -604,9 +320,9 @@
     padding: 20px;
     gap: 8px;
 
-    width: 768px;
-    max-width: 768px;
+    max-width: 51rem;
     height: 140px;
+    width: 51rem;
 
     background: #ffffff;
     border: 1px solid #3b82f6;
@@ -638,6 +354,7 @@
 .chatbot-input-tools-left {
     display: flex;
     gap: 8px;
+    position: relative;
 }
 
 .chatbot-input-tools-right {
@@ -653,9 +370,147 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 1px solid transparent;
+    transition: all 0.3s ease-in;
+    cursor: pointer;
+}
+
+.chatbot-input-button-active {
+    width: 40px;
+    height: 40px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    cursor: pointer;
+
 }
 
 .chatbot-input-button.send {
     background: #3b82f6;
     color: #ffffff;
+}
+
+.mic:hover {
+    background: #ffffff;
+    border: 1px solid black;
+}
+
+.mic-active {
+    background: var(--Mic-Active);
+}
+
+.icon-attachment {
+    width: 15px;
+    height: 15px;
+    background: url('/public/icon-plus.png') no-repeat center center / cover;
+}
+
+.icon-attachment-active {
+    width: 20px;
+    height: 20px;
+    background: url('/public/icon-plus-active.png') no-repeat center center / cover;
+}
+
+.icon-mic {
+    width: 15px;
+    height: 20px;
+    background: url('/public/icon-mic.png') no-repeat center center / cover;
+}
+
+.icon-mic-active {
+    width: 15px;
+    height: 20px;
+    background: url('/public/icon-mic.png') no-repeat center center / cover;
+}
+
+.icon-send {
+    width: 15px;
+    height: 20px;
+    background: url('/public/icon-arrow-up.png') no-repeat center center / cover;
+}
+
+.icon-clip {
+    width: 10px;
+    height: 20px;
+    background: url('/public/icon-clip.png') no-repeat center center / cover;
+}
+
+
+/* 통합 팝업 메뉴 */
+.plus-menu {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    min-width: 280px;
+    transition: all 0.2s ease;
+    z-index: 1000;
+    margin-bottom: 12px;
+
+    display: flex;
+    width: 18.75rem;
+    padding: 1.5rem 1.625rem;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.plus-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.menu-section {
+    padding: var(--spacing-2) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-3) var(--spacing-4);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    gap: var(--spacing-3);
+}
+
+.menu-item:hover {
+    background: var(--gray-50);
+}
+
+.menu-item-icon {
+    display: flex;
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+.menu-item-text {
+    flex: 1;
+}
+
+.menu-item-title {
+    overflow: hidden;
+    color: var(--Black---323232, #323232);
+    text-overflow: ellipsis;
+    font-family: Pretendard;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.menu-item-desc {
+    font-size: var(--text-xs);
+    color: var(--gray-500);
+    line-height: 1.3;
 }
