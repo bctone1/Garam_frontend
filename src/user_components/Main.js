@@ -114,9 +114,8 @@ export default function Main() {
             </div>,
 
             <div className="chatbot-guide">
-                <h5 className="chatbot-submenu-title-h5">POS 시스템 부팅 오류 해결 가이드</h5> <br />
+                <h5 className="chatbot-submenu-title-h5">POS 시스템 부팅 오류 해결 가이드</h5>
                 <h6 className="chatbot-submenu-title-h6">즉시 시도할 수 있는 해결 방법:</h6>
-                <br />
                 <br />
                 <h6 className="chatbot-submenu-title-h6">리스트 타입 - 1단계: 전원 확인</h6>
 
@@ -185,7 +184,7 @@ export default function Main() {
                         <div className="chatbot-button-icon icon-kiosk"></div>
                         <div>
                             <div className="chatbot-button-title">키오스크</div>
-                            <div className="chatbot-button-desc">터치스크링 및 주문 시스템</div>
+                            <div className="chatbot-button-desc">터치스크린 및 주문 시스템</div>
                         </div>
                     </div>
 
