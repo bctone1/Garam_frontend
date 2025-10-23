@@ -248,7 +248,7 @@ export default function Main() {
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home"><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                         <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
@@ -278,7 +278,7 @@ export default function Main() {
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home"><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                         <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
@@ -310,7 +310,7 @@ export default function Main() {
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home"><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                         <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
@@ -342,7 +342,7 @@ export default function Main() {
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home"><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                         <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
@@ -374,7 +374,7 @@ export default function Main() {
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home"><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                         <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
@@ -406,7 +406,7 @@ export default function Main() {
                     <br />
 
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home"><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                         <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
                     </div>
                 </div>
@@ -439,7 +439,7 @@ export default function Main() {
                     <br />
 
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home"><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                         <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
                     </div>
                 </div>
