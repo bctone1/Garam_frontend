@@ -632,9 +632,9 @@ export default function Main() {
                             <path d="M30 0C46.5685 0 60 13.4315 60 30C60 46.5685 46.5685 60 30 60C13.4315 60 0 46.5685 0 30C0 13.4315 13.4315 0 30 0ZM30 13C20.6112 13 13 20.6112 13 30C13 39.3888 20.6112 47 30 47C39.3888 47 47 39.3888 47 30C47 20.6112 39.3888 13 30 13Z" fill="url(#paint0_linear_3312_547)" />
                             <defs>
                                 <linearGradient id="paint0_linear_3312_547" x1="2.66172e-09" y1="16.5517" x2="60.0019" y2="16.5609" gradientUnits="userSpaceOnUse">
-                                    <stop stop-color="#F3AE2F" />
-                                    <stop offset="0.461538" stop-color="#D28A87" />
-                                    <stop offset="1" stop-color="#AD61EF" />
+                                    <stop stopColor="#F3AE2F" />
+                                    <stop offset="0.461538" stopColor="#D28A87" />
+                                    <stop offset="1" stopColor="#AD61EF" />
                                 </linearGradient>
                             </defs>
                         </svg>

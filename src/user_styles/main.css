@@ -874,6 +874,10 @@
     color: var(--Purple---Active, #B14EB7);
 }
 
+.inquiry-feedback-form{
+    margin-top: 20px;
+}
+
 
 /* ================================================
    default 속성
