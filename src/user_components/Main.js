@@ -727,11 +727,11 @@ export default function Main() {
                         <div className="chatbot-input-tools">
                             <div className="chatbot-input-tools-left">
 
-                                <button className={`chatbot-input-button${plusmenu ? "-active" : ""}`}
+                                {/* <button className={`chatbot-input-button${plusmenu ? "-active" : ""}`}
                                     onClick={() => setplusmenu((prev) => !prev)}
                                 >
                                     <i className="icon-attachment-active"></i>
-                                </button>
+                                </button> */}
 
                                 <div className={`plus-menu ${plusmenu ? "open" : ""}`}>
                                     <div className="menu-section">
