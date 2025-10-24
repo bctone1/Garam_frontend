@@ -590,15 +590,23 @@ export default function Main() {
 
     const [micStatus, setmicStatus] = useState(false);
 
-
-
-
-
-
     const sectionEndRef = useRef(null);
     useEffect(() => {
         sectionEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [sectionContent]);
+
+
+    // const [reviewStatus, setreviewStatus] = useState(true);
+    // useEffect(() => {
+    //     if (!reviewStatus) return;
+    //     setreviewStatus(false);
+    //     const timer = setTimeout(() => {
+    //         console.log("5초 동안 sectionContent 변경 없음 → getinquiryform(6) 실행");
+    //         getinquiryform(6);
+    //     }, 5000);
+
+    //     return () => clearTimeout(timer);
+    // }, [sectionContent]);
 
 
 
