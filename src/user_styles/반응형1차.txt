@@ -876,14 +876,13 @@ textarea::-webkit-scrollbar {
 
 @media screen and (max-width: 1024px) {
     .chatbot-header {
-        padding: 0 1.25rem;
+        padding: 0 1rem;
         margin-bottom: 20px;
-        height: 3.125rem;
     }
 
     .chatbot-header-inner {
         max-width: 100%;
-        gap: 8px;
+        gap: 6px;
     }
 
     .chatbot-header-title {
@@ -896,13 +895,13 @@ textarea::-webkit-scrollbar {
     }
 
     .chatbot-chat-area {
-        padding: 20px 1.25rem;
+        padding: 15px;
     }
 
     .chatbot-chat-section,
     .loading-section {
         max-width: 100%;
-        padding: 0 1rem;
+        padding: 0 15px;
     }
 
     .loading-section {
@@ -930,7 +929,7 @@ textarea::-webkit-scrollbar {
     }
 
     .chatbot-welecome-section {
-        padding-left: 1rem;
+        padding-left: 15px;
     }
 
     .chatbot-submenu-title-h3 {
@@ -945,23 +944,22 @@ textarea::-webkit-scrollbar {
 
     .chatbot-submenu-single {
         max-width: 100%;
-        padding: 0.75rem;
-        gap: 0.75rem;
+        padding: 0.625rem;
+        gap: 0.625rem;
     }
 
     .chatbot-submenu-id {
-        width: 2.75rem;
-        height: 2.75rem;
+        width: 2.5rem;
+        height: 2.5rem;
     }
 
     .chatbot-button-grid {
-        gap: 1rem;
-        grid-template-columns: repeat(2, 1fr);
+        gap: 0.875rem;
     }
 
     .chatbot-button {
         max-width: 100%;
-        padding: 0.75rem 1.125rem;
+        padding: 0.625rem 1rem;
     }
 
     .chatbot-button-title {
@@ -975,29 +973,29 @@ textarea::-webkit-scrollbar {
     }
 
     .chatbot-input-area {
-        padding: 0 1.25rem 1.25rem 1.25rem;
+        padding: 0 15px 15px 15px;
     }
 
     .chatbot-input-box {
         max-width: 100%;
-        padding: 18px;
-        height: 135px;
-        border-radius: 26px;
+        padding: 15px;
+        height: 130px;
+        border-radius: 24px;
     }
 
     .chatbot-input-message {
         font-size: 15px;
-        line-height: 30px;
+        line-height: 28px;
     }
 
     .plus-menu {
-        width: 17rem;
-        padding: 1.375rem 1.5rem;
+        width: 16rem;
+        padding: 1.25rem 1.375rem;
     }
 
     .inquiry-sky-form {
         max-width: 100%;
-        padding: 2.25rem 1.125rem;
+        padding: 2rem 1rem;
     }
 }
 
@@ -1007,124 +1005,124 @@ textarea::-webkit-scrollbar {
 
 @media screen and (max-width: 767px) {
     .chatbot-header {
-        height: 3.5rem;
-        padding: 0 1.25rem;
-        margin-bottom: 1.25rem;
+        height: 2.75rem;
+        padding: 0 0.75rem;
+        margin-bottom: 15px;
     }
 
     .chatbot-header-inner {
-        gap: 0.5rem;
-        height: auto;
+        gap: 4px;
+        height: 26px;
     }
 
     .icon-home,
     .icon-call,
     .icon-close,
     .chatbot-logo {
-        width: 1.875rem;
-        height: 1.875rem;
+        width: 26px;
+        height: 26px;
     }
 
     .chatbot-header-title {
-        font-size: 1.125rem;
-        margin-right: 0.5rem;
+        font-size: 0.875rem;
+        margin-right: 6px;
     }
 
     .chatbot-header-subtitle {
-        font-size: 1.125rem;
+        font-size: 0.875rem;
+        display: none; /* 모바일에서는 부제목 숨김 */
     }
 
     .chatbot-header-buttons {
         width: auto;
-        gap: 0.5rem;
+        gap: 6px;
     }
 
     .chatbot-header-button {
-        width: 1.875rem;
-        height: 1.875rem;
+        width: 26px;
+        height: 26px;
     }
 
     .chatbot-chat-area {
-        padding: 1.25rem;
+        padding: 12px;
     }
 
     .chatbot-chat-section,
     .loading-section {
         max-width: 100%;
-        padding: 0;
+        padding: 0 10px;
     }
 
     .loading-section {
         height: auto;
-        min-height: 20rem;
-        padding: 1.25rem;
+        min-height: 300px;
     }
 
     .loading-section svg {
-        width: 3.75rem;
-        height: 3.75rem;
+        width: 3rem;
+        height: 3rem;
     }
 
     .loading-section h1 {
-        font-size: 2rem;
-        margin: 1.25rem 0;
+        font-size: 1.5rem;
+        margin: 15px 0;
     }
 
     .loading-section p {
-        font-size: 1.25rem;
-        line-height: 2rem;
+        font-size: 1rem;
+        line-height: 1.5rem;
     }
 
     .chatbot-intro-title {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
 
     .chatbot-intro-text {
-        font-size: 1.25rem;
-        line-height: 2rem;
-        margin: 1.25rem 0;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        margin: 12px 0;
     }
 
     .chatbot-welecome-section {
-        padding-left: 1.25rem;
+        padding-left: 10px;
     }
 
     .chatbot-underline {
-        margin: 1.25rem auto;
+        margin: 15px auto;
     }
 
     .chatbot-submenu-title-h3 {
-        font-size: 1.625rem;
-        line-height: 2rem;
-    }
-
-    .chatbot-submenu-title-h5 {
         font-size: 1.25rem;
         line-height: 1.625rem;
     }
 
+    .chatbot-submenu-title-h5 {
+        font-size: 1rem;
+        line-height: 1.375rem;
+    }
+
     .chatbot-submenu-title-h6 {
-        font-size: 1.0625rem;
-        line-height: 1.4375rem;
+        font-size: 0.9375rem;
+        line-height: 1.25rem;
     }
 
     .chatbot-submenu-single {
         max-width: 100%;
-        padding: 0.75rem;
-        gap: 0.75rem;
-        border-radius: 2.125rem;
+        padding: 0.5rem;
+        gap: 0.5rem;
+        border-radius: 1.5rem;
     }
 
     .chatbot-submenu-id {
-        width: 3rem;
-        height: 3rem;
-        font-size: 1rem;
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: 0.875rem;
     }
 
     .chatbot-submenu {
-        height: 2rem;
-        padding: 0.25rem 0.5rem;
-        font-size: 1rem;
+        height: 1.75rem;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.875rem;
     }
 
     .icon-back,
@@ -1132,24 +1130,24 @@ textarea::-webkit-scrollbar {
     .icon-down,
     .icon-copy,
     .icon-speak {
-        width: 1.25rem;
-        height: 1.25rem;
+        width: 18px;
+        height: 18px;
     }
 
     .guide-list-ul,
     .guide-list-ol {
-        margin-left: 1.875rem;
+        margin-left: 20px;
     }
 
     .guide-list-ul li,
     .guide-list-ol li {
-        margin: 0.625rem 0;
-        font-size: 1rem;
+        margin: 8px 0;
+        font-size: 0.9375rem;
     }
 
     .emergncy-call {
-        font-size: 1rem;
-        line-height: 1.5rem;
+        font-size: 0.9375rem;
+        line-height: 1.375rem;
     }
 
     /* 모바일에서 버튼 그리드를 1열로 변경 */
@@ -1161,167 +1159,320 @@ textarea::-webkit-scrollbar {
 
     .chatbot-button {
         max-width: 100%;
-        padding: 0.75rem 1.25rem;
+        padding: 0.625rem 1rem;
     }
 
     .chatbot-button-icon {
-        width: 2.25rem;
-        height: 2.25rem;
+        width: 32px;
+        height: 32px;
     }
 
     .chatbot-button-title {
-        font-size: 1.0625rem;
-        line-height: 1.25rem;
+        font-size: 15px;
+        line-height: 18px;
     }
 
     .chatbot-button-desc {
-        font-size: 1rem;
-        line-height: 1.25rem;
+        font-size: 14px;
+        line-height: 18px;
     }
 
     .chatbot-input-area {
-        padding: 0 1.25rem 1.25rem 1.25rem;
+        padding: 0 12px 12px 12px;
     }
 
     .chatbot-input-box {
         max-width: 100%;
-        padding: 1.25rem;
-        height: 8.75rem;
-        border-radius: 1.75rem;
+        padding: 12px;
+        height: 120px;
+        border-radius: 20px;
     }
 
     .chatbot-input-message {
-        font-size: 1rem;
-        line-height: 2rem;
+        font-size: 14px;
+        line-height: 26px;
     }
 
     .chatbot-input-tools {
-        height: 2.5rem;
-        margin-top: 0.5rem;
+        height: 36px;
+        margin-top: 6px;
     }
 
     .chatbot-input-tools-left,
     .chatbot-input-tools-right {
-        gap: 0.5rem;
+        gap: 6px;
     }
 
     .chatbot-input-button,
     .chatbot-input-button-active {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 36px;
+        height: 36px;
     }
 
     .icon-attachment {
-        width: 0.9375rem;
-        height: 0.9375rem;
+        width: 14px;
+        height: 14px;
     }
 
     .icon-attachment-active {
-        width: 1.25rem;
-        height: 1.25rem;
+        width: 18px;
+        height: 18px;
     }
 
     .icon-mic,
     .icon-mic-active {
-        width: 0.9375rem;
-        height: 1.25rem;
+        width: 14px;
+        height: 18px;
     }
 
     .icon-send {
-        width: 0.9375rem;
-        height: 1.25rem;
+        width: 14px;
+        height: 18px;
     }
 
     .icon-clip {
-        width: 0.625rem;
-        height: 1.25rem;
+        width: 9px;
+        height: 18px;
     }
 
     .plus-menu {
-        width: 18.75rem;
-        padding: 1.5rem 1.625rem;
-        min-width: 280px;
+        width: 14rem;
+        padding: 1rem 1.125rem;
+        min-width: 240px;
     }
 
     .menu-item {
-        padding: 0.75rem 1rem;
+        padding: 0.5rem 0.75rem;
     }
 
     .menu-item-icon {
-        font-size: 1.125rem;
-        width: 1.25rem;
+        font-size: 16px;
+        width: 18px;
     }
 
     .menu-item-title {
-        font-size: 1rem;
+        font-size: 0.9375rem;
     }
 
     .bubble-date {
-        font-size: 0.75rem;
-        margin-bottom: 0.3125rem;
+        font-size: 0.6875rem;
+        margin-bottom: 4px;
     }
 
     .bubble-message {
-        padding: 1rem 1.25rem;
-        border-radius: 1.5rem 1.5rem 0.25rem 1.5rem;
+        padding: 0.875rem 1rem;
+        border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
     }
 
     .bubble-message.assistant {
-        border-radius: 1.5rem 1.5rem 1.5rem 0.25rem;
+        border-radius: 1.25rem 1.25rem 1.25rem 0.25rem;
     }
 
     .inquiry-step {
-        height: 2.4375rem;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-        line-height: 2rem;
-        margin-right: 0.625rem;
+        height: 2.125rem;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9375rem;
+        line-height: 1.75rem;
+        margin-right: 8px;
     }
 
     .inquiry-question {
-        font-size: 1rem;
-        line-height: 1.25rem;
+        font-size: 0.9375rem;
+        line-height: 1.125rem;
     }
 
     .inquiry-sky-form {
         max-width: 100%;
-        padding: 2.5rem 1.25rem;
-        gap: 1.25rem;
-        border-radius: 1.75rem;
+        padding: 1.5rem 1rem;
+        gap: 1rem;
+        border-radius: 1.5rem;
     }
 
     .inquiry-feedback-p {
-        font-size: 1rem;
-        line-height: 1.5rem;
+        font-size: 0.9375rem;
+        line-height: 1.375rem;
     }
 
     .inquiry-feedback-choice {
-        gap: 0.75rem;
+        gap: 0.625rem;
     }
 
     .feedback-button {
-        height: 3.5625rem;
-        padding: 0.75rem 1.25rem;
-        font-size: 1rem;
+        height: 3rem;
+        padding: 0.625rem 1rem;
+        font-size: 0.9375rem;
     }
 
     .feedback-button:hover {
-        height: 3.5625rem;
-        padding: 0.75rem 1.25rem;
+        height: 3rem;
+        padding: 0.625rem 1rem;
     }
 
     .inquiry-feedback-form {
-        margin-top: 1.25rem;
+        margin-top: 15px;
     }
 
     .assistant-text,
     .assistant-text-bold {
-        font-size: 1rem;
-        line-height: 1.5rem;
+        font-size: 0.9375rem;
+        line-height: 1.375rem;
     }
 
     .chatbot-bottom-nav {
-        margin-bottom: 1.25rem;
+        margin-bottom: 15px;
+    }
+}
+
+/* ================================================
+   반응형 스타일 - 소형 모바일 (~ 375px)
+   ================================================ */
+
+@media screen and (max-width: 375px) {
+    .chatbot-header {
+        height: 2.5rem;
+        padding: 0 0.625rem;
+    }
+
+    .chatbot-header-inner {
+        gap: 3px;
+        height: 24px;
+    }
+
+    .icon-home,
+    .icon-call,
+    .icon-close,
+    .chatbot-logo {
+        width: 24px;
+        height: 24px;
+    }
+
+    .chatbot-header-title {
+        font-size: 0.8125rem;
+    }
+
+    .chatbot-header-buttons {
+        gap: 4px;
+    }
+
+    .chatbot-header-button {
+        width: 24px;
+        height: 24px;
+    }
+
+    .chatbot-chat-area {
+        padding: 10px;
+    }
+
+    .loading-section svg {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .loading-section h1 {
+        font-size: 1.375rem;
+    }
+
+    .loading-section p {
+        font-size: 0.9375rem;
+    }
+
+    .chatbot-intro-title {
+        font-size: 1.375rem;
+    }
+
+    .chatbot-intro-text {
+        font-size: 0.9375rem;
+        line-height: 1.375rem;
+    }
+
+    .chatbot-submenu-title-h3 {
+        font-size: 1.125rem;
+        line-height: 1.5rem;
+    }
+
+    .chatbot-submenu-title-h5 {
+        font-size: 0.9375rem;
+        line-height: 1.25rem;
+    }
+
+    .chatbot-submenu-title-h6 {
+        font-size: 0.875rem;
+        line-height: 1.125rem;
+    }
+
+    .chatbot-button {
+        padding: 0.5rem 0.875rem;
+    }
+
+    .chatbot-button-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .chatbot-button-title {
+        font-size: 14px;
+        line-height: 17px;
+    }
+
+    .chatbot-button-desc {
+        font-size: 13px;
+        line-height: 17px;
+    }
+
+    .chatbot-input-box {
+        padding: 10px;
+        height: 110px;
+        border-radius: 18px;
+    }
+
+    .chatbot-input-message {
+        font-size: 13px;
+        line-height: 24px;
+    }
+
+    .chatbot-input-tools {
+        height: 32px;
+    }
+
+    .chatbot-input-button,
+    .chatbot-input-button-active {
+        width: 32px;
+        height: 32px;
+    }
+
+    .plus-menu {
+        width: 12.5rem;
+        padding: 0.875rem 1rem;
+        min-width: 200px;
+    }
+
+    .menu-item-title {
+        font-size: 0.875rem;
+    }
+
+    .bubble-message {
+        padding: 0.75rem 0.875rem;
+    }
+
+    .inquiry-sky-form {
+        padding: 1.25rem 0.875rem;
+    }
+
+    .feedback-button {
+        height: 2.75rem;
+        padding: 0.5rem 0.875rem;
+        font-size: 0.875rem;
+    }
+
+    .feedback-button:hover {
+        height: 2.75rem;
+        padding: 0.5rem 0.875rem;
+    }
+
+    .assistant-text,
+    .assistant-text-bold {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
     }
 }
 
@@ -1367,14 +1518,10 @@ textarea::-webkit-scrollbar {
 
     /* 버튼 터치 영역 확대 */
     .chatbot-input-button,
-    .chatbot-input-button-active {
-        min-width: 2.5rem;
-        min-height: 2.5rem;
-    }
-    
+    .chatbot-input-button-active,
     .chatbot-header-button {
-        min-width: 1.875rem;
-        min-height: 1.875rem;
+        min-width: 44px;
+        min-height: 44px;
     }
 }
 
@@ -1384,33 +1531,32 @@ textarea::-webkit-scrollbar {
 
 @media screen and (max-width: 767px) and (orientation: landscape) {
     .chatbot-header {
-        height: 3rem;
-        margin-bottom: 0.75rem;
+        height: 2.5rem;
+        margin-bottom: 10px;
     }
 
     .chatbot-chat-area {
-        padding: 0.75rem 1.25rem;
+        padding: 10px;
     }
 
     .loading-section {
-        min-height: 18rem;
+        min-height: 250px;
     }
 
     .loading-section h1 {
-        font-size: 1.75rem;
-        margin: 1rem 0;
+        font-size: 1.25rem;
     }
 
     .loading-section p {
-        font-size: 1.125rem;
-        line-height: 1.75rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
     }
 
     .chatbot-input-box {
-        height: 7.5rem;
+        height: 100px;
     }
 
     .chatbot-input-area {
-        padding: 0 1.25rem 0.75rem 1.25rem;
+        padding: 0 12px 10px 12px;
     }
 }
