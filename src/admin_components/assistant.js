@@ -49,7 +49,6 @@ export default function Assisstant() {
 
     return (
         <>
-
             <main className="assistant-main-content">
                 {/* 상단 헤더 */}
                 <header className="top-header">
