@@ -463,7 +463,22 @@ export default function Main() {
                 ...prev,
                 <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date assistant">{formattedTime}</div>
-                    <div className="bubble-message assistant">문의가 등록되었습니다!</div>
+                    <div className="bubble-message assistant">
+                        📝문의가 접수 되었습니다.<br />
+                        <br />
+                        접수 정보:<br />
+                        • 작성자: {inquiryInfo.name}<br />
+                        • 거래처: {inquiryInfo.group}<br />
+                        • 연락처: {inquiryInfo.phone}<br />
+                        • 문의 내용: {inquiryInfo.detail}<br />
+                        <br />
+                        귀하의 문의사항이 정상적으로 접수되었습니다.<br />
+                        담당자가 확인 후 영업일 기준 1-2일 내에 연락드리겠습니다.<br />
+                        <br />
+                        긴급한 사항인 경우 1588-1234로 직접 연락주시기 바랍니다.<br />
+                        <br />
+                        감사합니다! 🙏<br />
+                    </div>
                 </div>
             ]);
             setinquiryStatus(false);
