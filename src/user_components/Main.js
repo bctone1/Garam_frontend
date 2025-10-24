@@ -67,8 +67,8 @@ export default function Main() {
         setinquiryStatus(false);
         setSectionContent(prev => [
             ...prev,
-            <div className="chatbot-underline" />,
-            <div className="chatbot-submenu-wrap">
+            <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
+            <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
                 <h5 className="chatbot-submenu-title-h5">POS 시스템 지원</h5>
                 <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
                 <div className="chatbot-submenu-single" onClick={getAnswer}>
@@ -121,12 +121,12 @@ export default function Main() {
     const getAnswer = () => {
         setSectionContent(prev => [
             ...prev,
-            <div className="chatbot-bubble user">
+            <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                 <div className="bubble-date user">09. 23. 16:59</div>
                 <div className="bubble-message user">시스템 부팅/시작 오류 관련 문의입니다.</div>
             </div>,
 
-            <div className="chatbot-guide">
+            <div className="chatbot-guide" key={`guide-${Date.now()}`}>
                 <h5 className="chatbot-submenu-title-h5">POS 시스템 부팅 오류 해결 가이드</h5>
                 <h6 className="chatbot-submenu-title-h6">즉시 시도할 수 있는 해결 방법:</h6>
                 <br />
@@ -214,8 +214,8 @@ export default function Main() {
         if (status === 1) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="chatbot-underline"></div>,
-                <div className="inquiry-form">
+                <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
+                <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
                         <div className="inquiry-step"><h4>1</h4>/5 단계</div>
 
@@ -249,7 +249,7 @@ export default function Main() {
         } else if (status === 2) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="inquiry-form">
+                <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
                         <div className="inquiry-step"><h4>2</h4>/5 단계</div>
 
@@ -279,7 +279,7 @@ export default function Main() {
         } else if (status === 3) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="inquiry-form">
+                <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
                         <div className="inquiry-step"><h4>3</h4>/5 단계</div>
 
@@ -311,7 +311,7 @@ export default function Main() {
         } else if (status === 4) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="inquiry-form">
+                <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
                         <div className="inquiry-step"><h4>4</h4>/5 단계</div>
 
@@ -344,7 +344,7 @@ export default function Main() {
         } else if (status === 5) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="inquiry-form">
+                <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
                         <div className="inquiry-step"><h4>5</h4>/5 단계</div>
 
@@ -376,7 +376,7 @@ export default function Main() {
         } else if (status === 6) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="inquiry-feedback-form">
+                <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
                     <div className="inquiry-sky-form">
                         <h3 className="chatbot-submenu-title-h3">잠깐만요!</h3>
                         <p className="inquiry-feedback-p">오늘 상담이 도움이 되셨나요? <br />여러분의 소중한 의견을 들려주세요.</p>
@@ -406,7 +406,7 @@ export default function Main() {
         } else if (status === 7) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="inquiry-feedback-form">
+                <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
                     <div className="inquiry-sky-form">
                         <h3 className="chatbot-submenu-title-h3">긴급 기술지원</h3>
                         <p className="inquiry-feedback-p">문제 상황을 사진으로 찍어서 이메일로 보내주시면 더 빠른 해결이 가능합니다.</p>
@@ -459,7 +459,7 @@ export default function Main() {
             }));
             setSectionContent(prev => [
                 ...prev,
-                <div className="chatbot-bubble user">
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date user">{formattedTime}</div>
                     <div className="bubble-message user">{content}</div>
                 </div>
@@ -474,7 +474,7 @@ export default function Main() {
             }));
             setSectionContent(prev => [
                 ...prev,
-                <div className="chatbot-bubble user">
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date user">{formattedTime}</div>
                     <div className="bubble-message user">{content}</div>
                 </div>
@@ -489,7 +489,7 @@ export default function Main() {
             }));
             setSectionContent(prev => [
                 ...prev,
-                <div className="chatbot-bubble user">
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date user">{formattedTime}</div>
                     <div className="bubble-message user">{content}</div>
                 </div>
@@ -504,7 +504,7 @@ export default function Main() {
             }));
             setSectionContent(prev => [
                 ...prev,
-                <div className="chatbot-bubble user">
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date user">{formattedTime}</div>
                     <div className="bubble-message user">{content}</div>
                 </div>
@@ -518,7 +518,7 @@ export default function Main() {
             }));
             setSectionContent(prev => [
                 ...prev,
-                <div className="chatbot-bubble user">
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date user">{formattedTime}</div>
                     <div className="bubble-message user">{content}</div>
                 </div>
@@ -528,7 +528,7 @@ export default function Main() {
         } else if (!inquiryStatus) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="chatbot-bubble user">
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date user">{formattedTime}</div>
                     <div className="bubble-message user">{content}</div>
                 </div>
@@ -559,7 +559,7 @@ export default function Main() {
 
                 setSectionContent(prev => [
                     ...prev,
-                    <div className="chatbot-bubble assistant">
+                    <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
                         <div className="bubble-date assistant">{formattedTime}</div>
                         <div className="bubble-message assistant">{answer}</div>
                     </div>
@@ -568,7 +568,7 @@ export default function Main() {
                 console.error("메시지 전송 오류:", error);
                 setSectionContent(prev => [
                     ...prev,
-                    <div className="chatbot-bubble assistant">
+                    <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
                         <div className="bubble-date assistant">{formattedTime}</div>
                         <div className="bubble-message assistant">⚠️ 서버 연결 오류가 발생했습니다. 관리자에 문의해주세요</div>
                     </div>
