@@ -1,0 +1,9 @@
+{
+  "name": "Chatbot UI",
+  "short_name": "Chatbot",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "description": "POS 시스템 지원 챗봇"
+}

@@ -2,13 +2,26 @@ import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
 
 export default function Main() {
-    const [messages, setMessages] = useState([]);
 
     const [messageInput, setMessageInput] = useState("");
     const [topK, setTopK] = useState(5);
     const [knowledgeId, setKnowledgeId] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [Categories, setCategories] = useState([]);
+
+
+    const getCategory = () => {
+        console.log("카테고리를 불러옵니다.");
+        axios.get(`${process.env.REACT_APP_API_URL}/system/quick-categories`).then((res) => {
+            console.log(res.data);
+            setCategories(res.data);
+        })
+    }
+
+    useEffect(() => {
+        getCategory();
+    }, []);
 
     // --- ✨ AI 응답 요청 함수 ---
     const requestAssistantAnswer = async (question) => {
@@ -172,37 +185,15 @@ export default function Main() {
                         </div>
                     </div>
 
-                    <div className="chatbot-button" onClick={getSubmenu}>
-                        <div className="chatbot-button-icon icon-monitor"></div>
-                        <div>
-                            <div className="chatbot-button-title">POS 시스템</div>
-                            <div className="chatbot-button-desc">설치 및 문제 해결</div>
+                    {Categories.map(category => (
+                        <div key={category.id} className="chatbot-button" onClick={getSubmenu}>
+                            <div className={`chatbot-button-icon ${EmogiToTag(category.icon_emoji)}`}></div>
+                            <div>
+                                <div className="chatbot-button-title">{category.name}</div>
+                                <div className="chatbot-button-desc">{category.description}</div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="chatbot-button">
-                        <div className="chatbot-button-icon icon-kiosk"></div>
-                        <div>
-                            <div className="chatbot-button-title">키오스크</div>
-                            <div className="chatbot-button-desc">터치스크린 및 주문 시스템</div>
-                        </div>
-                    </div>
-
-                    <div className="chatbot-button">
-                        <div className="chatbot-button-icon icon-card"></div>
-                        <div>
-                            <div className="chatbot-button-title">결제 단말기</div>
-                            <div className="chatbot-button-desc">카드 및 전자결제</div>
-                        </div>
-                    </div>
-
-                    <div className="chatbot-button">
-                        <div className="chatbot-button-icon icon-code"></div>
-                        <div>
-                            <div className="chatbot-button-title">설치/설정</div>
-                            <div className="chatbot-button-desc">초기 설치 및 구성</div>
-                        </div>
-                    </div>
+                    ))}
 
                 </div>
             </div>
@@ -596,19 +587,37 @@ export default function Main() {
     }, [sectionContent]);
 
 
-    // const [reviewStatus, setreviewStatus] = useState(true);
-    // useEffect(() => {
-    //     if (!reviewStatus) return;
-    //     setreviewStatus(false);
-    //     const timer = setTimeout(() => {
-    //         console.log("5초 동안 sectionContent 변경 없음 → getinquiryform(6) 실행");
-    //         getinquiryform(6);
-    //     }, 5000);
 
-    //     return () => clearTimeout(timer);
-    // }, [sectionContent]);
+    const timerRef = useRef(null);
+    const hasRunRef = useRef(false); // ✅ 이미 실행됐는지 여부 추적
 
+    useEffect(() => {
+        if (hasRunRef.current) return;
 
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+        }
+
+        timerRef.current = setTimeout(() => {
+            console.log("5초 동안 sectionContent 변경 없음 → getinquiryform(6) 실행");
+            getinquiryform(6);
+            hasRunRef.current = true; // ✅ 이후 실행되지 않도록 설정
+        }, 5000);
+
+        return () => clearTimeout(timerRef.current);
+    }, [sectionContent]);
+
+    const EmogiToTag = (emogi) => {
+        const tags = {
+            "💻": "icon-monitor",
+            "🖥️": "icon-kiosk",
+            "🔧": "icon-code",
+            "💳": "icon-card",
+            "📋": "icon-card",
+        };
+
+        return tags[emogi] ?? "icon-default";
+    };
 
 
 
@@ -674,39 +683,15 @@ export default function Main() {
                                     </div>
                                 </div>
 
-                                <div className="chatbot-button" onClick={getSubmenu}>
-                                    <div className="chatbot-button-icon icon-monitor"></div>
-                                    <div>
-                                        <div className="chatbot-button-title">POS 시스템</div>
-                                        <div className="chatbot-button-desc">설치 및 문제 해결</div>
+                                {Categories.map(category => (
+                                    <div key={category.id} className="chatbot-button" onClick={getSubmenu}>
+                                        <div className={`chatbot-button-icon ${EmogiToTag(category.icon_emoji)}`}></div>
+                                        <div>
+                                            <div className="chatbot-button-title">{category.name}</div>
+                                            <div className="chatbot-button-desc">{category.description}</div>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div className="chatbot-button">
-                                    <div className="chatbot-button-icon icon-kiosk"></div>
-                                    <div>
-                                        <div className="chatbot-button-title">키오스크</div>
-                                        <div className="chatbot-button-desc">터치스크링 및 주문 시스템</div>
-                                    </div>
-                                </div>
-
-                                <div className="chatbot-button">
-                                    <div className="chatbot-button-icon icon-card"></div>
-                                    <div>
-                                        <div className="chatbot-button-title">결제 단말기</div>
-                                        <div className="chatbot-button-desc">카드 및 전자결제</div>
-                                    </div>
-                                </div>
-
-                                <div className="chatbot-button">
-                                    <div className="chatbot-button-icon icon-code"></div>
-                                    <div>
-                                        <div className="chatbot-button-title">설치/설정</div>
-                                        <div className="chatbot-button-desc">초기 설치 및 구성</div>
-                                    </div>
-                                </div>
-
-
+                                ))}
 
                             </div>
                         </div>
