@@ -118,6 +118,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                             currentAdminUser={currentAdminUser}
                             role={role}
                             setinquiries={setinquiries}
+                            fetch_inquiry_list={fetch_inquiry_list}
                         />
                     </div>
                 </div>
@@ -126,7 +127,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     )
 }
 
-function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries }) {
+function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries, fetch_inquiry_list }) {
 
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const sudo = role === "superadmin" ? true : false
@@ -216,6 +217,25 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         showToast(`${admin.name}문의가 ${action}되었습니다.`, "info");
         toggleDropdown(inquiry.id);
     };
+
+
+    const handleDetail = async (inquiry) => {
+        
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}`,
+                {
+                    method: "DELETE",
+                }
+            );
+            console.log(response.data);
+            fetch_inquiry_list();
+            showToast(`문의가 삭제 되었습니다.`, "warning");
+
+        } catch (err) {
+            console.error("삭제 요청 오류:", err);
+        }
+    }
 
 
     return (
@@ -424,7 +444,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                 {actionButtons}
                                 <button
                                     className="btn btn-danger btn-sm"
-
+                                    onClick={() => handleDetail(inquiry)}
                                 >
                                     <i className="fas fa-trash"></i> 삭제
                                 </button>
