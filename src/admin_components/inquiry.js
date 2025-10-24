@@ -3,141 +3,44 @@ import { showToast } from '../utill/utill';
 import { useState, useEffect } from 'react';
 
 export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }) {
+
+    const [adminUsers, setadminUsers] = useState([]);
+    const [inquiries, setinquiries] = useState([]);
+    const [currentAdminUser, setcurrentAdminUser] = useState("");
+    const [openAddAdminModal, setopenAddAdminModal] = useState(false);
     const admin_name = sessionStorage.getItem("admin_name");
+
     useEffect(() => {
         setcurrentAdminUser(admin_name);
     }, [admin_name]);
 
-
-    const fetch_admin_users = () => {
-        axios
-            .get(`${process.env.REACT_APP_API_URL}/admin_users`, {
-                params: {
-                    offset: 0,
-                    limit: 50,
-                    // 필요하다면 department, q도 추가 가능
-                    // department: "HR",
-                    // q: "홍길동"
-                },
-            })
-            .then((res) => {
-                setadminUsers(res.data);
-                // console.log("📌 관리자 목록:", res.data);
-            })
-            .catch((err) => {
-                if (err.response && err.response.status === 404) {
-                    alert("해당 setting을 찾을 수 없습니다.");
-                } else {
-                    console.error("❌ 요청 실패:", err);
-                }
-            });
-    }
-
     useEffect(() => {
         fetch_admin_users();
         fetch_inquiry_list();
-
     }, []);
+
+    const fetch_admin_users = () => {
+        axios.get(`${process.env.REACT_APP_API_URL}/admin_users`, {
+            params: {
+                offset: 0,
+                limit: 50,
+            },
+        }).then((res) => {
+            setadminUsers(res.data);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
 
 
     const fetch_inquiry_list = () => {
-        axios
-            .get(`${process.env.REACT_APP_API_URL}/inquiries/get_inquiry_list`)
-            .then((res) => {
-                setinquiries(res.data);
-                // console.log("📌 문의 목록:", res.data);
-            })
-            .catch((err) => {
-                if (err.response && err.response.status === 404) {
-                    alert("해당 setting을 찾을 수 없습니다.");
-                } else {
-                    console.error("❌ 요청 실패:", err);
-                }
-            });
+        axios.get(`${process.env.REACT_APP_API_URL}/inquiries/get_inquiry_list`).then((res) => {
+            setinquiries(res.data);
+            console.log(res.data);
+        }).catch((err) => {
+            console.log(err);
+        });
     }
-
-    const [adminUsers, setadminUsers] = useState([]);
-
-    const [inquiries, setinquiries] = useState([
-        {
-            id: 1,
-            name: '문의자1',
-            company: '가람포스텍',
-            phone: '010-1234-5678',
-            content: 'POS 시스템이 갑자기 꺼져서 재부팅을 해도 계속 같은 문제가 발생합니다. 긴급히 해결이 필요합니다.',
-            status: 'new',
-            createdDate: '2024-12-20 14:30',
-            assignee: null,
-            history: [
-                {
-                    action: '문의 접수',
-                    admin: '시스템',
-                    timestamp: '2024-12-20 14:30',
-                    details: '챗봇을 통해 문의가 접수되었습니다.'
-                }
-            ]
-        },
-        {
-            id: 2,
-            name: '문의자2',
-            company: '스마트카페',
-            phone: '010-2345-6789',
-            content: '키오스크 터치 반응이 느려서 고객들이 불편해하고 있습니다. 설정 방법을 알려주세요.',
-            status: 'processing',
-            createdDate: '2024-12-20 13:15',
-            assignee: '임영빈',
-            assignedDate: '2024-12-20 13:45',
-            history: [
-                {
-                    action: '문의 접수',
-                    admin: '시스템',
-                    timestamp: '2024-12-20 13:15',
-                    details: '챗봇을 통해 문의가 접수되었습니다.'
-                },
-                {
-                    action: '담당자 배정',
-                    admin: '임영빈',
-                    timestamp: '2024-12-20 13:45',
-                    details: '이관리님이 문의를 담당하게 되었습니다.'
-                }
-            ]
-        },
-        {
-            id: 3,
-            name: '문의자3',
-            company: '베이커리하우스',
-            phone: '010-3456-7890',
-            content: '프린터에서 영수증이 출력되지 않습니다. 용지는 충분한 상태인데 어떻게 해야 할까요?',
-            status: 'completed',
-            createdDate: '2024-12-19 16:20',
-            assignee: '박인식',
-            assignedDate: '2024-12-19 16:30',
-            completedDate: '2024-12-20 09:30',
-            history: [
-                {
-                    action: '문의 접수',
-                    admin: '시스템',
-                    timestamp: '2024-12-19 16:20',
-                    details: '챗봇을 통해 문의가 접수되었습니다.'
-                },
-                {
-                    action: '담당자 배정',
-                    admin: '박인식',
-                    timestamp: '2024-12-19 16:30',
-                    details: '김관리님이 문의를 담당하게 되었습니다.'
-                },
-                {
-                    action: '처리 완료',
-                    admin: '박인식',
-                    timestamp: '2024-12-20 09:30',
-                    details: '프린터 드라이버 재설치로 문제가 해결되었습니다.'
-                }
-            ]
-        }
-    ]);
-    const [currentAdminUser, setcurrentAdminUser] = useState("");
-
-    const [openAddAdminModal, setopenAddAdminModal] = useState(false);
 
     return (
         <>
@@ -187,12 +90,8 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                                 관리자 추가
                             </button>
                         )}
-
-
-
-
-
                     </div>
+
                     <div className="admin-grid" id="adminGrid">
                         <RenderAdminGrid
                             adminUsers={adminUsers}
@@ -228,17 +127,15 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
 }
 
 function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries }) {
+
     const [openDropdownId, setOpenDropdownId] = useState(null);
-
     const sudo = role === "superadmin" ? true : false
-
     const statusText = {
         new: "신규",
         processing: "처리중",
         on_hold: "대기",
         completed: "완료",
     };
-
     const statusClass = {
         new: "status-new",
         processing: "status-processing",
@@ -261,6 +158,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
             </div>
         );
     }
+
     const toggleDropdown = (id) => {
         setOpenDropdownId((prev) => (prev === id ? null : id));
     };
@@ -316,7 +214,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         }
 
         showToast(`${admin.name}문의가 ${action}되었습니다.`, "info");
-        toggleDropdown(inquiry.id); // 드롭다운 닫기
+        toggleDropdown(inquiry.id);
     };
 
 

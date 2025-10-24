@@ -72,6 +72,16 @@ export default function Dashboard() {
       };
     }
   };
+  const [ChatList, setChatList] = useState([]);
+
+  const getChat = () => {
+    console.log("카테고리를 불러옵니다.");
+    axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions?offset=0&limit=5`).then((res) => {
+      console.log(res.data);
+      setChatList(res.data);
+    })
+  }
+
 
   useEffect(() => {
     const fetchTrendChart = async () => {
@@ -121,6 +131,8 @@ export default function Dashboard() {
         },
       ],
     });
+
+    getChat();
   }, []);
 
   const Feedbackoptions = {
@@ -403,7 +415,7 @@ export default function Dashboard() {
             {/* 피드백 기반 만족도 분포 */}
             <div className="dashboard-chart-card">
               <div className="chart-header">
-                <h3 className="chart-title">사용자 피드백 분포</h3>
+                <h3 className="chart-title">사용자 피드백 분포(X)</h3>
                 <div className="chart-controls">
                   <button className="chart-action" title="차트 다운로드">
                     <i className="fas fa-download"></i>
@@ -429,10 +441,10 @@ export default function Dashboard() {
                     <span className="legend-color" style={{ background: "#1e60e1" }}></span>
                     문의량
                   </span>
-                  {/* <span className="legend-item">
+                  <span className="legend-item">
                     <span className="legend-color" style={{ background: "#28a745" }}></span>
-                    만족도
-                  </span> */}
+                    만족도(X)
+                  </span>
                 </div>
                 <button className="chart-action" title="차트 다운로드">
                   <i className="fas fa-download"></i>
@@ -455,43 +467,25 @@ export default function Dashboard() {
             <div className="activity-card">
               <div className="activity-header">
                 <h3 className="activity-title">최근 대화</h3>
-                <a href="분석 및 보고서.html" className="view-all-link">전체 보기</a>
+
               </div>
               <div className="activity-content">
                 <div className="conversation-list" id="recentConversations">
-                  <div className="conversation-item">
-                    <div className="conversation-avatar">
-                      <i className="fas fa-user"></i>
-                    </div>
-                    <div className="conversation-content">
-                      <div className="conversation-text">POS 시스템이 갑자기 꺼졌어요</div>
-                      <div className="conversation-meta">
-                        <span className="conversation-time">5분 전</span>
+
+                  {ChatList.map(chat => (
+                    <div className="conversation-item">
+                      <div className="conversation-avatar">
+                        <i className="fas fa-user"></i>
+                      </div>
+                      <div className="conversation-content">
+                        <div className="conversation-text">{chat.title} / {chat.preview}</div>
+                        <div className="conversation-meta">
+                          <span className="conversation-time">{chat.created_at}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="conversation-item">
-                    <div className="conversation-avatar">
-                      <i className="fas fa-user"></i>
-                    </div>
-                    <div className="conversation-content">
-                      <div className="conversation-text">키오스크 터치가 안 돼요</div>
-                      <div className="conversation-meta">
-                        <span className="conversation-time">12분 전</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="conversation-item">
-                    <div className="conversation-avatar">
-                      <i className="fas fa-user"></i>
-                    </div>
-                    <div className="conversation-content">
-                      <div className="conversation-text">카드 결제가 안 됩니다</div>
-                      <div className="conversation-meta">
-                        <span className="conversation-time">18분 전</span>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
+
                 </div>
               </div>
             </div>

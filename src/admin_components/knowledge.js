@@ -100,6 +100,23 @@ export default function Knowledge() {
     });
 
 
+    const handleDeleteFAQ = async (faq) => {
+        console.log(faq);
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/faqs/${faq.id}`,
+                {
+                    method: "DELETE",
+                }
+            );
+            fetch_FAQ();
+            showToast('FAQ가 삭제되었습니다.', 'success');
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
     return (
         <>
             <div className={`modal ${showAddFaqModal ? "show" : ""}`} id="faqAddModal" style={{ display: `${showAddFaqModal ? "flex" : "none"}` }}>
@@ -293,7 +310,7 @@ export default function Knowledge() {
                                                         <i className="fas fa-thumbs-up"></i> {faq.satisfaction_rate}
                                                     </span>
                                                 </div>
-                                                <button
+                                                {/* <button
                                                     className="action-btn-small"
                                                     title="편집"
                                                     onClick={(event) => {
@@ -302,14 +319,11 @@ export default function Knowledge() {
                                                     }}
                                                 >
                                                     <i className="fas fa-edit"></i>
-                                                </button>
+                                                </button> */}
                                                 <button
                                                     className="action-btn-small delete"
                                                     title="삭제"
-                                                    onClick={(event) => {
-                                                        event.stopPropagation();
-                                                        showToast('FAQ가 삭제되었습니다.', 'success');
-                                                    }}
+                                                    onClick={() => { handleDeleteFAQ(faq) }}
                                                 >
                                                     <i className="fas fa-trash"></i>
                                                 </button>
@@ -387,11 +401,11 @@ function LoadDocuments({ documents, fetch_Knowledge }) {
                     </td> */}
                     <td>
                         <div className="action-buttons">
-                            <button
+                            {/* <button
                                 className="action-btn-small" title="문서 보기" onClick={() => showToast('문서 미리보기 기능은 개발 중입니다.', 'info')}
                             >
                                 <i className="fas fa-eye"></i>
-                            </button>
+                            </button> */}
 
                             <button
                                 className="action-btn-small delete" title="삭제" onClick={() => handleDelete(doc)}
