@@ -250,10 +250,10 @@ export default function Chart() {
                                 <option value="quarter">지난 90일</option>
                             </select>
 
-                            <button className="btn btn-primary" >
+                            {/* <button className="btn btn-primary" >
                                 <i className="fas fa-download"></i>
                                 데이터 내보내기
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </header>
@@ -287,12 +287,11 @@ export default function Chart() {
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">일별 대화 트렌드</h3>
-                                <div className="chart-controls">
-
+                                {/* <div className="chart-controls">
                                     <button className="chart-action" title="차트 다운로드">
                                         <i className="fas fa-download"></i>
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="chart-container">
                                 {/* <canvas id="conversationChart"></canvas> */}
@@ -305,11 +304,11 @@ export default function Chart() {
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">사용자 피드백 분포</h3>
-                                <div className="chart-controls">
+                                {/* <div className="chart-controls">
                                     <button className="chart-action" title="차트 다운로드">
                                         <i className="fas fa-download"></i>
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="chart-container">
                                 {/* <canvas id="feedbackChart"></canvas> */}
@@ -325,11 +324,11 @@ export default function Chart() {
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">응답 시간 분석</h3>
-                                <div className="chart-controls">
+                                {/* <div className="chart-controls">
                                     <button className="chart-action" title="차트 다운로드">
                                         <i className="fas fa-download"></i>
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="chart-container">
                                 {/* <canvas id="responseTimeChart"></canvas> */}
@@ -342,11 +341,11 @@ export default function Chart() {
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">사용자 만족도 트렌드</h3>
-                                <div className="chart-controls">
+                                {/* <div className="chart-controls">
                                     <button className="chart-action" title="차트 다운로드">
                                         <i className="fas fa-download"></i>
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="chart-container">
                                 {/* <canvas id="satisfactionChart"></canvas> */}
@@ -361,11 +360,11 @@ export default function Chart() {
                     <div className="chart-card full-width" style={{ marginBottom: "2rem" }}>
                         <div className="chart-header">
                             <h3 className="chart-title">시간대별 대화량</h3>
-                            <div className="chart-controls">
+                            {/* <div className="chart-controls">
                                 <button className="chart-action" title="차트 다운로드">
                                     <i className="fas fa-download"></i>
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
                         <div className="chart-container">
                             {/* <canvas id="hourlyChart"></canvas> */}

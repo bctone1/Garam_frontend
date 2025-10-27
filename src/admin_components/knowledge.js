@@ -69,20 +69,46 @@ export default function Knowledge() {
     const fileInputRef = useRef(null);
 
     const handleFileSelect = async (e) => {
+        e.preventDefault();
+
         setuploadStatus(true);
-        const selectedFile = e.target.files[0];
-        // console.log("선택된 파일:", selectedFile);
-        if (!selectedFile) return;
+
+        const files = e.target.files || e.dataTransfer?.files;
+
+        if (!files || files.length === 0) {
+            console.warn("No files detected");
+            setuploadStatus(false);
+            return;
+        }
+
+        const selectedFile = files[0];
+
         const formData = new FormData();
         formData.append("file", selectedFile);
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/knowledge/upload`, {
-            method: "POST",
-            body: formData
-        });
-        const data = await response.json();
-        console.log(data);
-        fetch_Knowledge();
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/knowledge/upload`, {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+            console.log(data);
+            fetch_Knowledge();
+        } catch (err) {
+            console.error("Upload error:", err);
+        }
+
         setuploadStatus(false);
+    };
+
+    const handleDragOver = (event) => {
+        event.preventDefault();
+    };
+
+    const handleDrop = (event) => {
+        event.preventDefault();
+        handleFileSelect(event);
     };
 
     const [showAddFaqModal, setshowAddFaqModal] = useState(false);
@@ -169,7 +195,10 @@ export default function Knowledge() {
                 <section className={`tab-content ${contentTap === "documentsTab" ? "active" : ""}`} id="documentsTab">
                     {/* 업로드 영역 */}
                     <div className="upload-section">
-                        <div className="upload-area" id="documentUploadArea" >
+                        <div className="upload-area" id="documentUploadArea"
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                        >
                             <div className={`upload-overlay ${uploadStatus ? "show" : ""}`} id="uploadOverlay">
                                 <div className="spinner"></div>
                                 <p style={{ color: " var(--primary-color)", fontWeight: "500" }}>파일을 처리하고 있습니다...</p>
@@ -446,8 +475,22 @@ function getFileIcon(type) {
 }
 
 function FaqModal({ setshowAddFaqModal, fetch_FAQ }) {
+    const [Categories, setCategories] = useState([]);
+
+    const getCategory = () => {
+        console.log("카테고리를 불러옵니다.");
+        axios.get(`${process.env.REACT_APP_API_URL}/system/quick-categories`).then((res) => {
+            console.log(res.data);
+            setCategories(res.data);
+        })
+    }
+    useEffect(() => {
+        getCategory();
+    }, []);
+
     const [newFAQ, setnewFAQ] = useState({
         question: "",
+        category: "",
         answer: "",
     });
 
@@ -503,6 +546,42 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ }) {
                                     setnewFAQ((prev) => ({ ...prev, question: e.target.value }))
                                 }
                             />
+                        </div>
+
+
+                        <div>
+                            <label
+                                style={{
+                                    display: "block",
+                                    fontWeight: 600,
+                                    marginBottom: "0.5rem",
+                                    color: "var(--text-primary)",
+                                }}
+                            >
+                                카테고리 <span style={{ color: "var(--danger-color)" }}>*</span>
+                            </label>
+
+                            <select
+                                style={{
+                                    width: "100%",
+                                    padding: "0.75rem",
+                                    border: "1px solid var(--border-color)",
+                                    borderRadius: "var(--border-radius)",
+                                    fontSize: "1rem",
+                                }}
+                                value={newFAQ.category}
+                                onChange={(e) =>
+                                    setnewFAQ((prev) => ({ ...prev, category: e.target.value }))
+                                }
+                            >
+                                <option value="">자주하는 질문</option>
+                                {Categories.map(category => (
+                                    <option key={category.id}>{category.name}</option>
+                                ))}
+
+
+                            </select>
+
                         </div>
 
                         <div>

@@ -217,10 +217,10 @@ export default function Assisstant() {
 
                     {/* 액션 버튼  */}
                     <div className="assistant-actions">
-                        <button className="assistant-btn assistant-btn-secondary">
+                        {/* <button className="assistant-btn assistant-btn-secondary">
                             <i className="fas fa-undo"></i>
                             기본값 복원
-                        </button>
+                        </button> */}
                         <button
                             className="assistant-btn assistant-btn-primary"
                             onClick={handleClick}
