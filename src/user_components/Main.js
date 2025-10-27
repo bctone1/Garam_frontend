@@ -175,7 +175,6 @@ export default function Main() {
                         </div>
                     </div>
                 ]);
-
             } else {
                 setSectionContent(prev => [
                     ...prev,
@@ -207,6 +206,14 @@ export default function Main() {
     }
 
     const getAnswer = ({ category, faq }) => {
+
+        axios.post(`${process.env.REACT_APP_API_URL}/faqs/${faq.id}/views`,).then((res) => {
+            // console.log("클릭됨 : ", res.data);
+        }).catch((err) => {
+            console.error(err);
+        });
+
+
         setSectionContent(prev => [
             ...prev,
             <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
@@ -219,7 +226,11 @@ export default function Main() {
                 {faq.answer}
 
                 <div className="chatbot-bottom-nav">
-                    <div className="chatbot-submenu back" onClick={() => getSubmenu(category)}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                    {category === "mostqna" ? (
+                        <div className="chatbot-submenu back" onClick={() => loadFAQList()}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                    ) : (
+                        <div className="chatbot-submenu back" onClick={() => getSubmenu(category)}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                    )}
                     <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                     <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                     <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
@@ -244,7 +255,7 @@ export default function Main() {
                         </div>
                     </div>
 
-                    <div className="chatbot-button">
+                    <div className="chatbot-button" onClick={() => loadFAQList()}>
                         <div className="chatbot-button-icon icon-headset"></div>
                         <div>
                             <div className="chatbot-button-title ">자주하는 질문</div>
@@ -264,6 +275,45 @@ export default function Main() {
                 </div>
             </div>
         ]);
+    }
+
+    const loadFAQList = () => {
+        axios.get(`${process.env.REACT_APP_API_URL}/faqs`, {
+            params: {
+                offset: 0,
+                limit: 3,
+                order_by: "views"
+            },
+        }).then((res) => {
+            const qnaList = res.data;
+            console.log(qnaList);
+
+            setSectionContent(prev => [
+                ...prev,
+                <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
+                <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
+                    <h5 className="chatbot-submenu-title-h5">{qnaList.name}</h5>
+                    <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
+
+                    {qnaList?.map((faq, index) => (
+                        <div className="chatbot-submenu-single" key={faq.id}
+                            onClick={() => getAnswer({ category: "mostqna", faq })}
+                        >
+                            <div className="chatbot-submenu-id">{index + 1}</div>
+                            <div>
+                                <h3>{faq.question}</h3>
+                            </div>
+                        </div>
+                    ))}
+
+                    <div className="chatbot-bottom-nav">
+                        <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                    </div>
+                </div>
+            ]);
+        }).catch((err) => {
+            console.log(err);
+        });
     }
 
 
@@ -683,7 +733,7 @@ export default function Main() {
                                     </div>
                                 </div>
 
-                                <div className="chatbot-button">
+                                <div className="chatbot-button" onClick={() => loadFAQList()}>
                                     <div className="chatbot-button-icon icon-headset"></div>
                                     <div>
                                         <div className="chatbot-button-title ">자주하는 질문</div>
