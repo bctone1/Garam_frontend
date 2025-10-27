@@ -152,98 +152,74 @@ export default function Main() {
     }
 
 
-
-
-
-    const getSubmenu = () => {
-        setinquiryStatus(false);
-        setSectionContent(prev => [
-            ...prev,
-            <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
-            <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
-                <h5 className="chatbot-submenu-title-h5">POS 시스템 지원</h5>
-                <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
-                <div className="chatbot-submenu-single" onClick={getAnswer}>
-                    <div className="chatbot-submenu-id">1</div>
-                    <div>
-                        <h3>시스템 부팅/시작 오류</h3>
-                        <p>POS가 켜지지 않거나 시작 중 멈춤</p>
+    const getSubmenu = (category) => {
+        axios.get(`${process.env.REACT_APP_API_URL}/faqs`, {
+            params: {
+                offset: 0,
+                limit: 50,
+                quick_category_id: category.id
+            },
+        }).then((res) => {
+            setinquiryStatus(false);
+            const faqs = res.data;
+            console.log(faqs);
+            if (faqs.length === 0) {
+                setSectionContent(prev => [
+                    ...prev,
+                    <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
+                    <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
+                        <h5 className="chatbot-submenu-title-h5">{category.name}</h5>
+                        <p>등록된 질문이 없습니다.</p>
+                        <div className="chatbot-bottom-nav">
+                            <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                        </div>
                     </div>
-                </div>
+                ]);
 
-                <div className="chatbot-submenu-single">
-                    <div className="chatbot-submenu-id">2</div>
-                    <div>
-                        <h3>시스템 성능 저하</h3>
-                        <p>느린 처리 속도, 멈춤 현상</p>
+            } else {
+                setSectionContent(prev => [
+                    ...prev,
+                    <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
+                    <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
+                        <h5 className="chatbot-submenu-title-h5">{category.name}</h5>
+                        <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
+
+                        {faqs?.map(faq => (
+                            <div className="chatbot-submenu-single" key={faq.id}
+                                onClick={() => getAnswer({ category, faq })}
+                            >
+                                <div className="chatbot-submenu-id">1</div>
+                                <div>
+                                    <h3>{faq.question}</h3>
+                                </div>
+                            </div>
+                        ))}
+
+                        <div className="chatbot-bottom-nav">
+                            <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                        </div>
                     </div>
-                </div>
-
-                <div className="chatbot-submenu-single">
-                    <div className="chatbot-submenu-id">3</div>
-                    <div>
-                        <h3>영수증 프린터 문제</h3>
-                        <p>인쇄 안됨, 용지 걸림, 인쇄 품질</p>
-                    </div>
-                </div>
-
-                <div className="chatbot-submenu-single">
-                    <div className="chatbot-submenu-id">4</div>
-                    <div>
-                        <h3>네트워크 연결 문제</h3>
-                        <p>인터넷 연결 끊김, 서버 연결 오류</p>
-                    </div>
-                </div>
-
-                <div className="chatbot-submenu-single">
-                    <div className="chatbot-submenu-id">5</div>
-                    <div>
-                        <h3>데이터 백업/복구</h3>
-                        <p>매출 데이터 백업, 시스템 복구</p>
-                    </div>
-                </div>
-                <div className="chatbot-bottom-nav">
-                    <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
-                </div>
-            </div>
-
-        ]);
+                ]);
+            }
+        }).catch((err) => {
+            console.log(err);
+        });
     }
 
-    const getAnswer = () => {
+    const getAnswer = ({ category, faq }) => {
         setSectionContent(prev => [
             ...prev,
             <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
-                <div className="bubble-date user">09. 23. 16:59</div>
-                <div className="bubble-message user">시스템 부팅/시작 오류 관련 문의입니다.</div>
-            </div>,
+                <div className="bubble-date user">{formattedTime}</div>
+                <div className="bubble-message user">{faq.question} 오류 관련 문의입니다.</div>
+            </div>
+            ,
 
             <div className="chatbot-guide" key={`guide-${Date.now()}`}>
-                <h5 className="chatbot-submenu-title-h5">POS 시스템 부팅 오류 해결 가이드</h5>
-                <h6 className="chatbot-submenu-title-h6">즉시 시도할 수 있는 해결 방법:</h6>
-                <br />
-                <h6 className="chatbot-submenu-title-h6">리스트 타입 - 1단계: 전원 확인</h6>
-
-                <ul className="guide-list-ul">
-                    <li>전원 케이블이 제대로 연결되어 있는지 확인</li>
-                    <li>전원 버튼을 10초간 길게 눌러 완전 종료 후 재시작</li>
-                    <li>전원 어댑터 LED 표시등 확인</li>
-                </ul>
-                <br />
-
-                <h6 className="chatbot-submenu-title-h6">넘버링 리스트 타입 - 2단계: 하드웨어 점검</h6>
-                <ol className="guide-list-ol">
-                    <li>모든 USB 연결 장치 분리 후 재시작</li>
-                    <li>RAM 메모리 재장착 (가능한 경우)</li>
-                    <li>하드디스크 연결 상태 확인</li>
-                </ol>
-                <br />
-
-                <p className="emergncy-call">긴급 연락: 1588-1234 (24시간)</p>
-                <br />
+                {faq.answer}
 
                 <div className="chatbot-bottom-nav">
-                    <div className="chatbot-submenu back" onClick={getSubmenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                    <div className="chatbot-submenu back" onClick={() => getSubmenu(category)}><i className="icon-back"></i> 이전 메뉴 보기</div>
                     <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
                     <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                     <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
@@ -277,7 +253,7 @@ export default function Main() {
                     </div>
 
                     {Categories.map(category => (
-                        <div key={category.id} className="chatbot-button" onClick={getSubmenu}>
+                        <div key={category.id} className="chatbot-button" onClick={() => getSubmenu(category)}>
                             <div className={`chatbot-button-icon ${EmogiToTag(category.icon_emoji)}`}></div>
                             <div>
                                 <div className="chatbot-button-title">{category.name}</div>
@@ -524,7 +500,6 @@ export default function Main() {
         const content = messageInput.trim();
         if (!content) return;
 
-
         if (inquiryStatus === 1) {
             setInquiryInfo(prev => ({
                 ...prev,
@@ -717,7 +692,7 @@ export default function Main() {
                                 </div>
 
                                 {Categories.map(category => (
-                                    <div key={category.id} className="chatbot-button" onClick={getSubmenu}>
+                                    <div key={category.id} className="chatbot-button" onClick={() => getSubmenu(category)}>
                                         <div className={`chatbot-button-icon ${EmogiToTag(category.icon_emoji)}`}></div>
                                         <div>
                                             <div className="chatbot-button-title">{category.name}</div>

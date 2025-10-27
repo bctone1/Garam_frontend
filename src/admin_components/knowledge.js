@@ -3,78 +3,76 @@ import { useState, useRef, useEffect } from 'react';
 import { showToast } from '../utill/utill';
 
 export default function Knowledge() {
+    const [Categories, setCategories] = useState([]);
+    const [uploadStatus, setuploadStatus] = useState(false);
+    const [contentTap, setcontentTap] = useState("documentsTab");
+    const [documents, setdocuments] = useState([]);
+    const [openId, setOpenId] = useState(null);
+    const [faqs, setfaqs] = useState([]);
+    const fileInputRef = useRef(null);
+    const [showAddFaqModal, setshowAddFaqModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [FAQquery, setFAQquery] = useState('');
+
+    const getCategory = () => {
+        console.log("카테고리를 불러옵니다.");
+        axios.get(`${process.env.REACT_APP_API_URL}/system/quick-categories`).then((res) => {
+            console.log(res.data);
+            setCategories(res.data);
+        })
+    }
 
     const fetch_FAQ = () => {
-        axios
-            .get(`${process.env.REACT_APP_API_URL}/faqs`, {
-                params: {
-                    offset: 0,
-                    limit: 50,
-                    // 필요하다면 department, q도 추가 가능
-                    // department: "HR",
-                    // q: "홍길동"
-                },
-            })
-            .then((res) => {
-                setfaqs(res.data);
-                console.log("📌 관리자 목록:", res.data);
-            })
-            .catch((err) => {
-                if (err.response && err.response.status === 404) {
-                    alert("해당 setting을 찾을 수 없습니다.");
-                } else {
-                    console.error("❌ 요청 실패:", err);
-                }
-            });
+        axios.get(`${process.env.REACT_APP_API_URL}/faqs`, {
+            params: {
+                offset: 0,
+                limit: 50,
+            },
+        }).then((res) => {
+            setfaqs(res.data);
+            console.log("📌 관리자 목록:", res.data);
+        }).catch((err) => {
+            if (err.response && err.response.status === 404) {
+                alert("해당 setting을 찾을 수 없습니다.");
+            } else {
+                console.error("❌ 요청 실패:", err);
+            }
+        });
     }
 
     const fetch_Knowledge = () => {
-        axios
-            .get(`${process.env.REACT_APP_API_URL}/knowledge`, {
-                params: {
-                    offset: 0,
-                    limit: 50,
-                },
-            })
-            .then((res) => {
-                setdocuments(res.data);
-                console.log("📌 지식베이스 목록:", res.data);
-            })
-            .catch((err) => {
-                if (err.response && err.response.status === 404) {
-                    alert("해당 setting을 찾을 수 없습니다.");
-                } else {
-                    console.error("❌ 요청 실패:", err);
-                }
-            });
+        axios.get(`${process.env.REACT_APP_API_URL}/knowledge`, {
+            params: {
+                offset: 0,
+                limit: 50,
+            },
+        }).then((res) => {
+            setdocuments(res.data);
+            console.log("📌 지식베이스 목록:", res.data);
+        }).catch((err) => {
+            if (err.response && err.response.status === 404) {
+                alert("해당 setting을 찾을 수 없습니다.");
+            } else {
+                console.error("❌ 요청 실패:", err);
+            }
+        });
     }
 
     useEffect(() => {
+        getCategory();
         fetch_Knowledge();
         fetch_FAQ();
     }, []);
 
-    const [uploadStatus, setuploadStatus] = useState(false);
-
-    const [contentTap, setcontentTap] = useState("documentsTab");
-
-    const [documents, setdocuments] = useState([]);
-
-    const [openId, setOpenId] = useState(null);
-
     const toggleFAQ = (id) => {
         setOpenId(openId === id ? null : id); // 이미 열려있으면 닫기
     };
-    const [faqs, setfaqs] = useState([]);
-    const fileInputRef = useRef(null);
+
 
     const handleFileSelect = async (e) => {
         e.preventDefault();
-
         setuploadStatus(true);
-
         const files = e.target.files || e.dataTransfer?.files;
-
         if (!files || files.length === 0) {
             console.warn("No files detected");
             setuploadStatus(false);
@@ -82,7 +80,6 @@ export default function Knowledge() {
         }
 
         const selectedFile = files[0];
-
         const formData = new FormData();
         formData.append("file", selectedFile);
 
@@ -91,14 +88,12 @@ export default function Knowledge() {
                 method: "POST",
                 body: formData
             });
-
             const data = await response.json();
             console.log(data);
             fetch_Knowledge();
         } catch (err) {
             console.error("Upload error:", err);
         }
-
         setuploadStatus(false);
     };
 
@@ -111,20 +106,15 @@ export default function Knowledge() {
         handleFileSelect(event);
     };
 
-    const [showAddFaqModal, setshowAddFaqModal] = useState(false);
-
-    const [searchQuery, setSearchQuery] = useState('');
     const filteredKnowledge = documents.filter((p) => {
         const matchesSearch = p.original_name.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesSearch;
     });
 
-    const [FAQquery, setFAQquery] = useState('');
     const filteredFAQ = faqs.filter((p) => {
         const matchesSearch = p.question.toLowerCase().includes(FAQquery.toLowerCase());
         return matchesSearch;
     });
-
 
     const handleDeleteFAQ = async (faq) => {
         console.log(faq);
@@ -146,9 +136,8 @@ export default function Knowledge() {
     return (
         <>
             <div className={`modal ${showAddFaqModal ? "show" : ""}`} id="faqAddModal" style={{ display: `${showAddFaqModal ? "flex" : "none"}` }}>
-                <FaqModal setshowAddFaqModal={setshowAddFaqModal} fetch_FAQ={fetch_FAQ} />
+                <FaqModal setshowAddFaqModal={setshowAddFaqModal} fetch_FAQ={fetch_FAQ} Categories={Categories} />
             </div>
-
 
             <main className="main-content">
                 {/* 상단 헤더 */}
@@ -332,6 +321,9 @@ export default function Knowledge() {
                                             </div>
                                             <div className="faq-actions">
                                                 <div className="faq-stats">
+                                                    <span>{Categories.find(cat => cat.id === faq.quick_category_id)?.name || "카테고리 없음"}</span>
+                                                </div>
+                                                <div className="faq-stats">
                                                     <span>
                                                         <i className="fas fa-eye"></i> {faq.views}회
                                                     </span>
@@ -367,6 +359,9 @@ export default function Knowledge() {
                                         >
                                             <div className="faq-answer">{faq.answer}</div>
                                             <div className="faq-meta">
+                                                <span>
+                                                    <strong>카테고리:</strong> {Categories.find(cat => cat.id === faq.quick_category_id)?.name || "카테고리 없음"}
+                                                </span>
                                                 <span>
                                                     <strong>생성일:</strong> {new Date(faq.created_at).toISOString().split('T')[0]}
                                                 </span>
@@ -474,37 +469,38 @@ function getFileIcon(type) {
     return iconMap[type] || 'fa-file';
 }
 
-function FaqModal({ setshowAddFaqModal, fetch_FAQ }) {
-    const [Categories, setCategories] = useState([]);
+function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
 
-    const getCategory = () => {
-        console.log("카테고리를 불러옵니다.");
-        axios.get(`${process.env.REACT_APP_API_URL}/system/quick-categories`).then((res) => {
-            console.log(res.data);
-            setCategories(res.data);
-        })
-    }
-    useEffect(() => {
-        getCategory();
-    }, []);
 
     const [newFAQ, setnewFAQ] = useState({
         question: "",
-        category: "",
+        quick_category_id: "",
         answer: "",
     });
 
     const createFAQ = () => {
         console.log(newFAQ);
-        axios.post(`${process.env.REACT_APP_API_URL}/faqs`, newFAQ)
-            .then((res) => {
-                console.log("생성된 FAQ:", res.data);
-                setshowAddFaqModal(false);
-                fetch_FAQ();
-            })
-            .catch((err) => {
-                console.error(err);
+
+        if (!newFAQ.quick_category_id) {
+            alert("카테고리 선택은 필수입니다!");
+            return;
+        }
+
+        axios.post(`${process.env.REACT_APP_API_URL}/faqs`, {
+            ...newFAQ,
+            satisfaction_rate: 100,
+        }).then((res) => {
+            console.log("생성된 FAQ:", res.data);
+            setshowAddFaqModal(false);
+            fetch_FAQ();
+            setnewFAQ({
+                question: "",
+                quick_category_id: "",
+                answer: "",
             });
+        }).catch((err) => {
+            console.error(err);
+        });
     }
 
     return (
@@ -569,14 +565,14 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ }) {
                                     borderRadius: "var(--border-radius)",
                                     fontSize: "1rem",
                                 }}
-                                value={newFAQ.category}
+                                value={newFAQ.quick_category_id}
                                 onChange={(e) =>
-                                    setnewFAQ((prev) => ({ ...prev, category: e.target.value }))
+                                    setnewFAQ((prev) => ({ ...prev, quick_category_id: e.target.value }))
                                 }
                             >
-                                <option value="">자주하는 질문</option>
+                                <option value="">카테고리를 선택해주세요</option>
                                 {Categories.map(category => (
-                                    <option key={category.id}>{category.name}</option>
+                                    <option key={category.id} value={category.id}>{category.name}</option>
                                 ))}
 
 
