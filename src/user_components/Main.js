@@ -46,13 +46,12 @@ export default function Main() {
 
     useEffect(() => {
         if (hasRunRef.current) return;
-
         if (timerRef.current) {
             clearTimeout(timerRef.current);
         }
-
         timerRef.current = setTimeout(() => {
             console.log("5초 동안 sectionContent 변경 없음 → getinquiryform(6) 실행");
+            console.log(`카테고리 : ${Categories}`);
             setSectionContent(prev => [
                 ...prev,
                 <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
@@ -78,11 +77,12 @@ export default function Main() {
                     </div>
                 </div>
             ]);
-            hasRunRef.current = true; // ✅ 이후 실행되지 않도록 설정
-        }, 7000);
-
+            hasRunRef.current = true;
+        }, 10000);
         return () => clearTimeout(timerRef.current);
-    }, [sectionContent]);
+    }, [sectionContent, Categories]);
+
+
 
     const EmogiToTag = (emogi) => {
         const tags = {
@@ -260,7 +260,6 @@ export default function Main() {
             ...prev,
             <div className="after-loading" key={`after-loading-${Date.now()}`}>
                 <div className="chatbot-button-grid">
-
                     <div className="chatbot-button" onClick={() => getinquiryform(1)}>
                         <div className="chatbot-button-icon icon-headset"></div>
                         <div>
@@ -517,7 +516,6 @@ export default function Main() {
         } else if (status === "feedback") {
 
         }
-
     }
 
     // 메시지 전송
@@ -652,15 +650,6 @@ export default function Main() {
             }
         }
     };
-
-
-
-
-
-
-
-
-
 
 
 
