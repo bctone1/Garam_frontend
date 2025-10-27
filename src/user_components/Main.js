@@ -469,6 +469,7 @@ export default function Main() {
                         • 작성자: {inquiryInfo.name}<br />
                         • 거래처: {inquiryInfo.group}<br />
                         • 연락처: {inquiryInfo.phone}<br />
+                        • 이메일: {inquiryInfo.email}<br />
                         • 문의 내용: {inquiryInfo.detail}<br />
                         <br />
                         귀하의 문의사항이 정상적으로 접수되었습니다.<br />
