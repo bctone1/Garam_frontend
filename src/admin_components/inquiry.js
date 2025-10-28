@@ -9,6 +9,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     const [currentAdminUser, setcurrentAdminUser] = useState("");
     const [openAddAdminModal, setopenAddAdminModal] = useState(false);
     const admin_name = sessionStorage.getItem("admin_name");
+    // const admin_id = sessionStorage.getItem("admin_id");
 
     useEffect(() => {
         setcurrentAdminUser(admin_name);
@@ -164,54 +165,124 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         setOpenDropdownId((prev) => (prev === id ? null : id));
     };
 
-    const handleSelectAdmin = ({ admin, inquiry, action }) => {
-        if (action === "신규배정") {
-            setinquiries((prevInquiries) =>
-                prevInquiries.map((item) =>
-                    item.id === inquiry.id
-                        ? {
-                            ...item,
-                            status: "processing",
-                            assignee: admin.name,          // 담당자 교체
-                            assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "), // 배정 시간도 업데이트 가능
-                            history: [
-                                ...(item.history || []),
-                                {
-                                    action: "assign",
-                                    admin: admin.name,
-                                    timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
-                                    details: `${admin.name}님이 문의를 담당하게 되었습니다.`,
-                                },
-                            ],
-                        }
-                        : item
-                )
+    const handleComplete = ({ inquiry }) => {
+        const superadmin_id = adminUsers.find(cat => cat.name === currentAdminUser)?.id
+        const inputreason = prompt("처리결과를 입력해주세요");
+        if (inputreason === null) { console.log("동작이 취소되었습니다."); return; }
+        if (inputreason.trim() === "") { alert("사유를 입력해야 합니다!"); return; }
+
+
+        axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+            admin_id: superadmin_id,
+            details: `처리결과 :${inputreason}`,
+            action: "complete"
+        }).then((res) => {
+
+        }).catch((err) => {
+            console.log(err);
+        });
+
+        axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/status`, {
+            status: "completed",
+            details: "string",
+            actor_admin_id: superadmin_id,
+        }).then((res) => {
+            setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
+                {
+                    ...item,
+                    status: "completed",
+                    assignee: currentAdminUser,
+                    assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+                    history: [
+                        ...(item.history || []),
+                        {
+                            action: "complete",
+                            admin: currentAdminUser,
+                            timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+                            details: `처리결과 :${inputreason}`,
+                        },
+                    ],
+                } : item)
             );
+        }).catch((err) => {
+            console.log(err);
+        });
+
+    }
+
+    const handleSelectAdmin = ({ admin, inquiry, action }) => {
+        const superadmin_id = adminUsers.find(cat => cat.name === currentAdminUser)?.id
+
+        if (action === "신규배정") {
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+                admin_id: superadmin_id,
+                details: `${admin.name}님이 문의를 담당하게 되었습니다.`,
+                action: "assign"
+            }).then((res) => {
+
+            }).catch((err) => {
+                console.log(err);
+            });
+
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/assign`, {
+                admin_id: admin.id,
+                actor_admin: superadmin_id
+            }).then((res) => {
+                setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
+                    {
+                        ...item,
+                        status: "processing",
+                        assignee: admin.name,
+                        assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+                        history: [
+                            ...(item.history || []),
+                            {
+                                action: "assign",
+                                admin: currentAdminUser,
+                                timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+                                details: `${admin.name}님이 문의를 담당하게 되었습니다.`,
+                            },
+                        ],
+                    } : item)
+                );
+            }).catch((err) => {
+                console.log(err);
+            });
+
+
         } else {
             const inputreason = prompt("이관사유를 입력해주세요");
+            if (inputreason === null) { console.log("이관이 취소되었습니다."); return; }
+            if (inputreason.trim() === "") { alert("이관 사유를 입력해야 합니다!"); return; }
 
-            setinquiries((prevInquiries) =>
-                prevInquiries.map((item) =>
-                    item.id === inquiry.id
-                        ? {
-                            ...item,
-                            status: "processing",
-                            assignee: admin.name,
-                            assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "),
-                            history: [
-                                ...(item.history || []),
-                                {
-                                    action: "transfer",
-                                    admin: admin.name,
-                                    timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
-                                    details: `${item.assignee || "미지정"} -> ${admin.name} (사유:${inputreason})`,
-                                },
-                            ],
-                        }
-                        : item
-                )
-            );
+            const currentItem = inquiries.find((i) => i.id === inquiry.id);
+            const prevAssignee = currentItem?.assignee || "미지정";
 
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+                admin_id: superadmin_id,
+                details: `${prevAssignee || "미지정"} -> ${admin.name} (사유:${inputreason})`,
+                action: "transfer"
+            }).then((res) => {
+                setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
+                    {
+                        ...item,
+                        status: "processing",
+                        assignee: admin.name,
+                        assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+                        history: [
+                            ...(item.history || []),
+                            {
+                                action: "transfer",
+                                admin: currentAdminUser,
+                                timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+                                details: `${prevAssignee || "미지정"} -> ${admin.name} (사유:${inputreason})`,
+                            },
+                        ],
+                    } : item)
+                );
+            }).catch((err) => {
+                console.log(err);
+            });
         }
 
         showToast(`${admin.name}문의가 ${action}되었습니다.`, "info");
@@ -219,8 +290,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
     };
 
 
-    const handleDetail = async (inquiry) => {
-        
+    const deleteDetail = async (inquiry) => {
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}`,
@@ -231,12 +301,25 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
             console.log(response.data);
             fetch_inquiry_list();
             showToast(`문의가 삭제 되었습니다.`, "warning");
-
         } catch (err) {
             console.error("삭제 요청 오류:", err);
         }
     }
 
+    const actionsReturn = (action) => {
+        const actions = {
+            "new": "문의 접수",
+            "assign": "담당자 배정",
+            "on_hold": "처리 대기",
+            "resume": "처리 재개",
+            "transfer": "담당자 이관",
+            "complete": "처리 완료",
+            "note": "메모 추가",
+            "contact": "고객 연락",
+            "delete": "문의 삭제",
+        };
+        return actions[action] ?? "icon-default";
+    }
 
     return (
         <>
@@ -260,17 +343,11 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
                 const historyHtml = inquiry.history.map((item, idx) => (
                     <div key={idx} className="history-item">
-                        <div className="history-action">{item.action}</div>
+                        <div className="history-action">{actionsReturn(item.action)}</div>
                         <div className="history-admin">by {item.admin}</div>
                         <div className="history-time">{item.timestamp}</div>
                         {item.details && (
-                            <div
-                                style={{
-                                    fontSize: "0.75rem",
-                                    color: "var(--text-secondary)",
-                                    marginTop: "0.25rem",
-                                }}
-                            >
+                            <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "0.25rem", }}>
                                 {item.details}
                             </div>
                         )}
@@ -281,84 +358,50 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 let actionButtons = null;
                 if (inquiry.status === "new") {
                     actionButtons = (
-                        <div className="assign-dropdown">
-                            <button
-                                className="btn btn-warning btn-sm"
-                                onClick={() => toggleDropdown(inquiry.id)}
-                            >
-                                <i className="fas fa-user-plus"></i> 담당자 지정
-                            </button>
-
-                            <div
-                                className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`}
-                                id={`dropdown-${inquiry.id}`}
-                            >
-                                {adminUsers.map((admin) => (
-                                    <div key={admin.name} className="assign-dropdown-item"
-                                        onClick={() => handleSelectAdmin({ admin, inquiry, action: "신규배정" })}
-                                    >
-                                        <div className="admin-avatar">{admin.name.charAt(0)}</div>
-                                        <div>
-                                            <div style={{ fontWeight: 600 }}>{admin.name}</div>
-                                            <div
-                                                style={{
-                                                    fontSize: "0.75rem",
-                                                    color: "var(--text-secondary)",
-                                                }}
-                                            >
-                                                {admin.department}
+                        <>
+                            <div className="assign-dropdown">
+                                <div className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`} id={`dropdown-${inquiry.id}`}>
+                                    {adminUsers.map((admin) => (
+                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "신규배정" })}>
+                                            <div className="admin-avatar">{admin.name.charAt(0)}</div>
+                                            <div>
+                                                <div style={{ fontWeight: 600 }}>{admin.name}</div>
+                                                <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                                                    {admin.department}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+
+                            <button className="btn btn-warning btn-sm" onClick={() => toggleDropdown(inquiry.id)}>
+                                <i className="fas fa-user-plus"></i> 담당자 지정
+                            </button>
+                        </>
                     );
                 } else if (inquiry.status === "processing" && (isCurrentUser || sudo)) {
                     actionButtons = (
-                        <div className="action-buttons">
-                            <button
-                                className="btn btn-info btn-sm"
-
-                            >
+                        <>
+                            <button className="btn btn-info btn-sm">
                                 <i className="fas fa-phone"></i> 연락
                             </button>
-                            <button
-                                className="btn btn-secondary btn-sm"
-
-                            >
+                            <button className="btn btn-secondary btn-sm">
                                 <i className="fas fa-sticky-note"></i> 메모
                             </button>
-                            <button
-                                className="btn btn-warning btn-sm"
-
-                            >
+                            <button className="btn btn-warning btn-sm">
                                 <i className="fas fa-pause"></i> 대기
                             </button>
+
+
                             <div className="assign-dropdown">
-                                <button
-                                    className="btn btn-primary btn-sm"
-                                    onClick={() => toggleDropdown(inquiry.id)}
-                                >
-                                    <i className="fas fa-exchange-alt"></i> 이관
-                                </button>
-                                <div
-                                    className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`}
-                                    id={`dropdown-${inquiry.id}`}
-                                >
+                                <div className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`} id={`dropdown-${inquiry.id}`}>
                                     {adminUsers.map((admin) => (
-                                        <div key={admin.name} className="assign-dropdown-item"
-                                            onClick={() => handleSelectAdmin({ admin, inquiry, action: "이관" })}
-                                        >
+                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "이관" })}>
                                             <div className="admin-avatar">{admin.name.charAt(0)}</div>
                                             <div>
                                                 <div style={{ fontWeight: 600 }}>{admin.name}</div>
-                                                <div
-                                                    style={{
-                                                        fontSize: "0.75rem",
-                                                        color: "var(--text-secondary)",
-                                                    }}
-                                                >
+                                                <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", }}>
                                                     {admin.department}
                                                 </div>
                                             </div>
@@ -366,70 +409,53 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                     ))}
                                 </div>
                             </div>
-                            <button
-                                className="btn btn-success btn-sm"
 
-                            >
+                            <button className="btn btn-primary btn-sm" onClick={() => toggleDropdown(inquiry.id)}>
+                                <i className="fas fa-exchange-alt"></i> 이관
+                            </button>
+
+                            <button className="btn btn-success btn-sm" onClick={() => handleComplete({ inquiry })}>
                                 <i className="fas fa-check"></i> 완료
                             </button>
-                        </div>
+                        </>
                     );
                 } else if (inquiry.status === "on_hold" && (isCurrentUser || sudo)) {
                     actionButtons = (
-                        <div className="action-buttons">
-                            <button
-                                className="btn btn-info btn-sm"
-                            >
+                        <>
+                            <button className="btn btn-info btn-sm">
                                 <i className="fas fa-play"></i> 재개
                             </button>
-                            <button
-                                className="btn btn-secondary btn-sm"
-                            >
+                            <button className="btn btn-secondary btn-sm">
                                 <i className="fas fa-sticky-note"></i> 메모
                             </button>
+
                             <div className="assign-dropdown">
-                                <button
-                                    className="btn btn-primary btn-sm"
-                                    onClick={() => toggleDropdown(inquiry.id)}
-                                >
-                                    <i className="fas fa-exchange-alt"></i> 이관
-                                </button>
-                                <div
-                                    className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`}
-                                    id={`dropdown-${inquiry.id}`}
-                                >
+                                <div className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`} id={`dropdown-${inquiry.id}`}>
                                     {adminUsers.map((admin) => (
-                                        <div key={admin.name} className="assign-dropdown-item"
-                                            onClick={() => handleSelectAdmin({ admin, inquiry, action: "이관" })}
-                                        >
+                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "이관" })}>
                                             <div className="admin-avatar">{admin.name.charAt(0)}</div>
                                             <div>
                                                 <div style={{ fontWeight: 600 }}>{admin.name}</div>
-                                                <div
-                                                    style={{
-                                                        fontSize: "0.75rem",
-                                                        color: "var(--text-secondary)",
-                                                    }}
-                                                >
-                                                    {admin.department}
-                                                </div>
+                                                <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", }}>{admin.department}</div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            <button
-                                className="btn btn-success btn-sm"
+                            <button className="btn btn-primary btn-sm" onClick={() => toggleDropdown(inquiry.id)} >
+                                <i className="fas fa-exchange-alt"></i> 이관
+                            </button>
 
-                            >
+                            <button className="btn btn-success btn-sm" >
                                 <i className="fas fa-check"></i> 완료
                             </button>
-                        </div>
+                        </>
                     );
                 }
 
                 return (
                     <div key={inquiry.id} className="inquiry-item">
+
                         <div className="inquiry-header">
                             <div className="inquiry-info">
                                 <div className="inquiry-name">{inquiry.name}</div>
@@ -437,19 +463,20 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                     {inquiry.company} • {inquiry.phone} • {inquiry.createdDate}
                                 </div>
                             </div>
+
                             <div className="inquiry-actions">
                                 <span className={`status-badge ${statusClass[inquiry.status]}`}>
                                     {statusText[inquiry.status]}
                                 </span>
-                                {actionButtons}
-                                <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => handleDetail(inquiry)}
-                                >
-                                    <i className="fas fa-trash"></i> 삭제
-                                </button>
+                                <div className="action-buttons">
+                                    {actionButtons}
+                                    <button className="btn btn-danger btn-sm" onClick={() => deleteDetail(inquiry)} >
+                                        <i className="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
                         <div className="inquiry-content">{inquiry.content}</div>
                         {processorInfo}
                         <div className="history-timeline">{historyHtml}</div>
@@ -465,7 +492,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries, fetch_admin_users }) {
 
     const getAssignedCount = (adminName) =>
-        inquiries.filter(i => i.assignee === adminName && i.status === "processing").length;
+        inquiries.filter(i => i.assignee === adminName && i.status === "processing").length + inquiries.filter(i => i.assignee === adminName && i.status === "on_hold").length;
 
     const getCompletedCount = (adminName) =>
         inquiries.filter(i => i.assignee === adminName && i.status === "completed").length;

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { showNotification } from '../utill/utill';
+import { showNotification, assistant_showNotification } from '../utill/utill';
 
 
 export default function Chatbot() {
@@ -102,7 +102,7 @@ export default function Chatbot() {
     };
 
     const handleSettings = async () => {
-        alert("정보저장");
+        // alert("정보저장");
         try {
             const settingPayload = {
                 welcome_title: systemSettings.welcome_title,
@@ -136,8 +136,7 @@ export default function Chatbot() {
 
             console.log("System setting saved:", settingData);
             console.log("Categories saved:", categoryData);
-
-            alert("저장 완료!");
+            showNotification("저장 완료", "success");
 
         } catch (error) {
             console.error(error);
@@ -164,8 +163,7 @@ export default function Chatbot() {
             setCategories((prev) =>
                 prev.filter((category) => category.id !== category_id)
             );
-
-            alert("카테고리 삭제 완료!");
+            showNotification("해당 카테코리를 삭제했습니다.", "success");
 
         } catch (error) {
             console.error(error);

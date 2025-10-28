@@ -50,8 +50,8 @@ export default function Main() {
             clearTimeout(timerRef.current);
         }
         timerRef.current = setTimeout(() => {
-            console.log("5초 동안 sectionContent 변경 없음 → getinquiryform(6) 실행");
-            console.log(`카테고리 : ${Categories}`);
+            // console.log("5초 동안 sectionContent 변경 없음 → getinquiryform(6) 실행");
+            // console.log(`카테고리 : ${Categories}`);
             setSectionContent(prev => [
                 ...prev,
                 <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
@@ -97,9 +97,7 @@ export default function Main() {
     };
 
     const getCategory = () => {
-        console.log("카테고리를 불러옵니다.");
         axios.get(`${process.env.REACT_APP_API_URL}/system/quick-categories`).then((res) => {
-            console.log(res.data);
             setCategories(res.data);
         })
     }
@@ -129,6 +127,8 @@ export default function Main() {
     };
 
     const InquiryCreate = async () => {
+        console.log(`이메일 : ${messageInput}`);
+        console.log(inquiryInfo);
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_API_URL}/inquiries/`,
@@ -145,7 +145,6 @@ export default function Main() {
                     }),
                 }
             );
-            console.log(response.data);
         } catch (error) {
             console.log(error);
         }
@@ -495,7 +494,7 @@ export default function Main() {
                         • 작성자: {inquiryInfo.name}<br />
                         • 거래처: {inquiryInfo.group}<br />
                         • 연락처: {inquiryInfo.phone}<br />
-                        • 이메일: {inquiryInfo.email}<br />
+                        • 이메일: {messageInput}<br />
                         • 문의 내용: {inquiryInfo.detail}<br />
                         <br />
                         귀하의 문의사항이 정상적으로 접수되었습니다.<br />

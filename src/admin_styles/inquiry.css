@@ -462,6 +462,7 @@
        font-size: 0.75rem;
        font-weight: 600;
        margin-right: 0.5rem;
+       margin-top: 0.5rem;
    }
 
    .status-new {
@@ -599,11 +600,13 @@
    }
 
    /* 간단한 드롭다운 스타일 */
+   /* 기본 드롭다운 래퍼 */
    .assign-dropdown {
        position: relative;
        display: inline-block;
    }
 
+   /* 드롭다운 메뉴 기본 상태 */
    .assign-dropdown-menu {
        position: absolute;
        top: 100%;
@@ -614,17 +617,28 @@
        box-shadow: var(--shadow-md);
        z-index: 1000;
        min-width: 200px;
-       display: none;
+
+       /* 애니메이션 관련 */
+       opacity: 0;
+       transform: translateY(-10px);
+       visibility: hidden;
+       pointer-events: none;
+       transition: opacity 0.25s ease, transform 0.25s ease;
    }
 
+   /* 드롭다운 메뉴가 열릴 때 */
    .assign-dropdown-menu.show {
-       display: block;
+       opacity: 1;
+       transform: translateY(0);
+       visibility: visible;
+       pointer-events: auto;
    }
 
+   /* 메뉴 아이템 */
    .assign-dropdown-item {
        padding: 0.75rem 1rem;
        cursor: pointer;
-       transition: var(--transition);
+       transition: background 0.2s ease;
        display: flex;
        align-items: center;
        gap: 0.75rem;
@@ -634,11 +648,19 @@
        background: var(--secondary-color);
    }
 
+   /* 아바타 */
    .assign-dropdown-item .admin-avatar {
        width: 32px;
        height: 32px;
        font-size: 0.75rem;
+       border-radius: 50%;
+       background: var(--primary-color, #3B82F6);
+       color: white;
+       display: flex;
+       align-items: center;
+       justify-content: center;
    }
+
 
 
 

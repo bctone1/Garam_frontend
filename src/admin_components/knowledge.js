@@ -493,11 +493,13 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
             console.log("생성된 FAQ:", res.data);
             setshowAddFaqModal(false);
             fetch_FAQ();
+            showToast("저장 완료", "success");
             setnewFAQ({
                 question: "",
                 quick_category_id: "",
                 answer: "",
             });
+
         }).catch((err) => {
             console.error(err);
         });

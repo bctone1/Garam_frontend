@@ -9,9 +9,6 @@ export function showNotification(message, type = 'info', duration = 3000) {
       <i class="fas ${getNotificationIcon(type)}"></i>
       <span>${message}</span>
     </div>
-    <button class="notification-close">
-      <i class="fas fa-times"></i>
-    </button>
   `;
 
     Object.assign(notification.style, {
@@ -57,14 +54,14 @@ export function showNotification(message, type = 'info', duration = 3000) {
         notification.style.transform = 'translateX(0)';
     }, 10);
 
-    const closeBtn = notification.querySelector('.notification-close');
+    // const closeBtn = notification.querySelector('.notification-close');
     const closeNotification = () => {
         notification.style.opacity = '0';
         notification.style.transform = 'translateX(100%)';
         setTimeout(() => notification.remove(), 300);
     };
 
-    closeBtn.addEventListener('click', closeNotification);
+    // closeBtn.addEventListener('click', closeNotification);
 
     if (duration > 0) setTimeout(closeNotification, duration);
 }
