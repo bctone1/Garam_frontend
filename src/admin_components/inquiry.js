@@ -207,7 +207,6 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         }).catch((err) => {
             console.log(err);
         });
-
     }
 
     const handleSelectAdmin = ({ admin, inquiry, action }) => {

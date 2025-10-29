@@ -17,7 +17,7 @@ export default function Main() {
         detail: null,
     });
     const [welecome, setWelecome] = useState(false);
-    const [micStatus, setmicStatus] = useState(false);
+    const [micStatus, setMicStatus] = useState(false);
     const sectionEndRef = useRef(null);
     const [plusmenu, setplusmenu] = useState(false);
     const [sectionContent, setSectionContent] = useState([]);
@@ -102,8 +102,6 @@ export default function Main() {
         })
     }
 
-
-
     // --- ✨ AI 응답 요청 함수 ---
     const requestAssistantAnswer = async (question) => {
         try {
@@ -125,6 +123,35 @@ export default function Main() {
             console.log(error);
         }
     };
+
+    const requestAssistantAnswerStream = async (question) => {
+        try {
+            const payload = {
+                question,
+                top_k: Number(topK),
+                knowledge_id: knowledgeId ? Number(knowledgeId) : null,
+                session_id: 42,
+                style: "friendly",
+            };
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/llm/qa/stream`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                }
+            );
+            const message = await parseError(response);
+            return response.body.getReader();
+            // return response.json();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const streamTEST = () => {
+        alert("스트리밍 테스트");
+    }
+
+
 
     const InquiryCreate = async () => {
         console.log(`이메일 : ${messageInput}`);
@@ -676,6 +703,115 @@ export default function Main() {
         }
     };
 
+    const [audioBlob, setAudioBlob] = useState(null);
+    const mediaRecorderRef = useRef(null);
+    const audioChunksRef = useRef([]);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const STT_LANG = "Kor";
+
+    const handleSTT = async () => {
+        if (!micStatus) {
+            // ==================== 녹음 시작 ====================
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) audioChunksRef.current.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+                setAudioBlob(blob);
+                setIsProcessing(true);
+
+                // ==================== 서버 전송 ====================
+                const formData = new FormData();
+                formData.append("file", blob, "recording.webm");
+                formData.append("lang", STT_LANG);
+
+                try {
+                    const response = await fetch(`${process.env.REACT_APP_API_URL}/llm/clova_stt`, {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (!response.ok) throw new Error(`STT 실패: ${response.statusText}`);
+                    const data = await response.json();
+                    console.log("STT 결과:", data.text);
+
+                    setSectionContent(prev => [
+                        ...prev,
+                        <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                            <div className="bubble-date user">{formattedTime}</div>
+                            <div className="bubble-message user">{data.text}</div>
+                        </div>
+                    ]);
+
+                    const answerdata = await requestAssistantAnswer(data.text);
+                    const answer = answerdata.answer?.trim?.() ? answerdata.answer.trim() : "응답을 가져올 수 없습니다.";
+
+                    setSectionContent(prev => [
+                        ...prev,
+                        <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
+                            <div className="bubble-date assistant">{formattedTime}</div>
+                            <div className="bubble-message assistant">{answer}</div>
+                        </div>
+                    ]);
+
+
+                } catch (error) {
+                    console.error("STT 요청 오류:", error);
+                } finally {
+                    setIsProcessing(false);
+                }
+            };
+
+            // ==================== VAD 적용 ====================
+            const audioContext = new AudioContext();
+            const source = audioContext.createMediaStreamSource(stream);
+            const processor = audioContext.createScriptProcessor(2048, 1, 1);
+
+            let silenceStart = null;
+            const SILENCE_THRESHOLD = 0.01; // RMS 기준
+            const SILENCE_TIMEOUT = 1500;   // 1.5초 연속 무음 시 종료
+
+            processor.onaudioprocess = (e) => {
+                const input = e.inputBuffer.getChannelData(0);
+                const rms = Math.sqrt(input.reduce((sum, v) => sum + v * v, 0) / input.length);
+
+                if (rms < SILENCE_THRESHOLD) {
+                    if (!silenceStart) silenceStart = Date.now();
+                    else if (Date.now() - silenceStart > SILENCE_TIMEOUT) {
+                        // 자동 종료
+                        mediaRecorder.stop();
+                        console.log("음성 종료 감지: 자동 녹음 종료");
+                        setMicStatus(false);
+                        processor.disconnect();
+                        source.disconnect();
+                    }
+                } else {
+                    silenceStart = null;
+                }
+            };
+
+            source.connect(processor);
+            processor.connect(audioContext.destination);
+
+            mediaRecorder.start();
+            console.log("녹음 시작 (VAD 적용)");
+
+        } else {
+            // ==================== 수동 종료 ====================
+            mediaRecorderRef.current.stop();
+            console.log("녹음 수동 종료");
+        }
+
+        setMicStatus((prev) => !prev);
+    };
+
+
 
 
     return (
@@ -798,7 +934,7 @@ export default function Main() {
 
                             <div className="chatbot-input-tools-right">
                                 <button className={`chatbot-input-button mic${micStatus ? "-active" : ""}`}
-                                    onClick={() => setmicStatus((prev) => !prev)}
+                                    onClick={() => handleSTT()}
                                 >
                                     <i className="icon-mic-active"></i>
                                 </button>
