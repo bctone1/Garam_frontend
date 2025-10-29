@@ -190,7 +190,7 @@ body {
     background: #f8fafc;
 }
 
-.top-header {
+/* .top-header {
     background: var(--bg-white);
     border-bottom: 1px solid var(--border-color);
     padding: 1.5rem 2rem;
@@ -224,7 +224,7 @@ body {
     display: flex;
     align-items: center;
     gap: 1rem;
-}
+} */
 
 .preview-btn {
     display: flex;

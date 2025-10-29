@@ -226,138 +226,14 @@ export default function Chart() {
     }, []);
 
 
-    //일별 요청 수 추이 
-    const [RequestTrendChart, setRequestTrendChart] = useState(null);
-    const [RequestTrendChartOptions, setRequestTrendChartOptions] = useState({});
-    useEffect(() => {
-        setRequestTrendChart({
-            labels: ['10/09', '10/10', '10/11', '10/12', '10/13', '10/14', '10/15'],
-            datasets: [{
-                label: '임베딩 요청 (건)',
-                data: [152, 167, 185, 201, 156, 172, 189],
-                backgroundColor: 'rgba(139, 92, 246, 0.8)',
-                borderRadius: 4
-            }, {
-                label: 'LLM 요청 (건)',
-                data: [118, 132, 148, 156, 125, 138, 142],
-                backgroundColor: 'rgba(23, 162, 184, 0.8)',
-                borderRadius: 4
-            }, {
-                label: '음성 요청 (건)',
-                data: [32, 39, 51, 58, 44, 48, 52],
-                backgroundColor: 'rgba(255, 193, 7, 0.8)',
-                borderRadius: 4
-            }]
-        });
-
-        setRequestTrendChartOptions({
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20
-                    }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    callbacks: {
-                        label: function (context) {
-                            return context.dataset.label + ': ' + context.parsed.y + '건';
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    stacked: false
-                },
-                y: {
-                    beginAtZero: true,
-                    stacked: false,
-                    ticks: {
-                        callback: function (value) {
-                            return value + '건';
-                        }
-                    }
-                }
-            }
-        });
-    }, []);
 
 
-    //일별 API비용 추이
-    const [CostTrendChart, setCostTrendChart] = useState(null);
-    const [CostTrendChartOptions, setCostTrendChartOptions] = useState({});
-    useEffect(() => {
-        setCostTrendChart({
-            labels: ['10/09', '10/10', '10/11', '10/12', '10/13', '10/14', '10/15'],
-            datasets: [{
-                label: '임베딩 비용 ($)',
-                data: [3.42, 3.86, 4.15, 4.68, 3.58, 3.72, 4.15],
-                borderColor: '#8b5cf6',
-                backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: 'LLM 비용 ($)',
-                data: [8.17, 8.95, 10.90, 11.44, 9.21, 10.02, 10.45],
-                borderColor: '#17a2b8',
-                backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: '음성 비용 ($)',
-                data: [1.79, 1.79, 2.34, 2.65, 2.04, 2.21, 2.38],
-                borderColor: '#ffc107',
-                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        });
 
-        setCostTrendChartOptions({
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20
-                    }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    callbacks: {
-                        label: function (context) {
-                            return context.dataset.label + ': $' + context.parsed.y.toFixed(2);
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function (value) {
-                            return '$' + value.toFixed(2);
-                        }
-                    }
-                }
-            }
-        });
-    }, []);
 
 
     return (
         <>
             <main className="chart-main-content">
-
                 <header className="top-header">
                     <div className="header-left">
                         <div className="page-title">
@@ -369,187 +245,40 @@ export default function Chart() {
                         <div className="date-selector">
                             <select className="date-select" id="dateRange">
                                 <option value="today">오늘</option>
-                                <option value="week">지난 7일</option>
+                                <option value="week" >지난 7일</option>
                                 <option value="month">지난 30일</option>
                                 <option value="quarter">지난 90일</option>
                             </select>
+
+                            {/* <button className="btn btn-primary" >
+                                <i className="fas fa-download"></i>
+                                데이터 내보내기
+                            </button> */}
                         </div>
                     </div>
                 </header>
+
                 <div className="chart-main-container">
-
-
-                    {/* AI API 사용량 및 비용 섹션  */}
-                    <div className="section" style={{ marginBottom: "2rem" }}>
-                        <h2 className="section-title">
-                            <i className="fas fa-brain"></i>
-                            AI API 사용량 및 비용
-                        </h2>
-
-                        {/* API 요약 카드 (요청수 / 비용) */}
-                        <div className="metrics-row">
-                            <div className="metric-card">
-                                <div className="metric-value purple">1,247건 / $28.10</div>
-                                <div className="chart-metric-label">임베딩</div>
-                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>지식베이스 벡터화</small>
-                            </div>
-
-                            <div className="metric-card">
-                                <div className="metric-value info">847건 / $72.50</div>
-                                <div className="chart-metric-label">LLM API</div>
-                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>EXAONE 4.0 (32B)</small>
-                            </div>
-
-                            <div className="metric-card">
-                                <div className="metric-value warning">324건 / $15.20</div>
-                                <div className="chart-metric-label">음성 API</div>
-                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>NAVER Clova Speech STT</small>
-                            </div>
-
-                            <div className="metric-card">
-                                <div className="metric-value success">2,418건 / $115.80</div>
-                                <div className="chart-metric-label">총 API 사용량</div>
-                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>이번 달 누적</small>
-                            </div>
-                        </div>
-
-                        {/* 일별 요청 수 추이 차트 */}
-                        <div className="chart-card" style={{ marginBottom: "1.5rem" }}>
-                            <div className="chart-header">
-                                <h3 className="chart-title">일별 요청 수 추이</h3>
-                            </div>
-                            <div className="chart-container">
-                                <div id="apiRequestTrendChart" style={{ height: "270px" }}>
-                                    {RequestTrendChart ? <Bar data={RequestTrendChart} options={RequestTrendChartOptions} /> : <p>Loading...</p>}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 일별 API 비용 추이 차트 */}
-                        <div className="chart-card" style={{ marginBottom: "1.5rem" }}>
-                            <div className="chart-header">
-                                <h3 className="chart-title">일별 API 비용 추이</h3>
-                            </div>
-                            <div className="chart-container">
-                                <div id="apiCostTrendChart" style={{ height: "270px" }}>
-                                    {CostTrendChart ? <Line data={CostTrendChart} options={CostTrendChartOptions} /> : <p>Loading...</p>}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 상세 비용 내역 테이블 */}
-                        <div className="questions-card" style={{ marginBottom: "1.5rem" }}>
-                            <div className="chart-header">
-                                <h3 className="chart-title">날짜별 API 사용 내역</h3>
-                            </div>
-                            <div className="satisfaction-content">
-                                <table className="satisfaction-table">
-                                    <thead>
-                                        <tr>
-                                            <th>날짜</th>
-                                            <th>임베딩 요청</th>
-                                            <th>임베딩 비용</th>
-                                            <th>LLM 요청</th>
-                                            <th>LLM 비용</th>
-                                            <th>음성 요청</th>
-                                            <th>음성 비용</th>
-                                            <th>총 비용</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="apiUsageTableBody">
-                                        <tr>
-                                            <td>2025-10-29</td>
-                                            <td>212건</td>
-                                            <td>$3.98</td>
-                                            <td>146건</td>
-                                            <td>$10.04</td>
-                                            <td>38건</td>
-                                            <td>$2.09</td>
-                                            <td><strong>$16.11</strong></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>2025-10-28</td>
-                                            <td>245건</td>
-                                            <td>$3.15</td>
-                                            <td>122건</td>
-                                            <td>$8.93</td>
-                                            <td>45건</td>
-                                            <td>$2.21</td>
-                                            <td><strong>$14.29</strong></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* 페이지네이션 */}
-                            <div className="pagination-container">
-                                <div className="pagination-info" id="apiUsagePaginationInfo">
-                                    1-7 / 총 7건
-                                </div>
-                                <div className="pagination-controls">
-                                    <button className="pagination-btn" id="apiUsagePrevBtn" >
-                                        <i className="fas fa-chevron-left"></i> 이전
-                                    </button>
-                                    <div className="page-numbers" id="apiUsagePageNumbers">
-                                        {/* JavaScript로 동적 생성 */}
-                                    </div>
-                                    <button className="pagination-btn" id="apiUsageNextBtn" >
-                                        다음 <i className="fas fa-chevron-right"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* API 비용 정보 안내 */}
-                        <div className="info-box">
-                            <h3>
-                                <i className="fas fa-info-circle"></i>
-                                API 비용 정보
-                            </h3>
-                            <ul>
-                                <li>
-                                    <i className="fas fa-check" style={{ color: "#28a745", marginRight: "0.5rem" }}></i>
-                                    <strong>임베딩 비용:</strong> 지식베이스에 파일 등록 시 문서를 벡터화하는 과정에서 발생 (1회성)
-                                </li>
-                                <li>
-                                    <i className="fas fa-check" style={{ color: "#28a745", marginRight: "0.5rem" }}></i>
-                                    <strong>LLM API 비용:</strong> 챗봇이 검색 결과를 기반으로 답변을 생성할 때 발생 (EXAONE 4.0 32B 기준)
-                                </li>
-                                <li>
-                                    <i className="fas fa-check" style={{ color: "#28a745", marginRight: "0.5rem" }}></i>
-                                    <strong>음성 API 비용:</strong> 음성 입력을 텍스트로 변환하는 비용 (네이버 클로바 STT 기준, 분당 약 $0.047)
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
                     {/* 상단 성능 지표 카드들  */}
-                    <div className="section" style={{ marginBottom: "2rem" }}>
-                        <h2 className="section-title">
-                            <i className="fas fa-chart-line"></i>
-                            챗봇 성능 지표
-                        </h2>
+                    <div className="metrics-row">
+                        <div className="metric-card">
+                            <div className="metric-value success">94.2%</div>
+                            <div className="metric-label">문제 해결률</div>
+                        </div>
 
-                        <div className="metrics-row">
-                            <div className="metric-card">
-                                <div className="metric-value success">94.2%</div>
-                                <div className="chart-metric-label">문제 해결률</div>
-                            </div>
+                        <div className="metric-card">
+                            <div className="metric-value info">2.3분</div>
+                            <div className="metric-label">평균 응답 시간</div>
+                        </div>
 
-                            <div className="metric-card">
-                                <div className="metric-value info">2.3분</div>
-                                <div className="chart-metric-label">평균 응답 시간</div>
-                            </div>
+                        <div className="metric-card">
+                            <div className="metric-value purple">3.2턴</div>
+                            <div className="metric-label">평균 대화 턴수</div>
+                        </div>
 
-                            <div className="metric-card">
-                                <div className="metric-value purple">3.2턴</div>
-                                <div className="chart-metric-label">평균 대화 턴수</div>
-                            </div>
-
-                            <div className="metric-card">
-                                <div className="metric-value info" id="dailyAverage">45.0건/일</div>
-                                <div className="chart-metric-label">일평균 문의량</div>
-                            </div>
+                        <div className="metric-card">
+                            <div className="metric-value info" id="dailyAverage">45.0건/일</div>
+                            <div className="metric-label">일평균 문의량</div>
                         </div>
                     </div>
 
@@ -558,8 +287,14 @@ export default function Chart() {
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">일별 대화 트렌드</h3>
+                                {/* <div className="chart-controls">
+                                    <button className="chart-action" title="차트 다운로드">
+                                        <i className="fas fa-download"></i>
+                                    </button>
+                                </div> */}
                             </div>
                             <div className="chart-container">
+                                {/* <canvas id="conversationChart"></canvas> */}
                                 <div id="conversationChart" style={{ height: "270px" }}>
                                     {ConversationChart ? <Line data={ConversationChart} options={ConversationchartOptions} /> : <p>Loading...</p>}
                                 </div>
@@ -569,8 +304,14 @@ export default function Chart() {
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">사용자 피드백 분포</h3>
+                                {/* <div className="chart-controls">
+                                    <button className="chart-action" title="차트 다운로드">
+                                        <i className="fas fa-download"></i>
+                                    </button>
+                                </div> */}
                             </div>
                             <div className="chart-container">
+                                {/* <canvas id="feedbackChart"></canvas> */}
                                 <div id="feedbackChart" style={{ height: "270px" }}>
                                     {FeedbackChart ? <Doughnut data={FeedbackChart} options={FeedbackchartOptions} /> : <p>Loading...</p>}
                                 </div>
@@ -583,8 +324,14 @@ export default function Chart() {
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">응답 시간 분석</h3>
+                                {/* <div className="chart-controls">
+                                    <button className="chart-action" title="차트 다운로드">
+                                        <i className="fas fa-download"></i>
+                                    </button>
+                                </div> */}
                             </div>
                             <div className="chart-container">
+                                {/* <canvas id="responseTimeChart"></canvas> */}
                                 <div id="responseTimeChart" style={{ height: "270px" }}>
                                     {ResponseTimeChart ? <Bar data={ResponseTimeChart} options={ResponseTimeOptions} /> : <p>Loading...</p>}
                                 </div>
@@ -594,8 +341,14 @@ export default function Chart() {
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">사용자 만족도 트렌드</h3>
+                                {/* <div className="chart-controls">
+                                    <button className="chart-action" title="차트 다운로드">
+                                        <i className="fas fa-download"></i>
+                                    </button>
+                                </div> */}
                             </div>
                             <div className="chart-container">
+                                {/* <canvas id="satisfactionChart"></canvas> */}
                                 <div id="satisfactionChart" style={{ height: "270px" }}>
                                     {SatisfactionChart ? <Line data={SatisfactionChart} options={SatisfactionOptions} /> : <p>Loading...</p>}
                                 </div>
@@ -607,8 +360,14 @@ export default function Chart() {
                     <div className="chart-card full-width" style={{ marginBottom: "2rem" }}>
                         <div className="chart-header">
                             <h3 className="chart-title">시간대별 대화량</h3>
+                            {/* <div className="chart-controls">
+                                <button className="chart-action" title="차트 다운로드">
+                                    <i className="fas fa-download"></i>
+                                </button>
+                            </div> */}
                         </div>
                         <div className="chart-container">
+                            {/* <canvas id="hourlyChart"></canvas> */}
                             <div id="hourlyChart" style={{ height: "270px" }}>
                                 {HourlyChart ? <Bar data={HourlyChart} options={HourlyOptions} /> : <p>Loading...</p>}
                             </div>
@@ -678,9 +437,6 @@ export default function Chart() {
                                 </table>
                             </div>
                         </div>
-
-
-                        
                     </div>
                 </div>
             </main>

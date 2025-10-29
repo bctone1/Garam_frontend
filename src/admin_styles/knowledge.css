@@ -192,7 +192,7 @@ body {
     background: #f8fafc;
 }
 
-.top-header {
+/* .top-header {
     background: var(--bg-white);
     border-bottom: 1px solid var(--border-color);
     padding: 1.5rem 2rem;
@@ -233,7 +233,7 @@ body {
     display: flex;
     gap: 2rem;
     align-items: center;
-}
+} */
 
 .stat-item {
     text-align: center;
