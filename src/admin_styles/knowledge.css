@@ -322,7 +322,7 @@ body {
     padding: 0 2rem;
     border-bottom: 1px solid var(--border-color);
     background: var(--bg-white);
-    position: sticky;
+    /* position: sticky; */
     top: var(--header-height);
     z-index: 100;
 }
@@ -697,6 +697,20 @@ body {
     font-size: 0.875rem;
     color: var(--text-secondary);
     flex-wrap: wrap;
+}
+
+.faq-meta .action-btn-small {
+    margin-left: auto;
+    /* 나머지 공간을 채워 버튼을 오른쪽 끝으로 */
+    background: gray;
+    color: white;
+    width: 100px;
+}
+
+.faq-meta .action-btn-small:hover {
+    background: black;
+    color: white;
+    width: 100px;
 }
 
 /* 모달 */

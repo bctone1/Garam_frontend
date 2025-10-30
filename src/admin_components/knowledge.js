@@ -111,10 +111,14 @@ export default function Knowledge() {
         return matchesSearch;
     });
 
-    const filteredFAQ = faqs.filter((p) => {
-        const matchesSearch = p.question.toLowerCase().includes(FAQquery.toLowerCase());
-        return matchesSearch;
+    const filteredFAQ = faqs.filter((faq) => {
+        const matchesSearch = faq.question.toLowerCase().includes(FAQquery.toLowerCase());
+        const categoryName = Categories.find(cat => cat.id === faq.quick_category_id)?.name || "카테고리 없음";
+        const matchesCategory = categoryName.toLowerCase().includes(FAQquery.toLowerCase());
+
+        return matchesSearch || matchesCategory;
     });
+
 
     const handleDeleteFAQ = async (faq) => {
         console.log(faq);
@@ -132,6 +136,23 @@ export default function Knowledge() {
         }
     }
 
+    const [FixIndex, setFixIndex] = useState(false);
+    const handleFix = (faq) => {
+        if (FixIndex === faq.id) {
+            axios.patch(`${process.env.REACT_APP_API_URL}/faqs/${faq.id}`, {
+                quick_category_id: faq.quick_category_id,
+                answer: faq.answer
+            }).then(res => {
+                showToast('FAQ가 수정되었습니다.', 'success');
+                setFixIndex(false);
+                console.log(`FAQ ${faq.id} 카테고리 업데이트 성공`, res.data);
+            }).catch(err => {
+                console.error(`FAQ ${faq.id} 카테고리 업데이트 실패`, err);
+            });
+        } else {
+            setFixIndex(faq.id);
+        }
+    }
 
     return (
         <>
@@ -287,7 +308,7 @@ export default function Knowledge() {
                         <div className="section-header">
                             <div className="header-left">
                                 <h3>FAQ 목록</h3>
-                                <span className="document-count">5개 FAQ</span>
+                                <span className="document-count">{filteredFAQ.length}개 FAQ</span>
                             </div>
                             <div className="header-actions">
                                 <div className="search-box">
@@ -357,17 +378,63 @@ export default function Knowledge() {
                                             className={`faq-content ${openId === faq.id ? "show" : ""}`}
                                             id={`faq-content-${faq.id}`}
                                         >
-                                            <div className="faq-answer">{faq.answer}</div>
+                                            <div className="faq-answer">
+                                                <textarea
+                                                    style={{ display: `${FixIndex === faq.id ? "block" : "none"}` }}
+                                                    value={faq.answer}
+                                                    onChange={(e) => {
+                                                        const newValue = e.target.value;
+                                                        setfaqs(prevFaqs =>
+                                                            prevFaqs.map(item =>
+                                                                item.id === faq.id ? { ...item, answer: newValue } : item
+                                                            )
+                                                        );
+                                                    }}
+                                                />
+                                                <div
+                                                    style={{ display: `${FixIndex === faq.id ? "none" : "block"}` }}
+                                                >
+                                                    {faq.answer}
+                                                </div>
+
+                                            </div>
+
                                             <div className="faq-meta">
-                                                <span>
-                                                    <strong>카테고리:</strong> {Categories.find(cat => cat.id === faq.quick_category_id)?.name || "카테고리 없음"}
-                                                </span>
                                                 <span>
                                                     <strong>생성일:</strong> {new Date(faq.created_at).toISOString().split('T')[0]}
                                                 </span>
                                                 <span>
                                                     <strong>만족도:</strong> {faq.satisfaction_rate}
                                                 </span>
+                                                <span>
+                                                    <strong>카테고리:</strong> {Categories.find(cat => cat.id === faq.quick_category_id)?.name || "카테고리 없음"}
+                                                </span>
+                                                <select
+                                                    value={faq.quick_category_id}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    onChange={(e) => {
+                                                        const newCategoryId = Number(e.target.value); // 문자열 → 숫자
+                                                        setfaqs(prevFaqs =>
+                                                            prevFaqs.map(item =>
+                                                                item.id === faq.id ? { ...item, quick_category_id: newCategoryId } : item
+                                                            )
+                                                        );
+                                                    }}
+                                                    style={{ display: `${FixIndex === faq.id ? "block" : "none"}` }}
+                                                >
+                                                    <option value="카테고리 없음">카테고리 없음</option>
+                                                    {Categories.map(catetory => (
+                                                        <option value={catetory.id}>{catetory.name}</option>
+                                                    ))}
+                                                </select>
+
+                                                <button
+                                                    className="action-btn-small"
+                                                    onClick={() => handleFix(faq)}
+                                                >
+                                                    {FixIndex === faq.id ? "저장" : "수정"}
+                                                </button>
+
                                             </div>
                                         </div>
                                     </div>

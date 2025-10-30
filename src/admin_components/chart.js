@@ -9,35 +9,206 @@ ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Title, T
 
 export default function Chart() {
 
-    useEffect(() => {
-        axios
-            .get(`${process.env.REACT_APP_API_URL}/faqs`, {
-                params: {
-                    offset: 0,
-                    limit: 5,
-                },
-            })
-            .then((res) => {
-                setfaqs(res.data);
-                console.log("📌 관리자 목록:", res.data);
-            })
-            .catch((err) => {
-                if (err.response && err.response.status === 404) {
-                    alert("해당 setting을 찾을 수 없습니다.");
-                } else {
-                    console.error("❌ 요청 실패:", err);
-                }
-            });
-    }, []);
-
     const [faqs, setfaqs] = useState([]);
-
-
-
-    // 일별 대화 트렌드
     const [ConversationChart, setConversationChart] = useState(null);
     const [ConversationchartOptions, setConversationChartOptions] = useState({});
+    const [FeedbackChart, setFeedbackChart] = useState(null);
+    const [FeedbackchartOptions, setFeedbackChartOptions] = useState({});
+    const [ResponseTimeChart, setResponseTimeChart] = useState(null);
+    const [ResponseTimeOptions, setResponseTimeOptions] = useState({});
+    const [SatisfactionChart, setSatisfactionChart] = useState(null);
+    const [SatisfactionOptions, setSatisfactionOptions] = useState({});
+    const [HourlyChart, setHourlyChart] = useState(null);
+    const [HourlyOptions, setHourlyOptions] = useState({});
+    const [RequestTrendChart, setRequestTrendChart] = useState(null);
+    const [RequestTrendChartOptions, setRequestTrendChartOptions] = useState({});
+    const [CostTrendChart, setCostTrendChart] = useState(null);
+    const [CostTrendChartOptions, setCostTrendChartOptions] = useState({});
+    const [period, setPeriod] = useState(7);
+    const [APICost, setAPICost] = useState([]);
+    const [TotalCost, setTotalCost] = useState({});
+
     useEffect(() => {
+        fetchFAQs();
+        fetchConversationChart();
+        fetchFeedbackChart();
+        fetchResponseTimeChart();
+        fetchSatisfactionChart();
+        fetchHourlyChart();
+        fetchRequestTrendChart();
+        fetchCostTrendChart();
+    }, []);
+
+    useEffect(() => {
+        fetchCost(period);
+    }, [period]);
+
+    const fetchCost = async (days) => {
+        try {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - (days - 1));
+
+            const formatDate = (date) => date.toISOString().split('T')[0];
+
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api-cost/rows?start=${formatDate(startDate)}&end=${formatDate(endDate)}`);
+            const data = res.data;
+            console.log(data);
+
+            const labels = [...new Set(data.map(item => item.d))].sort();
+
+            // 2️⃣ 날짜별 product 합계 계산
+            const chartgrouped = labels.map(date => {
+                const dailyData = data.filter(item => item.d === date);
+                return {
+                    date,
+                    embedding: dailyData.find(i => i.product === 'embedding')?.embedding_tokens || 0,
+                    llm: dailyData.find(i => i.product === 'llm')?.llm_tokens || 0,
+                    stt: dailyData.find(i => i.product === 'stt')?.audio_seconds || 0,
+                };
+            });
+
+            // 3️⃣ Chart.js 데이터 포맷으로 변환
+            setRequestTrendChart({
+                labels: chartgrouped.map((g) => g.date.slice(5).replace("-", "/")), // '10/27' 형식
+                datasets: [
+                    {
+                        label: 'Embedding',
+                        data: chartgrouped.map(g => g.embedding),
+                        backgroundColor: 'rgba(139, 92, 246, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'LLM',
+                        data: chartgrouped.map(g => g.llm),
+                        backgroundColor: 'rgba(23, 162, 184, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'STT',
+                        data: chartgrouped.map(g => g.stt),
+                        backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
+            });
+
+
+            const apicostgrouped = labels.map((date) => {
+                const dailyData = data.filter((item) => item.d === date);
+                return {
+                    date,
+                    embedding: dailyData
+                        .filter((i) => i.product === "embedding")
+                        .reduce((sum, i) => sum + Number(i.cost_usd || 0), 0),
+                    llm: dailyData
+                        .filter((i) => i.product === "llm")
+                        .reduce((sum, i) => sum + Number(i.cost_usd || 0), 0),
+                    stt: dailyData
+                        .filter((i) => i.product === "stt")
+                        .reduce((sum, i) => sum + Number(i.cost_usd || 0), 0),
+                };
+            });
+            setCostTrendChart({
+                labels: apicostgrouped.map((g) => g.date.slice(5).replace("-", "/")), // '10/27' 형식
+                datasets: [
+                    {
+                        label: "임베딩 비용 ($)",
+                        data: apicostgrouped.map((g) => g.embedding.toFixed(2)),
+                        borderColor: "#8b5cf6",
+                        backgroundColor: "rgba(139, 92, 246, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                    },
+                    {
+                        label: "LLM 비용 ($)",
+                        data: apicostgrouped.map((g) => g.llm.toFixed(2)),
+                        borderColor: "#17a2b8",
+                        backgroundColor: "rgba(23, 162, 184, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                    },
+                    {
+                        label: "음성 비용 ($)",
+                        data: apicostgrouped.map((g) => g.stt.toFixed(2)),
+                        borderColor: "#ffc107",
+                        backgroundColor: "rgba(255, 193, 7, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                    },
+                ],
+            });
+
+
+
+
+
+
+
+
+
+
+
+            // ✅ 같은 product끼리 합산
+            const grouped = data.reduce((acc, item) => {
+                const { product, llm_tokens, embedding_tokens, cost_usd, audio_seconds } = item;
+                if (!acc[product]) {
+                    acc[product] = {
+                        product,
+                        total_llm_tokens: 0,
+                        total_embedding_tokens: 0,
+                        total_cost_usd: 0,
+                        total_audio_seconds: 0
+                    };
+                }
+                acc[product].total_llm_tokens += llm_tokens;
+                acc[product].total_embedding_tokens += embedding_tokens;
+                acc[product].total_cost_usd += Number(cost_usd);
+                acc[product].total_audio_seconds += audio_seconds;
+                return acc;
+            }, {});
+            // 객체를 배열로 변환
+            const summary = Object.values(grouped);
+            const totalSummary = summary.reduce((acc, item) => {
+                acc.total_llm_tokens += item.total_llm_tokens;
+                acc.total_embedding_tokens += item.total_embedding_tokens;
+                acc.total_cost_usd += item.total_cost_usd;
+                acc.total_audio_seconds += item.total_audio_seconds;
+                return acc;
+            }, {
+                product: "TOTAL",
+                total_llm_tokens: 0,
+                total_embedding_tokens: 0,
+                total_cost_usd: 0,
+                total_audio_seconds: 0
+            });
+            // ✅ summary 마지막에 추가
+            summary.push(totalSummary);
+            // console.log("📊 Product별 합계:", summary);
+            setAPICost(summary);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+    const fetchFAQs = () => {
+        axios.get(`${process.env.REACT_APP_API_URL}/faqs`, {
+            params: {
+                offset: 0,
+                limit: 5,
+                order_by: "views"
+            },
+        }).then((res) => {
+            setfaqs(res.data);
+            // console.log(res.data);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
+    // 일별 대화 트렌드
+    const fetchConversationChart = () => {
         setConversationChart({
             labels: ['월', '화', '수', '목', '금', '토', '일'],
             datasets: [
@@ -76,13 +247,10 @@ export default function Chart() {
                 },
             },
         });
-    }, []);
-
+    }
 
     // 사용자 피드백 분포
-    const [FeedbackChart, setFeedbackChart] = useState(null);
-    const [FeedbackchartOptions, setFeedbackChartOptions] = useState({});
-    useEffect(() => {
+    const fetchFeedbackChart = () => {
         setFeedbackChart({
             labels: ['도움됨', '도움안됨', '무응답'],
             datasets: [{
@@ -110,12 +278,10 @@ export default function Chart() {
                 }
             }
         });
-    }, []);
+    }
 
     // 응답 시간 분석
-    const [ResponseTimeChart, setResponseTimeChart] = useState(null);
-    const [ResponseTimeOptions, setResponseTimeOptions] = useState({});
-    useEffect(() => {
+    const fetchResponseTimeChart = () => {
         setResponseTimeChart({
             labels: ['1초 이하', '1-2초', '2-3초', '3-5초', '5초 이상'],
             datasets: [{
@@ -150,12 +316,11 @@ export default function Chart() {
                 }
             }
         });
-    }, []);
+    }
+
 
     // 사용자 만족도 트렌드
-    const [SatisfactionChart, setSatisfactionChart] = useState(null);
-    const [SatisfactionOptions, setSatisfactionOptions] = useState({});
-    useEffect(() => {
+    const fetchSatisfactionChart = () => {
         setSatisfactionChart({
             labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
             datasets: [{
@@ -188,13 +353,11 @@ export default function Chart() {
                 }
             }
         });
-    }, []);
+    }
+
 
     // 시간대별 대화량
-    const [HourlyChart, setHourlyChart] = useState(null);
-    const [HourlyOptions, setHourlyOptions] = useState({});
-
-    useEffect(() => {
+    const fetchHourlyChart = () => {
         setHourlyChart({
             labels: ['0시', '1시', '2시', '3시', '4시', '5시', '6시', '7시', '8시', '9시', '10시', '11시', '12시', '13시', '14시', '15시', '16시', '17시', '18시', '19시', '20시', '21시', '22시', '23시'],
             datasets: [{
@@ -223,33 +386,10 @@ export default function Chart() {
                 }
             }
         });
-    }, []);
-
+    }
 
     //일별 요청 수 추이 
-    const [RequestTrendChart, setRequestTrendChart] = useState(null);
-    const [RequestTrendChartOptions, setRequestTrendChartOptions] = useState({});
-    useEffect(() => {
-        setRequestTrendChart({
-            labels: ['10/09', '10/10', '10/11', '10/12', '10/13', '10/14', '10/15'],
-            datasets: [{
-                label: '임베딩 요청 (건)',
-                data: [152, 167, 185, 201, 156, 172, 189],
-                backgroundColor: 'rgba(139, 92, 246, 0.8)',
-                borderRadius: 4
-            }, {
-                label: 'LLM 요청 (건)',
-                data: [118, 132, 148, 156, 125, 138, 142],
-                backgroundColor: 'rgba(23, 162, 184, 0.8)',
-                borderRadius: 4
-            }, {
-                label: '음성 요청 (건)',
-                data: [32, 39, 51, 58, 44, 48, 52],
-                backgroundColor: 'rgba(255, 193, 7, 0.8)',
-                borderRadius: 4
-            }]
-        });
-
+    const fetchRequestTrendChart = () => {
         setRequestTrendChartOptions({
             responsive: true,
             maintainAspectRatio: false,
@@ -266,7 +406,14 @@ export default function Chart() {
                     intersect: false,
                     callbacks: {
                         label: function (context) {
-                            return context.dataset.label + ': ' + context.parsed.y + '건';
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.y;
+
+                            if (label.includes('STT')) {
+                                return `${label}: ${value}초`;
+                            } else {
+                                return `${label}: ${value}토큰`;
+                            }
                         }
                     }
                 }
@@ -286,38 +433,35 @@ export default function Chart() {
                 }
             }
         });
-    }, []);
-
+    }
 
     //일별 API비용 추이
-    const [CostTrendChart, setCostTrendChart] = useState(null);
-    const [CostTrendChartOptions, setCostTrendChartOptions] = useState({});
-    useEffect(() => {
-        setCostTrendChart({
-            labels: ['10/09', '10/10', '10/11', '10/12', '10/13', '10/14', '10/15'],
-            datasets: [{
-                label: '임베딩 비용 ($)',
-                data: [3.42, 3.86, 4.15, 4.68, 3.58, 3.72, 4.15],
-                borderColor: '#8b5cf6',
-                backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: 'LLM 비용 ($)',
-                data: [8.17, 8.95, 10.90, 11.44, 9.21, 10.02, 10.45],
-                borderColor: '#17a2b8',
-                backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: '음성 비용 ($)',
-                data: [1.79, 1.79, 2.34, 2.65, 2.04, 2.21, 2.38],
-                borderColor: '#ffc107',
-                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        });
+    const fetchCostTrendChart = () => {
+        // setCostTrendChart({
+        //     labels: ['10/09', '10/10', '10/11', '10/12', '10/13', '10/14', '10/15'],
+        //     datasets: [{
+        //         label: '임베딩 비용 ($)',
+        //         data: [3.42, 3.86, 4.15, 4.68, 3.58, 3.72, 4.15],
+        //         borderColor: '#8b5cf6',
+        //         backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        //         fill: true,
+        //         tension: 0.4
+        //     }, {
+        //         label: 'LLM 비용 ($)',
+        //         data: [8.17, 8.95, 10.90, 11.44, 9.21, 10.02, 10.45],
+        //         borderColor: '#17a2b8',
+        //         backgroundColor: 'rgba(23, 162, 184, 0.1)',
+        //         fill: true,
+        //         tension: 0.4
+        //     }, {
+        //         label: '음성 비용 ($)',
+        //         data: [1.79, 1.79, 2.34, 2.65, 2.04, 2.21, 2.38],
+        //         borderColor: '#ffc107',
+        //         backgroundColor: 'rgba(255, 193, 7, 0.1)',
+        //         fill: true,
+        //         tension: 0.4
+        //     }]
+        // });
 
         setCostTrendChartOptions({
             responsive: true,
@@ -351,7 +495,7 @@ export default function Chart() {
                 }
             }
         });
-    }, []);
+    }
 
 
     return (
@@ -367,11 +511,14 @@ export default function Chart() {
                     </div>
                     <div className="header-right">
                         <div className="date-selector">
-                            <select className="date-select" id="dateRange">
-                                <option value="today">오늘</option>
-                                <option value="week">지난 7일</option>
-                                <option value="month">지난 30일</option>
-                                <option value="quarter">지난 90일</option>
+                            <select className="date-select" id="dateRange"
+                                onChange={(e) => setPeriod(Number(e.target.value))}
+                                value={period}
+                            >
+                                <option value={1}>오늘</option>
+                                <option value={7}>지난 7일</option>
+                                <option value={30}>지난 30일</option>
+                                <option value={90}>지난 90일</option>
                             </select>
                         </div>
                     </div>
@@ -389,27 +536,44 @@ export default function Chart() {
                         {/* API 요약 카드 (요청수 / 비용) */}
                         <div className="metrics-row">
                             <div className="metric-card">
-                                <div className="metric-value purple">1,247건 / $28.10</div>
+                                <div className="metric-value purple">
+                                    <div className="metric-value info">
+                                        {APICost?.[0]
+                                            ? `${APICost[0].total_embedding_tokens.toLocaleString()} 토큰 / $${APICost[0].total_cost_usd?.toFixed(2)}`
+                                            : "로딩 중..."}
+                                    </div>
+                                </div>
                                 <div className="chart-metric-label">임베딩</div>
                                 <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>지식베이스 벡터화</small>
                             </div>
 
                             <div className="metric-card">
-                                <div className="metric-value info">847건 / $72.50</div>
+                                <div className="metric-value info">
+                                    {APICost?.[1]
+                                        ? `${APICost[1].total_llm_tokens.toLocaleString()} 토큰 / $${APICost[1].total_cost_usd?.toFixed(2)}`
+                                        : "로딩 중..."}
+                                </div>
                                 <div className="chart-metric-label">LLM API</div>
                                 <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>EXAONE 4.0 (32B)</small>
                             </div>
 
                             <div className="metric-card">
-                                <div className="metric-value warning">324건 / $15.20</div>
+                                <div className="metric-value warning">
+                                    {APICost?.[2]
+                                        ? `${APICost[2].total_audio_seconds.toLocaleString()} 초 / $${APICost[2].total_cost_usd?.toFixed(2)}`
+                                        : "로딩 중..."}
+                                </div>
                                 <div className="chart-metric-label">음성 API</div>
                                 <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>NAVER Clova Speech STT</small>
                             </div>
 
                             <div className="metric-card">
-                                <div className="metric-value success">2,418건 / $115.80</div>
+                                <div className="metric-value success">
+
+                                    {APICost?.[2] ? `$ ${APICost[3].total_cost_usd?.toFixed(2)}` : "로딩 중..."}
+                                </div>
                                 <div className="chart-metric-label">총 API 사용량</div>
-                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>이번 달 누적</small>
+                                {/* <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>이번 달 누적</small> */}
                             </div>
                         </div>
 
@@ -440,7 +604,7 @@ export default function Chart() {
                         {/* 상세 비용 내역 테이블 */}
                         <div className="questions-card" style={{ marginBottom: "1.5rem" }}>
                             <div className="chart-header">
-                                <h3 className="chart-title">날짜별 API 사용 내역</h3>
+                                <h3 className="chart-title">날짜별 API 사용 내역 (X)</h3>
                             </div>
                             <div className="satisfaction-content">
                                 <table className="satisfaction-table">
@@ -679,8 +843,6 @@ export default function Chart() {
                             </div>
                         </div>
 
-
-                        
                     </div>
                 </div>
             </main>

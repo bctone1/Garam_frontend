@@ -37,7 +37,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     const fetch_inquiry_list = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/inquiries/get_inquiry_list`).then((res) => {
             setinquiries(res.data);
-            console.log(res.data);
+            // console.log(res.data);
         }).catch((err) => {
             console.log(err);
         });
