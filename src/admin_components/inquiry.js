@@ -42,10 +42,6 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         });
     }
 
-    const processingCount = inquiries.filter(i => i.status === "processing").length;
-    const completedCount = inquiries.filter(i => i.status === "completed").length;
-
-
     return (
         <>
             <div className={`modal ${openAddAdminModal ? "show" : ""}`} id="addAdminModal" onClick={() => setopenAddAdminModal(false)}>

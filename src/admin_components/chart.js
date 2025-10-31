@@ -28,12 +28,12 @@ export default function Chart() {
     const [period, setPeriod] = useState(7);
     const [APICost, setAPICost] = useState([]);
     const [TotalCost, setTotalCost] = useState([]);
+    const [WindowData, setWindowData] = useState({});
+
 
     const sortedCost = [...TotalCost].sort((a, b) => new Date(b.date) - new Date(a.date));
     const [currentPage, setCurrentPage] = useState(1);
-    // 전체 페이지 수
     const totalPages = Math.ceil(sortedCost.length / ITEMS_PER_PAGE);
-    // 현재 페이지의 데이터 범위 계산
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const currentItems = sortedCost.slice(startIndex, endIndex);
@@ -59,7 +59,156 @@ export default function Chart() {
 
     useEffect(() => {
         fetchCost(period);
+        fetchCostWindow(period);
+        fetchDaily(period);
+        fetchHourly(period);
     }, [period]);
+
+    const fetchHourly = async (days) => {
+        const hours = [];
+        const inquiries = [];
+
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/analytics/timeseries/hourly?days=${days}`);
+        const apiData = res.data;
+        const hourlyTotals = Array.from({ length: 24 }, (_, i) => ({ hour: i, total: 0 }));
+
+        apiData.forEach((item) => {
+            const hour = new Date(item.ts).getHours(); // 시 추출 (한국시간 기반)
+            hourlyTotals[hour].total += item.messages; // 시별 합산
+        });
+
+        // 3️⃣ inquiries 배열 구성
+        hourlyTotals.forEach((h) => {
+            hours.push(`${h.hour}:00`);
+            inquiries.push(h.total);
+        });
+        // console.log(hours);
+        // console.log(inquiries);
+
+        setHourlyChart({
+            labels: hours,
+            datasets: [{
+                label: '대화량',
+                data: inquiries,
+                backgroundColor: 'rgba(30, 96, 225, 0.8)',
+                borderRadius: 4
+            }]
+        });
+
+
+    }
+
+    const fetchDaily = async (days) => {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - (days - 1));
+        const formatDate = (date) => date.toISOString().split('T')[0];
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/analytics/daily?start=${formatDate(startDate)}&end=${formatDate(endDate)}`);
+        const data = res.data
+        console.log(data);
+
+        const total_feedback_helpful = data.reduce(
+            (sum, item) => sum + (item.feedback_helpful || 0), 0
+        );
+        const total_feedback_not_helpful = data.reduce(
+            (sum, item) => sum + (item.feedback_not_helpful || 0), 0
+        );
+        setFeedbackChart({
+            labels: ['도움됨', '개선필요'],
+            datasets: [{
+                data: [total_feedback_helpful, total_feedback_not_helpful],
+                backgroundColor: [
+                    '#28a745',
+                    '#dc3545',
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        });
+
+
+
+        const tempMap = {}; // { '1': [점수, ...], '2': [...], ... }
+
+        res.data.forEach(item => {
+            const month = new Date(item.d).getMonth() + 1; // 0~11 → 1~12
+            const totalFeedback = item.feedback_helpful + item.feedback_not_helpful;
+            console.log(totalFeedback);
+            const score = totalFeedback === 0 ? 0 : (item.feedback_helpful / totalFeedback) * 100;
+            console.log(score);
+
+            if (!tempMap[month]) tempMap[month] = [];
+            tempMap[month].push(score);
+        });
+
+        console.log(tempMap);
+
+        // 2. labels: 1월~12월
+        const labels = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
+
+        // 3. groupdata: 각 달 평균, 없으면 0
+        const groupdata = labels.map((_, i) => {
+            const month = i + 1;
+            if (!tempMap[month]) return 0;
+            return Math.round(tempMap[month][0]);  // 반올림
+        });
+
+        console.log(labels);
+        console.log(groupdata);
+
+        // 4. 차트 업데이트
+        setSatisfactionChart({
+            labels,
+            datasets: [{
+                label: '만족도 (%)',
+                data: groupdata,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        });
+
+
+
+
+
+
+
+
+
+
+        const groupedByWeekday = res.data.reduce((acc, curr) => {
+            const day = curr.weekday; // 1(월) ~ 7(일)
+            const messages = curr.messages_total || 0;
+            acc[day] = (acc[day] || 0) + messages;
+            return acc;
+        }, {});
+        const orderedData = [1, 2, 3, 4, 5, 6, 7].map(day => groupedByWeekday[day] || 0);
+        setConversationChart({
+            labels: ['월', '화', '수', '목', '금', '토', '일'],
+            datasets: [
+                {
+                    label: '대화 수',
+                    data: orderedData,
+                    borderColor: '#1e60e1',
+                    backgroundColor: 'rgba(30, 96, 225, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                },
+            ],
+        });
+    };
+
+    const fetchCostWindow = (days) => {
+        try {
+            axios.get(`${process.env.REACT_APP_API_URL}/analytics/windows?days=${days}`).then((res) => {
+                setWindowData(res.data);
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const fetchCost = async (days) => {
         try {
@@ -102,7 +251,6 @@ export default function Chart() {
                         (sttData ? Number(sttData.cost_usd || 0) : 0),
                 };
             });
-            console.log(chartgrouped);
             setTotalCost(chartgrouped);
 
             // 3️⃣ Chart.js 데이터 포맷으로 변환
@@ -113,19 +261,22 @@ export default function Chart() {
                         label: 'Embedding',
                         data: chartgrouped.map(g => g.embedding),
                         backgroundColor: 'rgba(139, 92, 246, 0.8)',
-                        borderRadius: 4
+                        borderRadius: 4,
+                        yAxisID: 'y',   // 왼쪽 Y축 사용
                     },
                     {
                         label: 'LLM',
                         data: chartgrouped.map(g => g.llm),
                         backgroundColor: 'rgba(23, 162, 184, 0.8)',
-                        borderRadius: 4
+                        borderRadius: 4,
+                        yAxisID: 'y',   // 왼쪽 Y축 사용
                     },
                     {
                         label: 'STT',
                         data: chartgrouped.map(g => g.stt),
                         backgroundColor: 'rgba(255, 193, 7, 0.8)',
-                        borderRadius: 4
+                        borderRadius: 4,
+                        yAxisID: 'y1',  // 오른쪽 Y축 사용
                     }
                 ]
             });
@@ -221,31 +372,15 @@ export default function Chart() {
 
     // 일별 문의량
     const fetchConversationChart = () => {
-        setConversationChart({
-            labels: ['월', '화', '수', '목', '금', '토', '일'],
-            datasets: [
-                {
-                    label: '대화 수',
-                    data: [120, 145, 130, 160, 185, 120, 90],
-                    borderColor: '#1e60e1',
-                    backgroundColor: 'rgba(30, 96, 225, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                },
-                {
-                    label: '해결된 문의',
-                    data: [110, 135, 125, 155, 175, 115, 85],
-                    borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    fill: false,
-                    tension: 0.4,
-                },
-            ],
-        });
+
 
         setConversationChartOptions({
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false,
+            },
             plugins: {
                 legend: { position: 'top' },
             },
@@ -263,19 +398,6 @@ export default function Chart() {
 
     // 사용자 피드백 분포
     const fetchFeedbackChart = () => {
-        setFeedbackChart({
-            labels: ['도움됨', '개선필요'],
-            datasets: [{
-                data: [456, 52],
-                backgroundColor: [
-                    '#28a745',
-                    '#dc3545',
-                ],
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        });
-
         setFeedbackChartOptions({
             responsive: true,
             maintainAspectRatio: false,
@@ -332,21 +454,15 @@ export default function Chart() {
 
     // 사용자 만족도 트렌드
     const fetchSatisfactionChart = () => {
-        setSatisfactionChart({
-            labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-            datasets: [{
-                label: '만족도 (%)',
-                data: [85, 87, 84, 89, 91, 88, 90, 92, 89, 91, 93, 88],
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        });
+
 
         setSatisfactionOptions({
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false,
+            },
             plugins: {
                 legend: {
                     position: 'top'
@@ -355,7 +471,7 @@ export default function Chart() {
             scales: {
                 y: {
                     beginAtZero: false,
-                    min: 80,
+                    min: 0,
                     max: 95,
                     title: {
                         display: true,
@@ -369,19 +485,13 @@ export default function Chart() {
 
     // 시간대별 대화량
     const fetchHourlyChart = () => {
-        setHourlyChart({
-            labels: ['0시', '1시', '2시', '3시', '4시', '5시', '6시', '7시', '8시', '9시', '10시', '11시', '12시', '13시', '14시', '15시', '16시', '17시', '18시', '19시', '20시', '21시', '22시', '23시'],
-            datasets: [{
-                label: '대화량',
-                data: [5, 3, 2, 1, 2, 8, 12, 18, 25, 35, 45, 38, 42, 52, 48, 45, 42, 35, 28, 22, 18, 15, 12, 8],
-                backgroundColor: 'rgba(30, 96, 225, 0.8)',
-                borderRadius: 4
-            }]
-        });
-
         setHourlyOptions({
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false,
+            },
             plugins: {
                 legend: {
                     display: false
@@ -438,10 +548,32 @@ export default function Chart() {
                     stacked: false,
                     ticks: {
                         callback: function (value) {
-                            return value + '건';
+                            return value + '토큰';
                         }
+                    },
+                    title: {
+                        display: true,
+                        text: '토큰 사용량'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: {
+                        drawOnChartArea: false
+                    },
+                    ticks: {
+                        callback: function (value) {
+                            return value + '초';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: '음성 사용량'
                     }
                 }
+
             }
         });
     }
@@ -565,7 +697,7 @@ export default function Chart() {
                         {/* 일별 요청 수 추이 차트 */}
                         <div className="chart-card" style={{ marginBottom: "1.5rem" }}>
                             <div className="chart-header">
-                                <h3 className="chart-title">일별 요청 수 추이</h3>
+                                <h3 className="chart-title">일별 사용량</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="apiRequestTrendChart" style={{ height: "270px" }}>
@@ -577,7 +709,7 @@ export default function Chart() {
                         {/* 일별 API 비용 추이 차트 */}
                         <div className="chart-card" style={{ marginBottom: "1.5rem" }}>
                             <div className="chart-header">
-                                <h3 className="chart-title">일별 API 비용 추이</h3>
+                                <h3 className="chart-title">일별 API 비용</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="apiCostTrendChart" style={{ height: "270px" }}>
@@ -692,23 +824,29 @@ export default function Chart() {
 
                         <div className="metrics-row">
                             <div className="metric-card">
-                                <div className="metric-value success">94.2%</div>
+                                <div className="metric-value success">{WindowData.resolve_rate_excluding_noresp}%</div>
                                 <div className="chart-metric-label">문제 해결률</div>
                             </div>
 
                             <div className="metric-card">
-                                <div className="metric-value info">2.3분</div>
+                                <div className="metric-value info">
+                                    {Number(WindowData.avg_response_ms * 0.001 || 0).toFixed(2)} 초
+                                </div>
                                 <div className="chart-metric-label">평균 응답 시간</div>
                             </div>
 
                             <div className="metric-card">
-                                <div className="metric-value purple">3.2턴</div>
+                                <div className="metric-value purple">
+                                    {Number(WindowData.avg_turns).toFixed(2)} 턴
+                                </div>
                                 <div className="chart-metric-label">평균 대화 턴수</div>
                             </div>
 
                             <div className="metric-card">
-                                <div className="metric-value info" id="dailyAverage">45.0건/일</div>
-                                <div className="chart-metric-label">일평균 문의량</div>
+                                <div className="metric-value info" id="dailyAverage">
+                                    {Number(WindowData?.avg_messages || 0).toFixed(2)} 건/일
+                                </div>
+                                <div className="chart-metric-label">일평균 대화량</div>
                             </div>
                         </div>
                     </div>
@@ -717,7 +855,7 @@ export default function Chart() {
                     <div className="content-grid">
                         <div className="chart-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">일별 문의량</h3>
+                                <h3 className="chart-title">일별 대화량</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="conversationChart" style={{ height: "270px" }}>
@@ -742,7 +880,7 @@ export default function Chart() {
                     <div className="content-grid">
                         <div className="chart-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">응답 시간 분석</h3>
+                                <h3 className="chart-title">응답 시간 분석(avg_response_ms)(X)</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="responseTimeChart" style={{ height: "270px" }}>
@@ -753,7 +891,7 @@ export default function Chart() {
 
                         <div className="chart-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">사용자 만족도 트렌드</h3>
+                                <h3 className="chart-title">사용자 만족도 트렌드 <br/>(받는 데이터 부족 1년치 데이터를 받아서 하기에는 무리)</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="satisfactionChart" style={{ height: "270px" }}>
@@ -797,7 +935,7 @@ export default function Chart() {
 
                         <div className="questions-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">최근 등록된 파일</h3>
+                                <h3 className="chart-title">최근 등록된 파일(X)</h3>
                             </div>
                             <div className="satisfaction-content">
                                 <table className="satisfaction-table">

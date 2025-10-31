@@ -32,30 +32,79 @@ ChartJS.register(
 
 export default function Dashboard() {
 
-  // 일일 문의량 차트
   const [period, setPeriod] = useState(30);
   const [TrendChart, setTrendChart] = useState(null);
+  const [ChatList, setChatList] = useState([]);
+  const [FeedbackChart, setFeedbackChart] = useState(null);
+  const [HourlyChart, setHourlyChart] = useState(null);
+  const [HourlyOptions, setHourlyOptions] = useState({});
+  const [dashboard, setDashabord] = useState({});
+  const [refreshStatus, setrefreshStatus] = useState(false);
+
+
+  useEffect(() => {
+    const fetchTrendChart = async () => {
+      const chartData = await buildTrendChartData(period);
+      console.log(chartData);
+      setTrendChart(chartData);
+    };
+    fetchTrendChart();
+  }, [period]);
+
+  const Trendoptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: "index",
+      intersect: false,
+    },
+    plugins: {
+      legend: { display: false },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: "#e9ecef" },
+      },
+      x: {
+        grid: { display: false },
+      },
+    },
+  };
+
+  const Feedbackoptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+        },
+      },
+    },
+  };
+
+
+
   const buildTrendChartData = async (days) => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/analytics/timeseries/daily?days=${days}`);
       const apiData = res.data;
+      console.log(apiData);
 
-      // 날짜순 정렬 (혹시 서버에서 순서가 뒤죽이면 대비)
       apiData.sort((a, b) => new Date(a.ts) - new Date(b.ts));
-
-      // ✅ labels: 날짜 문자열
       const labels = apiData.map(item =>
         new Date(item.ts).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })
       );
-
-      // ✅ data: 세션 수 (혹은 avg_response_ms)
       const data = apiData.map(item => item.sessions); // 🔹 또는 item.avg_response_ms
 
       return {
         labels,
         datasets: [
           {
-            label: "일일 문의 수",
+            label: "일일 대화량",
             data,
             borderColor: "#1e60e1",
             backgroundColor: "rgba(30, 96, 225, 0.1)",
@@ -72,86 +121,38 @@ export default function Dashboard() {
       };
     }
   };
-  const [ChatList, setChatList] = useState([]);
 
   const getChat = () => {
-    console.log("카테고리를 불러옵니다.");
     axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions?offset=0&limit=5`).then((res) => {
-      console.log(res.data);
+      // console.log(res.data);
       setChatList(res.data);
     })
   }
 
-
+  // 피드백 차트 (임시)
   useEffect(() => {
-    const fetchTrendChart = async () => {
-      const chartData = await buildTrendChartData(period);
-      setTrendChart(chartData);
-    };
-    fetchTrendChart();
-  }, [period]);
+    fetchDashboard();
+    fetchData();
+    getChat();
 
-  const Trendoptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: { color: "#e9ecef" },
-      },
-      x: {
-        grid: { display: false },
-      },
-    },
-  };
-
-
-  // 피드백 차트
-  const [FeedbackChart, setFeedbackChart] = useState(null);
-  useEffect(() => {
     const feedbackData = JSON.parse(localStorage.getItem("feedbackData") || "{}");
     const helpful = feedbackData.helpful || 456;
     const notHelpful = feedbackData.notHelpful || 52;
-    const noResponse = Math.max(
-      0,
-      (feedbackData.total || 508) - helpful - notHelpful
-    );
 
     setFeedbackChart({
-      labels: ["도움됨", "도움안됨", "미응답"],
+      labels: ["도움됨", "도움안됨",],
       datasets: [
         {
-          data: [helpful, notHelpful, noResponse],
-          backgroundColor: ["#28a745", "#dc3545", "#6c757d"],
+          data: [helpful, notHelpful,],
+          backgroundColor: ["#28a745", "#dc3545",],
           borderWidth: 2,
           borderColor: "#fff",
         },
       ],
     });
-
-    getChat();
   }, []);
 
-  const Feedbackoptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: {
-          padding: 20,
-          usePointStyle: true,
-        },
-      },
-    },
-  };
 
-  // 시간대별 사용량 차트
-  const [HourlyChart, setHourlyChart] = useState(null);
-  const [HourlyOptions, setHourlyOptions] = useState({});
 
   const fetchData = async () => {
     try {
@@ -177,7 +178,7 @@ export default function Dashboard() {
         labels: hours,
         datasets: [
           {
-            label: "문의량",
+            label: "대화량",
             data: inquiries,
             backgroundColor: "rgba(30, 96, 225, 0.8)",
             yAxisID: "y",
@@ -216,7 +217,7 @@ export default function Dashboard() {
             },
             title: {
               display: true,
-              text: "문의 수",
+              text: "대화량",
             },
           },
           y1: {
@@ -240,19 +241,17 @@ export default function Dashboard() {
         },
       });
 
-      console.log(apiData);
     } catch (error) {
       console.error("데이터 불러오기 오류:", error);
     }
   };
 
-  const [dashboard, setDashabord] = useState({});
+
 
   const fetchDashboard = async () => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/analytics/dashboard`);
       const apiData = res.data;
-      console.log(apiData);
       setDashabord(apiData);
     } catch (error) {
       console.log(error);
@@ -260,12 +259,9 @@ export default function Dashboard() {
 
   }
 
-  useEffect(() => {
-    fetchDashboard();
-    fetchData();
-  }, []);
 
-  const [refreshStatus, setrefreshStatus] = useState(false);
+
+
   const handlerefresh = async () => {
     console.log("ENV:", process.env.REACT_APP_API_URL);
     try {
@@ -340,7 +336,7 @@ export default function Dashboard() {
               </div>
               <div className="metric-content">
                 <div className="dashboard-metric-value" id="totalConversations">{dashboard.total_sessions}</div>
-                <div className="metric-label">문의 수</div>
+                <div className="metric-label">대화량</div>
                 {/* <div className="metric-change positive">
                   <i className="fas fa-arrow-up"></i>
                   <span>+15.3%</span>
@@ -384,10 +380,10 @@ export default function Dashboard() {
         {/* 차트 섹션 */}
         <section className="charts-section">
           <div className="charts-grid">
-            {/* 일별 문의량 */}
+            {/* 일별 대화량 */}
             <div className="dashboard-chart-card">
               <div className="chart-header">
-                <h3 className="chart-title">일별 문의량</h3>
+                <h3 className="chart-title">일별 대화량</h3>
                 <div className="chart-controls">
                   <select
                     className="chart-period"
@@ -439,7 +435,7 @@ export default function Dashboard() {
                 <div className="chart-legend">
                   <span className="legend-item">
                     <span className="legend-color" style={{ background: "#1e60e1" }}></span>
-                    문의량
+                    대화량
                   </span>
                   <span className="legend-item">
                     <span className="legend-color" style={{ background: "#28a745" }}></span>
