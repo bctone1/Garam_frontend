@@ -33,15 +33,18 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         });
     }
 
-
     const fetch_inquiry_list = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/inquiries/get_inquiry_list`).then((res) => {
             setinquiries(res.data);
-            // console.log(res.data);
+            console.log(res.data);
         }).catch((err) => {
             console.log(err);
         });
     }
+
+    const processingCount = inquiries.filter(i => i.status === "processing").length;
+    const completedCount = inquiries.filter(i => i.status === "completed").length;
+
 
     return (
         <>
@@ -60,19 +63,19 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                             <div className="stat-label">전체 문의</div>
                         </div>
                         <div className="stat-card">
-                            <div className="stat-number">0</div>
+                            <div className="stat-number"> {inquiries.filter(i => i.status === "new").length}</div>
                             <div className="stat-label">신규 문의</div>
                         </div>
                         <div className="stat-card">
-                            <div className="stat-number">0</div>
+                            <div className="stat-number">{inquiries.filter(i => i.status === "processing").length}</div>
                             <div className="stat-label">처리중</div>
                         </div>
                         <div className="stat-card">
-                            <div className="stat-number">0</div>
+                            <div className="stat-number">{inquiries.filter(i => i.status === "on_hold").length}</div>
                             <div className="stat-label">처리 대기</div>
                         </div>
                         <div className="stat-card">
-                            <div className="stat-number">0</div>
+                            <div className="stat-number">{inquiries.filter(i => i.status === "completed").length}</div>
                             <div className="stat-label">처리 완료</div>
                         </div>
                     </div>
@@ -145,8 +148,23 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         completed: "status-completed",
     };
 
+    const actionsReturn = (action) => {
+        const actions = {
+            "new": "문의 접수",
+            "assign": "담당자 배정",
+            "on_hold": "처리 대기",
+            "resume": "처리 재개",
+            "transfer": "담당자 이관",
+            "complete": "처리 완료",
+            "note": "메모 추가",
+            "contact": "고객 연락",
+            "delete": "문의 삭제",
+        };
+        return actions[action] ?? "icon-default";
+    }
+
     const filteredInquiries = inquiries.filter((inquiry) => {
-        if (sudo) return true; // superadmin은 모든 항목 표시
+        if (sudo) return true;
         return inquiry.assignee && inquiry.assignee === currentAdminUser;
     });
 
@@ -165,28 +183,24 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         setOpenDropdownId((prev) => (prev === id ? null : id));
     };
 
+    const superadmin_id = adminUsers.find(cat => cat.name === currentAdminUser)?.id
+
     const handleComplete = ({ inquiry }) => {
-        const superadmin_id = adminUsers.find(cat => cat.name === currentAdminUser)?.id
         const inputreason = prompt("처리결과를 입력해주세요");
         if (inputreason === null) { console.log("동작이 취소되었습니다."); return; }
         if (inputreason.trim() === "") { alert("사유를 입력해야 합니다!"); return; }
 
-
-        axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
-            admin_id: superadmin_id,
-            details: `처리결과 :${inputreason}`,
-            action: "complete"
-        }).then((res) => {
-
-        }).catch((err) => {
-            console.log(err);
-        });
-
-        axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/status`, {
-            status: "completed",
-            details: "string",
-            actor_admin_id: superadmin_id,
-        }).then((res) => {
+        try {
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+                admin_id: superadmin_id,
+                details: `처리결과 :${inputreason}`,
+                action: "complete"
+            });
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/status`, {
+                status: "completed",
+                details: "string",
+                actor_admin_id: superadmin_id,
+            });
             setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
                 {
                     ...item,
@@ -204,29 +218,24 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                     ],
                 } : item)
             );
-        }).catch((err) => {
-            console.log(err);
-        });
+            showToast("문의가 처리 완료되었습니다.", "info");
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     const handleSelectAdmin = ({ admin, inquiry, action }) => {
-        const superadmin_id = adminUsers.find(cat => cat.name === currentAdminUser)?.id
-
         if (action === "신규배정") {
-            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
-                admin_id: superadmin_id,
-                details: `${admin.name}님이 문의를 담당하게 되었습니다.`,
-                action: "assign"
-            }).then((res) => {
-
-            }).catch((err) => {
-                console.log(err);
-            });
-
-            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/assign`, {
-                admin_id: admin.id,
-                actor_admin: superadmin_id
-            }).then((res) => {
+            try {
+                axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+                    admin_id: superadmin_id,
+                    details: `${admin.name}님이 문의를 담당하게 되었습니다.`,
+                    action: "assign"
+                });
+                axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/assign`, {
+                    admin_id: admin.id,
+                    actor_admin: superadmin_id
+                });
                 setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
                     {
                         ...item,
@@ -244,33 +253,29 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                         ],
                     } : item)
                 );
-            }).catch((err) => {
-                console.log(err);
-            });
-
-
+            } catch (error) {
+                console.log(error);
+            }
         } else {
             const inputreason = prompt("이관사유를 입력해주세요");
             if (inputreason === null) { console.log("이관이 취소되었습니다."); return; }
             if (inputreason.trim() === "") { alert("이관 사유를 입력해야 합니다!"); return; }
-
             const currentItem = inquiries.find((i) => i.id === inquiry.id);
             const prevAssignee = currentItem?.assignee || "미지정";
 
-            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
-                admin_id: superadmin_id,
-                details: `${prevAssignee || "미지정"} -> ${admin.name} (사유:${inputreason})`,
-                // details: `테스트`,
-                action: "transfer"
-            }).then((res) => {
-            }).catch((err) => {
-                console.log(err);
-            });
+            try {
+                axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+                    admin_id: superadmin_id,
+                    details: `${prevAssignee || "미지정"} -> ${admin.name} (사유:${inputreason})`,
+                    // details: `테스트`,
+                    action: "transfer"
+                });
 
-            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/transfer`, {
-                admin_id: admin.id,
-                actor_admin: superadmin_id
-            }).then((res) => {
+                axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/transfer`, {
+                    to_admin_id: admin.id,
+                    actor_admin: superadmin_id
+                });
+
                 setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
                     {
                         ...item,
@@ -288,13 +293,10 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                         ],
                     } : item)
                 );
-            }).catch((err) => {
-                console.log(err);
-            });
-
-
+            } catch (error) {
+                console.log(error);
+            }
         }
-
         showToast(`${admin.name}문의가 ${action}되었습니다.`, "info");
         toggleDropdown(inquiry.id);
     };
@@ -316,19 +318,121 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         }
     }
 
-    const actionsReturn = (action) => {
-        const actions = {
-            "new": "문의 접수",
-            "assign": "담당자 배정",
-            "on_hold": "처리 대기",
-            "resume": "처리 재개",
-            "transfer": "담당자 이관",
-            "complete": "처리 완료",
-            "note": "메모 추가",
-            "contact": "고객 연락",
-            "delete": "문의 삭제",
-        };
-        return actions[action] ?? "icon-default";
+
+    const handleNote = ({ inquiry }) => {
+        const inputreason = prompt("메모를 입력해주세요");
+        if (inputreason === null) { console.log("취소되었습니다."); return; }
+        if (inputreason.trim() === "") { alert("메모를 입력해야 합니다!"); return; }
+        try {
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+                admin_id: superadmin_id,
+                details: `${inputreason}`,
+                action: "note"
+            });
+
+            setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
+                {
+                    ...item,
+                    status: "processing",
+                    assignee: currentAdminUser,
+                    assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+                    history: [
+                        ...(item.history || []),
+                        {
+                            action: "note",
+                            admin: currentAdminUser,
+                            timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+                            details: `${inputreason}`,
+                        },
+                    ],
+                } : item)
+            );
+            showToast("메모가 추가되었습니다.", "info");
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleHold = ({ inquiry }) => {
+        const inputreason = prompt("대기 사유를 입력해주세요");
+        if (inputreason === null) { console.log("동작이 취소되었습니다."); return; }
+        if (inputreason.trim() === "") { alert("사유를 입력해야 합니다!"); return; }
+
+        try {
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+                admin_id: superadmin_id,
+                details: `${inputreason}`,
+                action: "on_hold"
+            });
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/status`, {
+                status: "on_hold",
+                details: "string",
+                actor_admin_id: superadmin_id,
+            });
+            setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
+                {
+                    ...item,
+                    status: "on_hold",
+                    assignee: currentAdminUser,
+                    assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+                    history: [
+                        ...(item.history || []),
+                        {
+                            action: "on_hold",
+                            admin: currentAdminUser,
+                            timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+                            details: `${inputreason}`,
+                        },
+                    ],
+                } : item)
+            );
+            showToast("문의가 대기상태로 변경됩니다.", "info");
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleResume = ({ inquiry }) => {
+        if (!window.confirm("해당 문의를 재개하시겠습니까?")) return;
+
+        try {
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/status`, {
+                status: "processing",
+                details: "string",
+                actor_admin_id: superadmin_id,
+            });
+
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
+                admin_id: superadmin_id,
+                details: "대기 상태에서 처리를 재개했습니다.",
+                action: "resume"
+            });
+
+            setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
+                {
+                    ...item,
+                    status: "processing",
+                    assignee: currentAdminUser,
+                    assignedDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+                    history: [
+                        ...(item.history || []),
+                        {
+                            action: "resume",
+                            admin: currentAdminUser,
+                            timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
+                            details: "대기 상태에서 처리를 재개했습니다.",
+                        },
+                    ],
+                } : item)
+            );
+            showToast("문의를 재개합니다.", "info");
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleContact = () => {
+        showToast("개발중입니다.", "warning");
     }
 
     return (
@@ -393,13 +497,13 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 } else if (inquiry.status === "processing" && (isCurrentUser || sudo)) {
                     actionButtons = (
                         <>
-                            <button className="btn btn-info btn-sm">
+                            <button className="btn btn-info btn-sm" onClick={() => handleContact()}>
                                 <i className="fas fa-phone"></i> 연락
                             </button>
-                            <button className="btn btn-secondary btn-sm">
+                            <button className="btn btn-secondary btn-sm" onClick={() => handleNote({ inquiry })}>
                                 <i className="fas fa-sticky-note"></i> 메모
                             </button>
-                            <button className="btn btn-warning btn-sm">
+                            <button className="btn btn-warning btn-sm" onClick={() => handleHold({ inquiry })}>
                                 <i className="fas fa-pause"></i> 대기
                             </button>
 
@@ -432,10 +536,10 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 } else if (inquiry.status === "on_hold" && (isCurrentUser || sudo)) {
                     actionButtons = (
                         <>
-                            <button className="btn btn-info btn-sm">
+                            <button className="btn btn-info btn-sm" onClick={() => handleResume({ inquiry })}>
                                 <i className="fas fa-play"></i> 재개
                             </button>
-                            <button className="btn btn-secondary btn-sm">
+                            <button className="btn btn-secondary btn-sm" onClick={() => handleNote({ inquiry })}>
                                 <i className="fas fa-sticky-note"></i> 메모
                             </button>
 
@@ -456,7 +560,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                 <i className="fas fa-exchange-alt"></i> 이관
                             </button>
 
-                            <button className="btn btn-success btn-sm" >
+                            <button className="btn btn-success btn-sm" onClick={() => handleComplete({ inquiry })}>
                                 <i className="fas fa-check"></i> 완료
                             </button>
                         </>
@@ -540,16 +644,8 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
                     method: "DELETE",
                 }
             );
-
-            if (response.status === 204) {
-                showToast(`삭제 되었습니다.`, "warning");
-
-                fetch_admin_users();
-            } else if (response.status === 404) {
-                alert("해당 사용자를 찾을 수 없습니다 ❌");
-            } else {
-                alert("삭제 중 오류가 발생했습니다 ⚠️");
-            }
+            showToast(`삭제 되었습니다.`, "warning");
+            fetch_admin_users();
         } catch (err) {
             console.error("삭제 요청 오류:", err);
         }

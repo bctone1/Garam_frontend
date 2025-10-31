@@ -244,7 +244,7 @@ export default function Main() {
             ...prev,
             <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                 <div className="bubble-date user">{formattedTime}</div>
-                <div className="bubble-message user">{faq.question} 오류 관련 문의입니다.</div>
+                <div className="bubble-message user">{faq.question}</div>
             </div>
             ,
 
@@ -258,10 +258,10 @@ export default function Main() {
                         <div className="chatbot-submenu back" onClick={() => getSubmenu(category)}><i className="icon-back"></i> 이전 메뉴 보기</div>
                     )}
                     <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
-                    <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                    {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                     <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                     <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
-                    <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
+                    <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                 </div>
             </div>
         ]);
