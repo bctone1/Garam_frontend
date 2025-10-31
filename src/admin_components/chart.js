@@ -252,7 +252,7 @@ export default function Chart() {
     // 사용자 피드백 분포
     const fetchFeedbackChart = () => {
         setFeedbackChart({
-            labels: ['도움됨', '도움안됨', '무응답'],
+            labels: ['도움됨', '개선필요', '무응답'],
             datasets: [{
                 data: [456, 52, 120],
                 backgroundColor: [
@@ -801,43 +801,29 @@ export default function Chart() {
 
                         <div className="questions-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">최근 만족도 평가</h3>
+                                <h3 className="chart-title">최근 등록된 파일</h3>
                             </div>
                             <div className="satisfaction-content">
                                 <table className="satisfaction-table">
                                     <thead>
                                         <tr>
-                                            <th>시간</th>
-                                            <th>문의 내용</th>
-                                            <th>만족도</th>
+                                            <th>업로드일</th>
+                                            <th>제목</th>
+                                            <th>크기</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>14:23</td>
-                                            <td>POS 시스템이 갑자기 꺼져요</td>
-                                            <td className="emoji-rating">👍</td>
+                                            <td>2025-10-30</td>
+                                            <td>미 증시, AI 과열 경계감.pdf</td>
+                                            <td className="emoji-rating">377.10 KB</td>
                                         </tr>
                                         <tr>
-                                            <td>14:18</td>
-                                            <td>카드 결제가 안돼요</td>
-                                            <td className="emoji-rating">👍</td>
+                                            <td>2025-10-30</td>
+                                            <td>rfhic수정.pdf</td>
+                                            <td className="emoji-rating">152.86 KB</td>
                                         </tr>
-                                        <tr>
-                                            <td>14:12</td>
-                                            <td>키오스크 화면이 검게 나와요</td>
-                                            <td className="emoji-rating">👎</td>
-                                        </tr>
-                                        <tr>
-                                            <td>14:05</td>
-                                            <td>무선단말기 연결이 안돼요</td>
-                                            <td className="emoji-rating">👍</td>
-                                        </tr>
-                                        <tr>
-                                            <td>13:58</td>
-                                            <td>CCTV 화질이 흐려요</td>
-                                            <td className="emoji-rating">👍</td>
-                                        </tr>
+
                                     </tbody>
                                 </table>
                             </div>

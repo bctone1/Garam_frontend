@@ -374,10 +374,10 @@ export default function Main() {
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
-                        <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
-                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
@@ -404,10 +404,10 @@ export default function Main() {
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
-                        <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
-                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
@@ -436,10 +436,10 @@ export default function Main() {
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
-                        <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
-                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
@@ -468,10 +468,10 @@ export default function Main() {
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
-                        <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
-                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
@@ -500,10 +500,10 @@ export default function Main() {
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
-                        <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                         <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                         <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
-                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
@@ -533,6 +533,33 @@ export default function Main() {
                     </div>
                 </div>
             ]);
+
+            setSectionContent(prev => [
+                ...prev,
+                <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
+                    <div className="inquiry-sky-form">
+                        <h3 className="chatbot-submenu-title-h3">잠깐만요!</h3>
+                        <p className="inquiry-feedback-p">오늘 상담이 도움이 되셨나요? <br />여러분의 소중한 의견을 들려주세요.</p>
+
+                        <div className="inquiry-feedback-choice">
+                            <div className="feedback-button up">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M9.17802 4.86094C9.85374 3.73019 11.2896 3.27528 12.5079 3.84716L12.7418 3.97063C13.8723 4.64974 14.3271 6.08593 13.7554 7.30441L13.2973 8.2792H16.8611L17.1015 8.2922C18.2807 8.41243 19.2001 9.40996 19.2001 10.6187C19.2001 11.0476 19.0831 11.444 18.8817 11.7884C19.0799 12.1329 19.1968 12.5293 19.2001 12.9582C19.2001 13.5528 18.9759 14.089 18.6153 14.5016C18.6576 14.6738 18.6803 14.8525 18.6803 15.0377C18.6803 15.8533 18.2612 16.5649 17.6343 16.9841C17.5725 18.1376 16.6791 19.0701 15.5421 19.1839L15.3017 19.1968H11.9199C11.3351 19.1968 10.7536 19.0864 10.2111 18.8752L9.98044 18.7777L9.9577 18.7679L9.74329 18.664L9.72055 18.6542L9.32421 18.443C8.92463 18.2318 8.56728 17.9654 8.25541 17.6599C8.12221 18.534 7.36853 19.2001 6.45891 19.2001H5.41934C4.41551 19.2001 3.6001 18.3845 3.6001 17.3805L3.60659 10.0988C3.60659 9.09478 4.42201 8.2792 5.42584 8.2792H6.4654C6.81626 8.2792 7.14437 8.37993 7.42375 8.5554L9.05133 5.09489L9.07082 5.0559L9.15853 4.89344L9.17802 4.86419V4.86094ZM5.42584 9.83887C5.2829 9.83887 5.16595 9.95584 5.16595 10.0988V17.3772C5.16595 17.5202 5.2829 17.6372 5.42584 17.6372H6.4654C6.60834 17.6372 6.7253 17.5202 6.7253 17.3772V10.0988C6.7253 9.95584 6.60834 9.83887 6.4654 9.83887H5.42584ZM11.8452 5.25736C11.3644 5.03315 10.7958 5.20537 10.523 5.64727L10.4515 5.77724L8.60626 9.70565C8.49256 9.94934 8.42759 10.2093 8.41134 10.4757L8.40809 10.6122V14.2807L8.41459 14.5374C8.49256 15.5999 9.1098 16.5552 10.0617 17.0621L10.4353 17.2603L10.6399 17.361C11.0427 17.543 11.4781 17.6372 11.9199 17.6372H15.3017L15.3797 17.6339C15.7728 17.5949 16.0814 17.2603 16.0814 16.8574L16.0749 16.7729C16.0717 16.7436 16.0684 16.7176 16.0619 16.6884C15.9742 16.2952 16.2016 15.9021 16.5817 15.7786C16.8968 15.6779 17.121 15.3822 17.121 15.0377C17.121 14.898 17.0852 14.7713 17.0203 14.6543C16.8156 14.2937 16.9293 13.8355 17.2801 13.6146C17.5011 13.4748 17.644 13.2311 17.644 12.9582C17.644 12.7275 17.5433 12.5195 17.3776 12.3733C17.2087 12.2239 17.1112 12.0126 17.1112 11.7884C17.1112 11.5642 17.2087 11.353 17.3776 11.2036C17.5433 11.0574 17.644 10.8494 17.644 10.6187L17.6407 10.5407C17.605 10.1735 17.3126 9.88111 16.9455 9.84537L16.8676 9.84212H12.0758C11.8094 9.84212 11.5625 9.70565 11.4196 9.48145C11.2766 9.25724 11.2572 8.97131 11.3709 8.73086L12.3455 6.64156C12.5729 6.15416 12.3909 5.57904 11.9394 5.30935L11.8452 5.25736Z" fill="#323232" />
+                                </svg>
+                                네, 도움이 되었어요
+                            </div>
+                            <div className="feedback-button down"><i className="icon-down"></i>아니요, 더 개선이 필요해요</div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div className="chatbot-bottom-nav">
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
+                    </div>
+                </div>
+            ]);
+
             setinquiryStatus(false);
         } else if (status === 7) {
             setSectionContent(prev => [

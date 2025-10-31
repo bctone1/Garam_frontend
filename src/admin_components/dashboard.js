@@ -463,8 +463,10 @@ export default function Dashboard() {
         {/* 최근 활동 섹션 */}
         <section className="activity-section">
           <div className="activity-grid">
+
+
             {/* 최근 대화  */}
-            <div className="activity-card">
+            {/* <div className="activity-card">
               <div className="activity-header">
                 <h3 className="activity-title">최근 대화</h3>
 
@@ -488,7 +490,12 @@ export default function Dashboard() {
 
                 </div>
               </div>
-            </div>
+            </div> */}
+
+
+
+
+
           </div>
         </section>
       </main>

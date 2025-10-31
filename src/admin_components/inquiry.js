@@ -260,7 +260,16 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
             axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
                 admin_id: superadmin_id,
                 details: `${prevAssignee || "미지정"} -> ${admin.name} (사유:${inputreason})`,
+                // details: `테스트`,
                 action: "transfer"
+            }).then((res) => {
+            }).catch((err) => {
+                console.log(err);
+            });
+
+            axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/transfer`, {
+                admin_id: admin.id,
+                actor_admin: superadmin_id
             }).then((res) => {
                 setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
                     {
@@ -282,6 +291,8 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
             }).catch((err) => {
                 console.log(err);
             });
+
+
         }
 
         showToast(`${admin.name}문의가 ${action}되었습니다.`, "info");
@@ -531,7 +542,8 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
             );
 
             if (response.status === 204) {
-                alert("삭제되었습니다 ✅");
+                showToast(`삭제 되었습니다.`, "warning");
+
                 fetch_admin_users();
             } else if (response.status === 404) {
                 alert("해당 사용자를 찾을 수 없습니다 ❌");
