@@ -348,9 +348,9 @@ export default function Knowledge() {
                                                     <span>
                                                         <i className="fas fa-eye"></i> {faq.views}회
                                                     </span>
-                                                    <span>
+                                                    {/* <span>
                                                         <i className="fas fa-thumbs-up"></i> {faq.satisfaction_rate}
-                                                    </span>
+                                                    </span> */}
                                                 </div>
                                                 {/* <button
                                                     className="action-btn-small"
