@@ -384,10 +384,10 @@ export default function Dashboard() {
         {/* 차트 섹션 */}
         <section className="charts-section">
           <div className="charts-grid">
-            {/* 일일 문의량 트렌드 */}
+            {/* 일별 문의량 */}
             <div className="dashboard-chart-card">
               <div className="chart-header">
-                <h3 className="chart-title">일일 문의량 트렌드</h3>
+                <h3 className="chart-title">일별 문의량</h3>
                 <div className="chart-controls">
                   <select
                     className="chart-period"

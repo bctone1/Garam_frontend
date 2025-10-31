@@ -424,7 +424,7 @@ export default function Knowledge() {
                                                 >
                                                     <option value="카테고리 없음">카테고리 없음</option>
                                                     {Categories.map(catetory => (
-                                                        <option value={catetory.id}>{catetory.name}</option>
+                                                        <option key={catetory.id} value={catetory.id}>{catetory.name}</option>
                                                     ))}
                                                 </select>
 

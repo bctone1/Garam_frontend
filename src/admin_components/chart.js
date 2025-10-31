@@ -9,6 +9,7 @@ ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Title, T
 
 export default function Chart() {
 
+    const ITEMS_PER_PAGE = 7;
     const [faqs, setfaqs] = useState([]);
     const [ConversationChart, setConversationChart] = useState(null);
     const [ConversationchartOptions, setConversationChartOptions] = useState({});
@@ -26,7 +27,24 @@ export default function Chart() {
     const [CostTrendChartOptions, setCostTrendChartOptions] = useState({});
     const [period, setPeriod] = useState(7);
     const [APICost, setAPICost] = useState([]);
-    const [TotalCost, setTotalCost] = useState({});
+    const [TotalCost, setTotalCost] = useState([]);
+
+    const sortedCost = [...TotalCost].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const [currentPage, setCurrentPage] = useState(1);
+    // 전체 페이지 수
+    const totalPages = Math.ceil(sortedCost.length / ITEMS_PER_PAGE);
+    // 현재 페이지의 데이터 범위 계산
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentItems = sortedCost.slice(startIndex, endIndex);
+    // 페이지 변경 함수
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+
 
     useEffect(() => {
         fetchFAQs();
@@ -53,20 +71,39 @@ export default function Chart() {
 
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/api-cost/rows?start=${formatDate(startDate)}&end=${formatDate(endDate)}`);
             const data = res.data;
-            console.log(data);
+            // console.log(data);
 
             const labels = [...new Set(data.map(item => item.d))].sort();
-
             // 2️⃣ 날짜별 product 합계 계산
             const chartgrouped = labels.map(date => {
                 const dailyData = data.filter(item => item.d === date);
+                const embeddingData = dailyData.find(i => i.product === 'embedding');
+                const llmData = dailyData.find(i => i.product === 'llm');
+                const sttData = dailyData.find(i => i.product === 'stt');
+
                 return {
                     date,
-                    embedding: dailyData.find(i => i.product === 'embedding')?.embedding_tokens || 0,
-                    llm: dailyData.find(i => i.product === 'llm')?.llm_tokens || 0,
-                    stt: dailyData.find(i => i.product === 'stt')?.audio_seconds || 0,
+                    // Embedding
+                    embedding: embeddingData?.embedding_tokens || 0,
+                    embedding_cost: embeddingData ? Number(embeddingData.cost_usd || 0) : 0,
+
+                    // LLM
+                    llm: llmData?.llm_tokens || 0,
+                    llm_cost: llmData ? Number(llmData.cost_usd || 0) : 0,
+
+                    // STT
+                    stt: sttData?.audio_seconds || 0,
+                    stt_cost: sttData ? Number(sttData.cost_usd || 0) : 0,
+
+                    // 총비용 (3개 합계)
+                    total_cost:
+                        (embeddingData ? Number(embeddingData.cost_usd || 0) : 0) +
+                        (llmData ? Number(llmData.cost_usd || 0) : 0) +
+                        (sttData ? Number(sttData.cost_usd || 0) : 0),
                 };
             });
+            console.log(chartgrouped);
+            setTotalCost(chartgrouped);
 
             // 3️⃣ Chart.js 데이터 포맷으로 변환
             setRequestTrendChart({
@@ -93,28 +130,12 @@ export default function Chart() {
                 ]
             });
 
-
-            const apicostgrouped = labels.map((date) => {
-                const dailyData = data.filter((item) => item.d === date);
-                return {
-                    date,
-                    embedding: dailyData
-                        .filter((i) => i.product === "embedding")
-                        .reduce((sum, i) => sum + Number(i.cost_usd || 0), 0),
-                    llm: dailyData
-                        .filter((i) => i.product === "llm")
-                        .reduce((sum, i) => sum + Number(i.cost_usd || 0), 0),
-                    stt: dailyData
-                        .filter((i) => i.product === "stt")
-                        .reduce((sum, i) => sum + Number(i.cost_usd || 0), 0),
-                };
-            });
             setCostTrendChart({
-                labels: apicostgrouped.map((g) => g.date.slice(5).replace("-", "/")), // '10/27' 형식
+                labels: chartgrouped.map((g) => g.date.slice(5).replace("-", "/")), // '10/27' 형식
                 datasets: [
                     {
                         label: "임베딩 비용 ($)",
-                        data: apicostgrouped.map((g) => g.embedding.toFixed(2)),
+                        data: chartgrouped.map((g) => g.embedding_cost.toFixed(2)),
                         borderColor: "#8b5cf6",
                         backgroundColor: "rgba(139, 92, 246, 0.1)",
                         fill: true,
@@ -122,7 +143,7 @@ export default function Chart() {
                     },
                     {
                         label: "LLM 비용 ($)",
-                        data: apicostgrouped.map((g) => g.llm.toFixed(2)),
+                        data: chartgrouped.map((g) => g.llm_cost.toFixed(2)),
                         borderColor: "#17a2b8",
                         backgroundColor: "rgba(23, 162, 184, 0.1)",
                         fill: true,
@@ -130,7 +151,7 @@ export default function Chart() {
                     },
                     {
                         label: "음성 비용 ($)",
-                        data: apicostgrouped.map((g) => g.stt.toFixed(2)),
+                        data: chartgrouped.map((g) => g.stt_cost.toFixed(2)),
                         borderColor: "#ffc107",
                         backgroundColor: "rgba(255, 193, 7, 0.1)",
                         fill: true,
@@ -138,15 +159,6 @@ export default function Chart() {
                     },
                 ],
             });
-
-
-
-
-
-
-
-
-
 
 
             // ✅ 같은 product끼리 합산
@@ -207,7 +219,7 @@ export default function Chart() {
         });
     }
 
-    // 일별 대화 트렌드
+    // 일별 문의량
     const fetchConversationChart = () => {
         setConversationChart({
             labels: ['월', '화', '수', '목', '금', '토', '일'],
@@ -252,13 +264,12 @@ export default function Chart() {
     // 사용자 피드백 분포
     const fetchFeedbackChart = () => {
         setFeedbackChart({
-            labels: ['도움됨', '개선필요', '무응답'],
+            labels: ['도움됨', '개선필요'],
             datasets: [{
-                data: [456, 52, 120],
+                data: [456, 52],
                 backgroundColor: [
                     '#28a745',
                     '#dc3545',
-                    '#6c757d'
                 ],
                 borderWidth: 2,
                 borderColor: '#fff'
@@ -437,32 +448,6 @@ export default function Chart() {
 
     //일별 API비용 추이
     const fetchCostTrendChart = () => {
-        // setCostTrendChart({
-        //     labels: ['10/09', '10/10', '10/11', '10/12', '10/13', '10/14', '10/15'],
-        //     datasets: [{
-        //         label: '임베딩 비용 ($)',
-        //         data: [3.42, 3.86, 4.15, 4.68, 3.58, 3.72, 4.15],
-        //         borderColor: '#8b5cf6',
-        //         backgroundColor: 'rgba(139, 92, 246, 0.1)',
-        //         fill: true,
-        //         tension: 0.4
-        //     }, {
-        //         label: 'LLM 비용 ($)',
-        //         data: [8.17, 8.95, 10.90, 11.44, 9.21, 10.02, 10.45],
-        //         borderColor: '#17a2b8',
-        //         backgroundColor: 'rgba(23, 162, 184, 0.1)',
-        //         fill: true,
-        //         tension: 0.4
-        //     }, {
-        //         label: '음성 비용 ($)',
-        //         data: [1.79, 1.79, 2.34, 2.65, 2.04, 2.21, 2.38],
-        //         borderColor: '#ffc107',
-        //         backgroundColor: 'rgba(255, 193, 7, 0.1)',
-        //         fill: true,
-        //         tension: 0.4
-        //     }]
-        // });
-
         setCostTrendChartOptions({
             responsive: true,
             maintainAspectRatio: false,
@@ -604,65 +589,76 @@ export default function Chart() {
                         {/* 상세 비용 내역 테이블 */}
                         <div className="questions-card" style={{ marginBottom: "1.5rem" }}>
                             <div className="chart-header">
-                                <h3 className="chart-title">날짜별 API 사용 내역 (X)</h3>
+                                <h3 className="chart-title">날짜별 API 사용 내역</h3>
                             </div>
                             <div className="satisfaction-content">
                                 <table className="satisfaction-table">
                                     <thead>
                                         <tr>
                                             <th>날짜</th>
-                                            <th>임베딩 요청</th>
+                                            <th>임베딩 토큰</th>
                                             <th>임베딩 비용</th>
-                                            <th>LLM 요청</th>
+                                            <th>LLM 토큰</th>
                                             <th>LLM 비용</th>
-                                            <th>음성 요청</th>
+                                            <th>음성 사용량</th>
                                             <th>음성 비용</th>
                                             <th>총 비용</th>
                                         </tr>
                                     </thead>
                                     <tbody id="apiUsageTableBody">
-                                        <tr>
-                                            <td>2025-10-29</td>
-                                            <td>212건</td>
-                                            <td>$3.98</td>
-                                            <td>146건</td>
-                                            <td>$10.04</td>
-                                            <td>38건</td>
-                                            <td>$2.09</td>
-                                            <td><strong>$16.11</strong></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>2025-10-28</td>
-                                            <td>245건</td>
-                                            <td>$3.15</td>
-                                            <td>122건</td>
-                                            <td>$8.93</td>
-                                            <td>45건</td>
-                                            <td>$2.21</td>
-                                            <td><strong>$14.29</strong></td>
-                                        </tr>
+                                        {currentItems.map(cost => (
+                                            <tr key={cost.date}>
+                                                <td>{cost.date}</td>
+                                                <td>{cost.embedding} 토큰</td>
+                                                <td>$ {cost.embedding_cost.toFixed(2)}</td>
+                                                <td>{cost.llm} 토큰</td>
+                                                <td>$ {cost.llm_cost.toFixed(2)}</td>
+                                                <td>{cost.stt} 초</td>
+                                                <td>$ {cost.stt_cost.toFixed(2)}</td>
+                                                <td><strong>$ {cost.total_cost.toFixed(2)}</strong></td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
 
                             {/* 페이지네이션 */}
                             <div className="pagination-container">
-                                <div className="pagination-info" id="apiUsagePaginationInfo">
-                                    1-7 / 총 7건
+                                <div className="pagination-info">
+                                    {startIndex + 1} - {Math.min(endIndex, TotalCost.length)} / 총 {TotalCost.length}건
                                 </div>
                                 <div className="pagination-controls">
-                                    <button className="pagination-btn" id="apiUsagePrevBtn" >
+                                    <button
+                                        className="pagination-btn"
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    >
                                         <i className="fas fa-chevron-left"></i> 이전
                                     </button>
-                                    <div className="page-numbers" id="apiUsagePageNumbers">
-                                        {/* JavaScript로 동적 생성 */}
+
+                                    <div className="page-numbers">
+                                        {Array.from({ length: totalPages }, (_, i) => (
+                                            <button
+                                                key={i + 1}
+                                                className={`page-number ${currentPage === i + 1 ? "active" : ""}`}
+                                                onClick={() => handlePageChange(i + 1)}
+                                            >
+                                                {i + 1}
+                                            </button>
+                                        ))}
                                     </div>
-                                    <button className="pagination-btn" id="apiUsageNextBtn" >
+
+                                    <button
+                                        className="pagination-btn"
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                    >
                                         다음 <i className="fas fa-chevron-right"></i>
                                     </button>
                                 </div>
                             </div>
+
+
                         </div>
 
                         {/* API 비용 정보 안내 */}
@@ -721,7 +717,7 @@ export default function Chart() {
                     <div className="content-grid">
                         <div className="chart-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">일별 대화 트렌드</h3>
+                                <h3 className="chart-title">일별 문의량</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="conversationChart" style={{ height: "270px" }}>
