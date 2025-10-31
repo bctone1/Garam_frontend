@@ -249,7 +249,11 @@ export default function Main() {
             ,
 
             <div className="chatbot-guide" key={`guide-${Date.now()}`}>
-                {faq.answer}
+                <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`} style={{ margin: "10px 0px" }}>
+                    <div className="bubble-message assistant">
+                        {faq.answer}
+                    </div>
+                </div>
 
                 <div className="chatbot-bottom-nav">
                     {category === "mostqna" ? (
