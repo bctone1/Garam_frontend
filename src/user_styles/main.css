@@ -169,6 +169,7 @@
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -236,6 +237,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -424,6 +426,11 @@
     width: 36px;
     height: 36px;
     flex: none;
+}
+
+
+.icon-default {
+    background: url('/public/icon\ -\ monitor.png') no-repeat center center / cover;
 }
 
 .icon-monitor {
@@ -1330,6 +1337,7 @@ textarea::-webkit-scrollbar {
    ================================================ */
 
 @media (hover: none) and (pointer: coarse) {
+
     /* 터치 디바이스에서 hover 효과 제거 */
     .chatbot-button:hover,
     .chatbot-submenu-single:hover,
@@ -1371,7 +1379,7 @@ textarea::-webkit-scrollbar {
         min-width: 2.5rem;
         min-height: 2.5rem;
     }
-    
+
     .chatbot-header-button {
         min-width: 1.875rem;
         min-height: 1.875rem;

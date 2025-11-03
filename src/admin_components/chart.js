@@ -29,6 +29,7 @@ export default function Chart() {
     const [APICost, setAPICost] = useState([]);
     const [TotalCost, setTotalCost] = useState([]);
     const [WindowData, setWindowData] = useState({});
+    const [documents, setdocuments] = useState([]);
 
 
     const sortedCost = [...TotalCost].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -44,8 +45,6 @@ export default function Chart() {
         }
     };
 
-
-
     useEffect(() => {
         fetchFAQs();
         fetchConversationChart();
@@ -55,6 +54,7 @@ export default function Chart() {
         fetchHourlyChart();
         fetchRequestTrendChart();
         fetchCostTrendChart();
+        fetch_Knowledge();
     }, []);
 
     useEffect(() => {
@@ -63,6 +63,21 @@ export default function Chart() {
         fetchDaily(period);
         fetchHourly(period);
     }, [period]);
+
+    const fetch_Knowledge = () => {
+        axios.get(`${process.env.REACT_APP_API_URL}/knowledge`, {
+            params: {
+                offset: 0,
+                limit: 5,
+            },
+        }).then((res) => {
+            setdocuments(res.data);
+            console.log("📌 지식베이스 목록:", res.data);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
 
     const fetchHourly = async (days) => {
         const hours = [];
@@ -877,7 +892,7 @@ export default function Chart() {
                     </div>
 
                     {/* 응답 시간 분석 및 사용자 만족도 트렌드 */}
-                    <div className="content-grid">
+                    {/* <div className="content-grid">
                         <div className="chart-card">
                             <div className="chart-header">
                                 <h3 className="chart-title">응답 시간 분석(avg_response_ms)(X)</h3>
@@ -899,7 +914,7 @@ export default function Chart() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* 시간대별 대화량 */}
                     <div className="chart-card full-width" style={{ marginBottom: "2rem" }}>
@@ -947,17 +962,13 @@ export default function Chart() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>2025-10-30</td>
-                                            <td>미 증시, AI 과열 경계감.pdf</td>
-                                            <td className="emoji-rating">377.10 KB</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2025-10-30</td>
-                                            <td>rfhic수정.pdf</td>
-                                            <td className="emoji-rating">152.86 KB</td>
-                                        </tr>
-
+                                        {documents.map(document => (
+                                            <tr key={document.id}>
+                                                <td>{new Date(document.created_at).toISOString().split("T")[0]}</td>
+                                                <td>{document.original_name}</td>
+                                                <td className="emoji-rating">{formatBytes(document.size)}</td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
@@ -968,4 +979,11 @@ export default function Chart() {
             </main>
         </>
     )
+}
+
+function formatBytes(bytes) {
+    if (bytes >= 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
+    if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    if (bytes >= 1024) return (bytes / 1024).toFixed(2) + " KB";
+    return bytes + " B";
 }

@@ -23,6 +23,8 @@ export default function Main() {
     const [sectionContent, setSectionContent] = useState([]);
     const timerRef = useRef(null);
     const hasRunRef = useRef(false);
+    const [newSession, setnewSession] = useState(0);
+    const initialized = useRef(false);
 
 
     const now = new Date();
@@ -32,6 +34,20 @@ export default function Main() {
     const minutes = String(now.getMinutes()).padStart(2, '0');  // 분: 00~59
     const formattedTime = `${month}. ${date}. ${hours}:${minutes}`;
 
+    const createSession = () => {
+        axios.post(`${process.env.REACT_APP_API_URL}/chat/sessions`, {
+            title: "",
+            preview: "",
+            resolved: false,
+            model_id: 1
+        }).then((res) => {
+            // console.log(res.data.id);
+            setnewSession(res.data.id);
+        }).catch((err) => {
+            console.error(err);
+        });
+    }
+
     setTimeout(() => {
         setWelecome(true);
     }, 1000);
@@ -40,7 +56,13 @@ export default function Main() {
         getCategory();
     }, []);
 
+
     useEffect(() => {
+        if (!initialized.current) {
+            initialized.current = true;
+            createSession();
+        }
+
         sectionEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [sectionContent]);
 
@@ -110,7 +132,7 @@ export default function Main() {
                 top_k: Number(topK),
                 knowledge_id: knowledgeId ? Number(knowledgeId) : null,
             };
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/llm/chat/sessions/42/qa`,
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/llm/chat/sessions/${newSession}/qa`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -696,7 +718,7 @@ export default function Main() {
                 const start = performance.now();
                 const latencyMs = Math.round(performance.now() - start);
                 const response = await fetch(
-                    `${process.env.REACT_APP_API_URL}/chat/sessions/42/messages`,
+                    `${process.env.REACT_APP_API_URL}/chat/sessions/${newSession}/messages`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
