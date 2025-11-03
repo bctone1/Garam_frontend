@@ -183,12 +183,12 @@ export default function Chatbot() {
                             <p className="page-subtitle">챗봇의 외관과 동작을 설정합니다</p>
                         </div>
                     </div>
-                    <div className="header-right">
+                    {/* <div className="header-right">
                         <a href="../09.10-가람포스텍 챗봇(수정).html" target="_blank" className="preview-btn">
                             <i className="fas fa-external-link-alt"></i>
                             챗봇 미리보기
                         </a>
-                    </div>
+                    </div> */}
                 </header>
 
                 <div className="main-container">
@@ -462,10 +462,10 @@ export default function Chatbot() {
 
                 {/* 액션 버튼  */}
                 <div className="chatbot-actions">
-                    <button className="btn chatbot-btn-secondary" >
+                    {/* <button className="btn chatbot-btn-secondary" >
                         <i className="fas fa-undo"></i>
                         기본값으로 되돌리기
-                    </button>
+                    </button> */}
                     <button className="btn btn-primary"
                         onClick={() => handleSettings()}
                     >

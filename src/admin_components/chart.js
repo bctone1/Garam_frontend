@@ -950,7 +950,7 @@ export default function Chart() {
 
                         <div className="questions-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">최근 등록된 파일(X)</h3>
+                                <h3 className="chart-title">최근 등록된 파일</h3>
                             </div>
                             <div className="satisfaction-content">
                                 <table className="satisfaction-table">

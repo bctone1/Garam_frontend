@@ -173,11 +173,11 @@ export default function Knowledge() {
                         <div className="header-stats">
                             <div className="stat-item">
                                 <span className="stat-label">활성 문서</span>
-                                <span className="stat-value" id="totalDocuments">3</span>
+                                <span className="stat-value" id="totalDocuments">{documents.length}</span>
                             </div>
                             <div className="stat-item">
                                 <span className="stat-label">FAQ</span>
-                                <span className="stat-value">5</span>
+                                <span className="stat-value">{faqs.length}</span>
                             </div>
                         </div>
                         <div className="status-indicator">
