@@ -406,7 +406,7 @@ export default function Chatbot() {
                         기본 동작 설정
                     </h2>
 
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label className="form-label">파일 업로드 허용</label>
                         <select className="form-input" id="fileUpload" value={systemSettings?.file_upload_mode}
                             onChange={(e) =>
@@ -421,7 +421,7 @@ export default function Chatbot() {
                             <option value="false">차단</option>
                         </select>
                         <div className="form-help">사용자가 파일을 첨부할 수 있는지 설정</div>
-                    </div>
+                    </div> */}
 
                     <div className="form-group">
                         <label className="form-label">세션 유지 시간</label>
