@@ -933,11 +933,11 @@ export default function Main() {
                             <div className="chatbot-header-subtitle">24시간 스마트 고객지원 서비스</div>
                         </div>
                     </div>
-                    <div className="chatbot-header-buttons">
+                    {/* <div className="chatbot-header-buttons">
                         <button className="chatbot-header-button"><i className="icon-home"></i></button>
                         <button className="chatbot-header-button"><i className="icon-call"></i></button>
-                        {/* <button className="chatbot-header-button"><i className="icon-close"></i></button> */}
-                    </div>
+                        <button className="chatbot-header-button"><i className="icon-close"></i></button>
+                    </div> */}
                 </header>
 
 
