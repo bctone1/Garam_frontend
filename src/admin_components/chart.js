@@ -650,7 +650,7 @@ export default function Chart() {
                                 <option value={1}>오늘</option>
                                 <option value={7}>지난 7일</option>
                                 <option value={30}>지난 30일</option>
-                                <option value={90}>지난 90일</option>
+                                {/* <option value={90}>지난 90일</option> */}
                             </select>
                         </div>
                     </div>

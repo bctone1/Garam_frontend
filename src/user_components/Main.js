@@ -54,6 +54,7 @@ export default function Main() {
 
     useEffect(() => {
         getCategory();
+        chatbotSettings();
     }, []);
 
 
@@ -120,9 +121,27 @@ export default function Main() {
         return tags[emogi] ?? "icon-default";
     };
 
+    const [systemSettings, setsystemSettings] = useState({
+        welcome_title: "",
+        welcome_message: "",
+        emergency_phone: "",
+        emergency_email: "",
+        operating_hours: "",
+        file_upload_mode: "",
+        session_duration: "",
+        max_messages: ""
+    });
+
+
     const getCategory = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/system/quick-categories`).then((res) => {
             setCategories(res.data);
+        })
+    }
+
+    const chatbotSettings = () => {
+        axios.get(`${process.env.REACT_APP_API_URL}/system/setting`).then((res) => {
+            setsystemSettings(res.data);
         })
     }
 
@@ -961,9 +980,10 @@ export default function Main() {
                     <section className={`chatbot-chat-section ${welecome ? "fade-in" : "fade-out"}`} >
                         <div className="after-loading">
                             <div className="chatbot-welecome-section">
-                                <h1 className="chatbot-intro-title">안녕하세요! 가람포스텍 AI 지원센터입니다.</h1>
+                                <h1 className="chatbot-intro-title">{systemSettings.welcome_title}</h1>
                                 <p className="chatbot-intro-text">
-                                    POS 시스템, 키오스크, 결제 단말기 관련 궁금한 점이나 문제가 있으시면 <br /> 언제든지 말씀해 주세요!
+                                    {/* POS 시스템, 키오스크, 결제 단말기 관련 궁금한 점이나 문제가 있으시면 <br /> 언제든지 말씀해 주세요! */}
+                                    {systemSettings.welcome_message}
                                 </p>
                             </div>
                             <div className="chatbot-button-grid">
