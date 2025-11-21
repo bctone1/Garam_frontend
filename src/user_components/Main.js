@@ -252,11 +252,11 @@ export default function Main() {
                         <h5 className="chatbot-submenu-title-h5">{category.name}</h5>
                         <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
 
-                        {faqs?.map(faq => (
+                        {faqs?.map((faq, index) => (
                             <div className="chatbot-submenu-single" key={faq.id}
                                 onClick={() => getAnswer({ category, faq })}
                             >
-                                <div className="chatbot-submenu-id">1</div>
+                                <div className="chatbot-submenu-id">{index + 1}</div>
                                 <div>
                                     <h3>{faq.question}</h3>
                                 </div>
