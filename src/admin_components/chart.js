@@ -72,7 +72,7 @@ export default function Chart() {
             },
         }).then((res) => {
             setdocuments(res.data);
-            console.log("📌 지식베이스 목록:", res.data);
+            // console.log("📌 지식베이스 목록:", res.data);
         }).catch((err) => {
             console.log(err);
         });
@@ -120,7 +120,7 @@ export default function Chart() {
         const formatDate = (date) => date.toISOString().split('T')[0];
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/analytics/daily?start=${formatDate(startDate)}&end=${formatDate(endDate)}`);
         const data = res.data
-        console.log(data);
+        // console.log(data);
 
         const total_feedback_helpful = data.reduce(
             (sum, item) => sum + (item.feedback_helpful || 0), 0
@@ -148,15 +148,15 @@ export default function Chart() {
         res.data.forEach(item => {
             const month = new Date(item.d).getMonth() + 1; // 0~11 → 1~12
             const totalFeedback = item.feedback_helpful + item.feedback_not_helpful;
-            console.log(totalFeedback);
+            // console.log(totalFeedback);
             const score = totalFeedback === 0 ? 0 : (item.feedback_helpful / totalFeedback) * 100;
-            console.log(score);
+            // console.log(score);
 
             if (!tempMap[month]) tempMap[month] = [];
             tempMap[month].push(score);
         });
 
-        console.log(tempMap);
+        // console.log(tempMap);
 
         // 2. labels: 1월~12월
         const labels = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
@@ -168,8 +168,8 @@ export default function Chart() {
             return Math.round(tempMap[month][0]);  // 반올림
         });
 
-        console.log(labels);
-        console.log(groupdata);
+        // console.log(labels);
+        // console.log(groupdata);
 
         // 4. 차트 업데이트
         setSatisfactionChart({
@@ -266,6 +266,8 @@ export default function Chart() {
                         (sttData ? Number(sttData.cost_usd || 0) : 0),
                 };
             });
+
+            // console.log(chartgrouped);
             setTotalCost(chartgrouped);
 
             // 3️⃣ Chart.js 데이터 포맷으로 변환
@@ -329,22 +331,43 @@ export default function Chart() {
 
             // ✅ 같은 product끼리 합산
             const grouped = data.reduce((acc, item) => {
-                const { product, llm_tokens, embedding_tokens, cost_usd, audio_seconds } = item;
-                if (!acc[product]) {
-                    acc[product] = {
-                        product,
-                        total_llm_tokens: 0,
-                        total_embedding_tokens: 0,
-                        total_cost_usd: 0,
-                        total_audio_seconds: 0
-                    };
-                }
+                const { product, llm_tokens = 0, embedding_tokens = 0, cost_usd = 0, audio_seconds = 0 } = item;
+
+                // product가 없으면 기본 객체 생성
+                if (!acc["embedding"]) acc["embedding"] = {
+                    product: "embedding",
+                    total_llm_tokens: 0,
+                    total_embedding_tokens: 0,
+                    total_cost_usd: 0,
+                    total_audio_seconds: 0
+                };
+                if (!acc["llm"]) acc["llm"] = {
+                    product: "llm",
+                    total_llm_tokens: 0,
+                    total_embedding_tokens: 0,
+                    total_cost_usd: 0,
+                    total_audio_seconds: 0
+                };
+                if (!acc["stt"]) acc["stt"] = {
+                    product: "stt",
+                    total_llm_tokens: 0,
+                    total_embedding_tokens: 0,
+                    total_cost_usd: 0,
+                    total_audio_seconds: 0
+                };
+
+                // 실제 데이터 더하기
                 acc[product].total_llm_tokens += llm_tokens;
                 acc[product].total_embedding_tokens += embedding_tokens;
                 acc[product].total_cost_usd += Number(cost_usd);
                 acc[product].total_audio_seconds += audio_seconds;
+
                 return acc;
             }, {});
+
+            console.log(grouped);
+
+
             // 객체를 배열로 변환
             const summary = Object.values(grouped);
             const totalSummary = summary.reduce((acc, item) => {
@@ -362,7 +385,11 @@ export default function Chart() {
             });
             // ✅ summary 마지막에 추가
             summary.push(totalSummary);
-            // console.log("📊 Product별 합계:", summary);
+            console.log("📊 Product별 합계:", summary);
+
+
+
+
             setAPICost(summary);
         } catch (error) {
             console.log(error);
@@ -702,7 +729,7 @@ export default function Chart() {
                             <div className="metric-card">
                                 <div className="metric-value success">
 
-                                    {APICost?.[2] ? `$ ${APICost[3].total_cost_usd?.toFixed(2)}` : "로딩 중..."}
+                                    {APICost?.[3] ? `$ ${APICost[3].total_cost_usd?.toFixed(2)}` : "로딩 중..."}
                                 </div>
                                 <div className="chart-metric-label">총 API 사용량</div>
                                 {/* <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>이번 달 누적</small> */}

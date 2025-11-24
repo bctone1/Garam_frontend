@@ -885,8 +885,6 @@ export default function Main() {
                             <div className="bubble-message assistant">{answer}</div>
                         </div>
                     ]);
-
-
                 } catch (error) {
                     console.error("STT 요청 오류:", error);
                 } finally {
