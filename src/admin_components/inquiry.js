@@ -493,9 +493,9 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 } else if (inquiry.status === "processing" && (isCurrentUser || sudo)) {
                     actionButtons = (
                         <>
-                            <button className="btn btn-info btn-sm" onClick={() => handleContact()}>
+                            {/* <button className="btn btn-info btn-sm" onClick={() => handleContact()}>
                                 <i className="fas fa-phone"></i> 연락
-                            </button>
+                            </button> */}
                             <button className="btn btn-secondary btn-sm" onClick={() => handleNote({ inquiry })}>
                                 <i className="fas fa-sticky-note"></i> 메모
                             </button>
