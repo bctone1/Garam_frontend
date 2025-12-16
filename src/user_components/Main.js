@@ -293,9 +293,14 @@ export default function Main() {
 
             <div className="chatbot-guide" key={`guide-${Date.now()}`}>
                 <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`} style={{ margin: "10px 0px" }}>
-                    <div className="bubble-message assistant">
-                        {faq.answer}
-                    </div>
+                    <div className="bubble-message assistant"
+                        dangerouslySetInnerHTML={{
+                            __html: (faq.answer || "")
+                                .replace(/\n/g, "<br>")
+                                .replace(/\r\n/g, "<br>")
+                        }}
+                    />
+
                 </div>
 
                 <div className="chatbot-bottom-nav">

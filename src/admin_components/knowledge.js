@@ -380,7 +380,17 @@ export default function Knowledge() {
                                         >
                                             <div className="faq-answer">
                                                 <textarea
-                                                    style={{ display: `${FixIndex === faq.id ? "block" : "none"}` }}
+                                                    style={{
+                                                        display: `${FixIndex === faq.id ? "block" : "none"}`,
+                                                        width: "100%",
+                                                        padding: "0.75rem",
+                                                        border: "1px solid var(--border-color)",
+                                                        borderRadius: "var(--border-radius)",
+                                                        fontSize: "0.875rem",
+                                                        resize: "vertical",
+                                                        fontFamily: "inherit",
+                                                        minHeight: "120px",
+                                                    }}
                                                     value={faq.answer}
                                                     onChange={(e) => {
                                                         const newValue = e.target.value;
@@ -392,10 +402,17 @@ export default function Knowledge() {
                                                     }}
                                                 />
                                                 <div
-                                                    style={{ display: `${FixIndex === faq.id ? "none" : "block"}` }}
-                                                >
-                                                    {faq.answer}
-                                                </div>
+                                                    style={{ 
+                                                        display: `${FixIndex === faq.id ? "none" : "block"}`,
+                                                        whiteSpace: "pre-wrap",
+                                                        wordWrap: "break-word"
+                                                    }}
+                                                    dangerouslySetInnerHTML={{ 
+                                                        __html: (faq.answer || "")
+                                                            .replace(/\n/g, "<br>")
+                                                            .replace(/\r\n/g, "<br>")
+                                                    }}
+                                                />
 
                                             </div>
 

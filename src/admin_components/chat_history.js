@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { showToast } from '../utill/utill';
 
 export default function ChatHistory() {
     const [SessionsList, setSessionsList] = useState([]);
@@ -11,8 +12,10 @@ export default function ChatHistory() {
         axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions?offset=0&limit=100`).then((res) => {
             console.log(res.data);
             setSessionsList(res.data);
+            showToast("세션 목록 가져오기 성공", "success");
         }).catch((err) => {
             console.error("세션 목록 가져오기 오류:", err);
+            showToast("세션 목록 가져오기 실패", "error");
         });
     }
 
