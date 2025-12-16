@@ -86,14 +86,14 @@ export default function ChatHistory() {
                                             {session.preview}
                                         </div>
                                     )}
-                                    <div className="session-meta">
+                                    {/* <div className="session-meta">
                                         <span className="session-id">ID: {session.id}</span>
                                         {session.resolved !== undefined && (
                                             <span className={`session-status ${session.resolved ? "resolved" : "active"}`}>
                                                 {session.resolved ? "완료" : "진행중"}
                                             </span>
                                         )}
-                                    </div>
+                                    </div> */}
                                 </div>
                             ))
                         )}
