@@ -147,6 +147,7 @@ export default function Main() {
 
     // --- ✨ AI 응답 요청 함수 ---
     const requestAssistantAnswer = async (question) => {
+        console.log("요청");
         try {
             const payload = {
                 question,
@@ -160,6 +161,7 @@ export default function Main() {
                     body: JSON.stringify(payload),
                 }
             );
+            console.log(response);
             const message = await parseError(response);
             return response.json();
         } catch (error) {
@@ -787,19 +789,6 @@ export default function Main() {
             try {
                 const start = performance.now();
                 const latencyMs = Math.round(performance.now() - start);
-                const response = await fetch(
-                    `${process.env.REACT_APP_API_URL}/chat/sessions/${newSession}/messages`,
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            session_id: 42,
-                            role: "user",
-                            content,
-                            response_latency_ms: latencyMs,
-                        }),
-                    }
-                );
 
                 const data = await requestAssistantAnswer(content);
                 const answer = data.answer?.trim?.() ? data.answer.trim() : "응답을 가져올 수 없습니다.";
