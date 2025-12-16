@@ -1,5 +1,5 @@
 export default function Sidebar({ view, handleMenuClick, role, admin_email, admin_name }) {
-    
+
 
     // 메뉴 데이터 정의
     const menuItems = [
@@ -8,11 +8,12 @@ export default function Sidebar({ view, handleMenuClick, role, admin_email, admi
         { key: "assistant", icon: "fas fa-robot", label: "AI 모델 설정" },
         { key: "chart", icon: "fas fa-chart-bar", label: "분석 및 보고서" },
         { key: "chatbot", icon: "fas fa-comments", label: "챗봇 운영 설정" },
-        { key: "inquiry", icon: "fas fa-comments", label: "문의 관리" },
+        { key: "inquiry", icon: "fa-solid fa-address-book", label: "문의 관리" },
+        { key: "chat_history", icon: "fas fa-comment-dots", label: "대화 기록" },
     ];
 
     // role이 admin이면 "문의 관리"만 보이도록 필터링
-    const visibleMenu = role !== "superadmin" 
+    const visibleMenu = role !== "superadmin"
         ? menuItems.filter(item => item.key === "inquiry")
         : menuItems;
 

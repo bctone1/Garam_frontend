@@ -6,7 +6,7 @@ import Assistant from "../admin_components/assistant";
 import Chart from '../admin_components/chart';
 import Chatbot from '../admin_components/chatbot';
 import Inquiry from '../admin_components/inquiry';
-// import Admin_login from '../admin_components/admin_login';
+import ChatHistory from '../admin_components/chat_history';
 
 import "../admin_styles/dashboard.css";
 import "../admin_styles/knowledge.css";
@@ -14,6 +14,7 @@ import "../admin_styles/assistant.css";
 import "../admin_styles/chart.css";
 import "../admin_styles/chatbot.css";
 import "../admin_styles/inquiry.css";
+import "../admin_styles/chat_history.css";
 
 
 
@@ -65,8 +66,8 @@ export default function Adminpage() {
                     setadmin_email={setadmin_email}
                     setadmin_name={setadmin_name}
                 />;
-            // case 'admin_login':
-            //     return <Admin_login handleMenuClick={handleMenuClick} />;
+            case 'chat_history':
+                return <ChatHistory />;
             default:
                 return <div>준비 중입니다: {view}</div>;
         }
