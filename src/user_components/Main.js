@@ -1,5 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function Main() {
 
@@ -797,7 +799,9 @@ export default function Main() {
                     ...prev,
                     <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
                         <div className="bubble-date assistant">{formattedTime}</div>
-                        <div className="bubble-message assistant">{answer}</div>
+                        <div className="bubble-message assistant">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
+                        </div>
                     </div>
                 ]);
             } catch (error) {
@@ -876,7 +880,9 @@ export default function Main() {
                         ...prev,
                         <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
                             <div className="bubble-date assistant">{formattedTime}</div>
-                            <div className="bubble-message assistant">{answer}</div>
+                            <div className="bubble-message assistant">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
+                            </div>
                         </div>
                     ]);
                 } catch (error) {

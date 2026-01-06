@@ -55,13 +55,13 @@ export default function Assisstant() {
                     <div className="header-left">
                         <div className="page-title">
                             <h1>AI 모델 설정</h1>
-                            <p className="page-subtitle">EXAONE 4.0 모델의 성능과 동작을 조정하여 최적의 응답을 생성하세요</p>
+                            <p className="page-subtitle">gpt-4o-mini 모델의 성능과 동작을 조정하여 최적의 응답을 생성하세요</p>
                         </div>
                     </div>
                     <div className="header-right">
                         <div className="status-indicator">
                             <div className="status-dot"></div>
-                            <span>EXAONE 4.0 활성</span>
+                            <span>gpt-4o-mini 활성</span>
                         </div>
                     </div>
                 </header>
@@ -110,8 +110,8 @@ export default function Assisstant() {
                                     <i className="fas fa-star"></i>
                                 </div>
                                 <div className="model-info">
-                                    <div className="model-name">EXAONE 4.0</div>
-                                    <div className="model-provider">LG AI Research</div>
+                                    <div className="model-name">gpt-4o-mini</div>
+                                    <div className="model-provider">Open AI</div>
                                 </div>
                             </div>
 
