@@ -55,13 +55,13 @@ export default function Assisstant() {
                     <div className="header-left">
                         <div className="page-title">
                             <h1>AI 모델 설정</h1>
-                            <p className="page-subtitle">gpt-4o-mini 모델의 성능과 동작을 조정하여 최적의 응답을 생성하세요</p>
+                            <p className="page-subtitle">GPT-4o-mini 모델의 성능과 동작을 조정하여 최적의 응답을 생성하세요</p>
                         </div>
                     </div>
                     <div className="header-right">
                         <div className="status-indicator">
                             <div className="status-dot"></div>
-                            <span>gpt-4o-mini 활성</span>
+                            <span>GPT-4o-mini 활성</span>
                         </div>
                     </div>
                 </header>
@@ -110,21 +110,19 @@ export default function Assisstant() {
                                     <i className="fas fa-star"></i>
                                 </div>
                                 <div className="model-info">
-                                    <div className="model-name">gpt-4o-mini</div>
-                                    <div className="model-provider">Open AI</div>
+                                    <div className="model-name">GPT-4o-mini</div>
+                                    <div className="model-provider">OpenAI</div>
                                 </div>
                             </div>
 
                             <div className="model-description">
-                                한국 최초 하이브리드 AI 모델로 자연어 처리와 추론 능력을 통합하여 제공합니다.
-                                한국어에 특화되어 기술지원에 최적화되었으며, 높은 정확도와 빠른 응답 속도를 자랑합니다.
+                                OpenAI의 경량화 모델로 빠른 응답 속도와 안정적인 성능을 제공합니다. 고객 기술 지원 문의 응대에 최적화되어 있습니다.
                             </div>
 
                             <div className="model-features">
-                                <span className="feature-tag">한국어 특화</span>
-                                <span className="feature-tag">하이브리드 추론</span>
+                                <span className="feature-tag">고속 응답</span>
+                                <span className="feature-tag">안정적 성능</span>
                                 <span className="feature-tag">기술지원 최적화</span>
-                                <span className="feature-tag">131K 토큰 컨텍스트</span>
                             </div>
                         </div>
                     </div>
