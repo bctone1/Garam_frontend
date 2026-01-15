@@ -1,6 +1,6 @@
 import axios from "axios";
 import { showToast } from '../utill/utill';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }) {
 
@@ -8,10 +8,6 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     const [inquiries, setinquiries] = useState([]);
     const [currentAdminUser, setcurrentAdminUser] = useState("");
     const [openAddAdminModal, setopenAddAdminModal] = useState(false);
-    const [categoryFilter, setCategoryFilter] = useState("all");
-    const [notifications, setNotifications] = useState([]);
-    const [openNotificationModal, setOpenNotificationModal] = useState(false);
-    const [showNotificationContent, setShowNotificationContent] = useState(false);
     const admin_name = sessionStorage.getItem("admin_name");
     // const admin_id = sessionStorage.getItem("admin_id");
 
@@ -53,43 +49,6 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
             </div>
 
             <main className="inquiry-main-content">
-                <div className="inquiry-page-header">
-                    <button
-                        className="inquiry-notification-btn"
-                        title="알림"
-                        onClick={() => setShowNotificationContent(!showNotificationContent)}
-                    >
-                        <svg className="inquiry-notification-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                        <span className="inquiry-notification-badge">3</span>
-                    </button>
-
-                    <div className={`inquiry-notification-content ${showNotificationContent ? 'show' : ''}`}>
-                        <div className="inquiry-notification-item">
-                            <div className="inquiry-notification-item-title">
-                                <span className="inquiry-notification-item-title-text">
-                                    새로운 문의가 등록되었습니다.
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="inquiry-notification-item">
-                            <div className="inquiry-notification-item-title">
-                                <span className="inquiry-notification-item-title-text">
-                                    ~~문의가 완료되었습니다.
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="inquiry-notification-item">
-                            <div className="inquiry-notification-item-title">
-                                <span className="inquiry-notification-item-title-text">
-                                    ~문의가 최인턴에서 임사원으로 이관되었습니다.
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div className="page-header">
                     <h1 className="page-title">문의 관리</h1>
                     <p className="page-subtitle">챗봇을 통해 접수된 고객 문의를 관리합니다</p>
@@ -151,29 +110,10 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                 <div className="inquiry-section">
                     <div className="section-header">
                         <h3 className="section-title">문의 목록</h3>
-
-                        <div className="inquiry-filter">
-                            <select
-                                className="inquiry-filter-select"
-                                value={categoryFilter}
-                                onChange={(e) => setCategoryFilter(e.target.value)}
-                            >
-                                <option value="all">전체</option>
-                                <option value="paper_request">용지요청</option>
-                                <option value="sales_report">매출 내역</option>
-                                <option value="kiosk_menu_update">메뉴 수정 및 추가</option>
-                                <option value="other">기타</option>
-                            </select>
-                        </div>
-
                     </div>
-
                     <div className="inquiry-list" id="inquiryList">
                         <RenderInquiries
-                            inquiries={categoryFilter === "all"
-                                ? inquiries
-                                : inquiries.filter(inquiry => inquiry.inquiryType === categoryFilter)
-                            }
+                            inquiries={inquiries}
                             adminUsers={adminUsers}
                             currentAdminUser={currentAdminUser}
                             role={role}
@@ -491,15 +431,9 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         showToast("개발중입니다.", "warning");
     }
 
-    const labelType = (type) => {
-        if (type === "paper_request") return "용지요청";
-        if (type === "sales_report") return "매출 내역";
-        if (type === "kiosk_menu_update") return "메뉴 수정 및 추가";
-        if (type === "other") return "기타";
-    }
-
     return (
         <>
+            
             {filteredInquiries.length === 0 && (
                 <div className="empty-state">
                     <div className="empty-icon">
@@ -637,7 +571,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                             <div className="inquiry-info">
                                 <div className="inquiry-name">{inquiry.businessName}</div>
                                 <div className="inquiry-meta">
-                                    <span className="inquiry-meta-item">카테고리</span> : {labelType(inquiry.inquiryType)} | <span className="inquiry-meta-item">사업자번호</span> : {inquiry.businessNumber} | <span className="inquiry-meta-item">연락처</span> : {inquiry.phone} | <span className="inquiry-meta-item">접수일</span> : {inquiry.createdDate}
+                                    <span className="inquiry-meta-item">사업자번호</span> : {inquiry.businessNumber} | <span className="inquiry-meta-item">연락처</span> : {inquiry.phone} | <span className="inquiry-meta-item">접수일</span> : {inquiry.createdDate}
                                 </div>
                             </div>
 
@@ -654,26 +588,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                             </div>
                         </div>
 
-                        <div className="inquiry-content">
-                            <div className="inquiry-file-preview-container">
-                                {inquiry.attachments.map((attachment, index) => {
-                                    return (
-                                        <div key={index} className="inquiry-file-preview-item">
-                                            {attachment.contentType.startsWith('image/') && (
-                                                <div className="inquiry-file-preview-image-wrapper">
-                                                    <img
-                                                        src={`http://localhost:5002${attachment.storageKey}`}
-                                                        className="inquiry-file-preview-image"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    )
-                                })}
-                            </div>
-
-                            {inquiry.content}
-                        </div>
+                        <div className="inquiry-content">{inquiry.content}</div>
                         {processorInfo}
                         <div className="history-timeline">{historyHtml}</div>
                     </div>
@@ -693,6 +608,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
     const getCompletedCount = (adminName) =>
         inquiries.filter(i => i.assignee === adminName && i.status === "completed").length;
 
+
     const switchToAdmin = (admin) => {
         const inputPassword = prompt(`"${admin.name}" 계정의 비밀번호를 입력하세요:`);
         if (!inputPassword) return;
@@ -709,18 +625,6 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
 
             setcurrentAdminUser(admin.name);
             showToast(`${admin.name}으로 전환되었습니다.`, "info");
-
-
-
-            const ws = new WebSocket("ws://localhost:5002/ws");
-
-            ws.onopen = () => {
-                ws.send(`${admin.id}hello websocket`);
-            };
-
-            ws.onmessage = (event) => {
-                console.log(event.data);
-            };
 
         } else {
             alert("❌ 비밀번호가 틀립니다.");

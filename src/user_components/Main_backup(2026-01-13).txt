@@ -13,9 +13,9 @@ export default function Main() {
     const [Categories, setCategories] = useState([]);
     const [inquiryStatus, setinquiryStatus] = useState(false);
     const [inquiryInfo, setInquiryInfo] = useState({
-        category: null,
-        businessNumber: null,
-        companyName: null,
+        name: null,
+        email: null,
+        group: null,
         phone: null,
         detail: null,
     });
@@ -61,8 +61,14 @@ export default function Main() {
     }, []);
 
 
+    useEffect(() => {
+        if (!initialized.current) {
+            initialized.current = true;
+            createSession();
+        }
 
-
+        sectionEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [sectionContent]);
 
     useEffect(() => {
         if (hasRunRef.current) return;
@@ -70,6 +76,8 @@ export default function Main() {
             clearTimeout(timerRef.current);
         }
         timerRef.current = setTimeout(() => {
+            // console.log("5초 동안 sectionContent 변경 없음 → getinquiryform(6) 실행");
+            // console.log(`카테고리 : ${Categories}`);
             setSectionContent(prev => [
                 ...prev,
                 <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
@@ -98,7 +106,7 @@ export default function Main() {
                 </div>
             ]);
             hasRunRef.current = true;
-        }, 20000);
+        }, 10000);
         return () => clearTimeout(timerRef.current);
     }, [sectionContent, Categories]);
 
@@ -194,25 +202,22 @@ export default function Main() {
 
 
     const InquiryCreate = async () => {
+        console.log(`이메일 : ${messageInput}`);
         console.log(inquiryInfo);
-        console.log(selectedFiles);
-        console.log(messageInput);
-        const formData = new FormData();
-        formData.append("business_name", inquiryInfo.companyName);
-        formData.append("business_number", inquiryInfo.businessNumber);
-        formData.append("phone", inquiryInfo.phone ?? "");
-        formData.append("content", messageInput);
-        formData.append("inquiry_type", inquiryInfo.category);
-
-        selectedFiles.forEach((file) => {
-            formData.append("files", file); // key 이름 중요
-        });
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_API_URL}/inquiries/`,
                 {
                     method: "POST",
-                    body: formData, // headers 지정 ❌
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        customer_name: inquiryInfo.name,
+                        company: inquiryInfo.group,
+                        phone: inquiryInfo.phone,
+                        content: inquiryInfo.detail,
+                        status: "new",
+                        assignee_admin_id: 0,
+                    }),
                 }
             );
         } catch (error) {
@@ -370,7 +375,7 @@ export default function Main() {
                 ...prev,
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                 <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
-                    <h5 className="chatbot-submenu-title-h5">자주하는 질문</h5>
+                    <h5 className="chatbot-submenu-title-h5">{qnaList.name}</h5>
                     <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
 
                     {qnaList?.map((faq, index) => (
@@ -406,119 +411,6 @@ export default function Main() {
         });
     }
 
-    const selectInquiryCategory = (category) => {
-        setInquiryInfo(prev => ({
-            ...prev,
-            category: category
-        }));
-
-        let content = null;
-        if (category === 'paper_request') {
-            content = 1
-        } else if (category === 'sales_report') {
-            content = 2
-        } else if (category === 'kiosk_menu_update') {
-            content = 3
-        } else if (category === 'other') {
-            content = 4
-        }
-
-        setSectionContent(prev => [
-            ...prev,
-            <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
-                <div className="bubble-date user">{formattedTime}</div>
-                <div className="bubble-message user">{content}</div>
-            </div>
-        ]);
-
-        getinquiryform(2);
-    }
-
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [filePreviews, setFilePreviews] = useState([]);
-    const prevFilePreviewsRef = useRef([]);
-
-    useEffect(() => {
-        if (!initialized.current) {
-            initialized.current = true;
-            createSession();
-        }
-
-        sectionEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [sectionContent, filePreviews]);
-
-    const handleFileChange = (e) => {
-        const newFiles = Array.from(e.target.files);
-
-        // 함수형 업데이트를 사용하여 최신 상태 확인
-        setFilePreviews(prev => {
-            const currentCount = prev.length;
-            const newCount = currentCount + newFiles.length;
-
-            if (newCount > 3) {
-                alert("파일은 최대 3개까지 선택할 수 있습니다.");
-                e.target.value = "";
-                return prev; // 상태 변경 없이 반환
-            }
-
-            // 파일 미리보기 URL 생성
-            const newPreviews = newFiles.map(file => {
-                const preview = {
-                    file: file,
-                    url: URL.createObjectURL(file),
-                    name: file.name,
-                    type: file.type
-                };
-                return preview;
-            });
-
-            return [...prev, ...newPreviews];
-        });
-
-        // selectedFiles는 별도로 업데이트 (중복 방지)
-        setSelectedFiles(prevFiles => {
-            const currentCount = prevFiles.length;
-            if (currentCount + newFiles.length > 3) {
-                return prevFiles; // 이미 filePreviews에서 체크했으므로 여기서는 그대로 반환
-            }
-            return [...prevFiles, ...newFiles];
-        });
-    };
-
-    const handleFileRemove = (index) => {
-        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-        setFilePreviews(prev => prev.filter((_, i) => i !== index));
-    };
-
-    // filePreviews가 변경될 때 삭제된 항목의 URL 정리
-    useEffect(() => {
-        const prevPreviews = prevFilePreviewsRef.current;
-        const currentPreviews = filePreviews;
-
-        // 이전에 있던 항목 중 현재 없는 항목의 URL 해제
-        prevPreviews.forEach(prevPreview => {
-            const stillExists = currentPreviews.some(
-                current => current.url === prevPreview.url
-            );
-            if (!stillExists) {
-                URL.revokeObjectURL(prevPreview.url);
-            }
-        });
-
-        // 현재 상태를 ref에 저장
-        prevFilePreviewsRef.current = filePreviews;
-    }, [filePreviews]);
-
-    // 컴포넌트 언마운트 시 모든 URL 해제
-    useEffect(() => {
-        return () => {
-            filePreviews.forEach(preview => {
-                URL.revokeObjectURL(preview.url);
-            });
-        };
-    }, []);
-
-
 
 
     const getinquiryform = (status) => {
@@ -527,78 +419,64 @@ export default function Main() {
             setSectionContent(prev => [
                 ...prev,
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
-                <div className="chatbot-submenu-wrap" key={`inquiry-${Date.now()}`}>
+                <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
+                    <div className="chatbot-inquiry-header">
+                        <div className="inquiry-step"><h4>1</h4>/5 단계</div>
 
-                    <h5 className="chatbot-submenu-title-h5">문의 하기</h5>
-                    <p>번호를 입력하거나 클릭하여 카테고리를 선택하세요.</p>
-
-
-                    <div className="chatbot-submenu-single"
-                        onClick={() => selectInquiryCategory('paper_request')}
-                    >
-                        <div className="chatbot-submenu-id">1</div>
                         <div>
-                            <h3>용지 요청</h3>
+                            <h5 className="chatbot-submenu-title-h5">문의 정보 수집</h5>
+                            <p className="inquiry-question">성함을 알려주세요.</p>
                         </div>
                     </div>
+                    <br />
 
-                    <div className="chatbot-submenu-single"
-                        onClick={() => selectInquiryCategory('sales_report')}
-                    >
-                        <div className="chatbot-submenu-id">2</div>
-                        <div>
-                            <h3>매출 내역</h3>
-                        </div>
+                    <div className="inquiry-message">
+                        <h6 className="chatbot-submenu-title-h6">문의하기 시작</h6>
+                        <br />
+
+                        <p className="assistant-text">안녕하세요! 문의사항을 접수해드리겠습니다. <br />빠른 처리를 위해 몇 가지 정보를 수집하겠습니다.</p>
+                        <br />
+
+                        <p className="assistant-text-bold">첫 번째로, 성함을 알려주세요. </p>
+                        <p className="assistant-text">(예: 홍길동)</p>
+                        <br />
                     </div>
-
-                    <div className="chatbot-submenu-single"
-                        onClick={() => selectInquiryCategory('kiosk_menu_update')}
-                    >
-                        <div className="chatbot-submenu-id">3</div>
-                        <div>
-                            <h3>메뉴 수정 및 추가</h3>
-                        </div>
-                    </div>
-
-                    <div className="chatbot-submenu-single"
-                        onClick={() => selectInquiryCategory('other')}
-                    >
-                        <div className="chatbot-submenu-id">4</div>
-                        <div>
-                            <h3>기타</h3>
-                        </div>
-                    </div>
-
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
+                        <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
         } else if (status === 2) {
             setSectionContent(prev => [
                 ...prev,
-                <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>1</h4>/4 단계</div>
+                        <div className="inquiry-step"><h4>2</h4>/5 단계</div>
 
                         <div>
-                            <h5 className="chatbot-submenu-title-h5">문의 정보 수집</h5>
-                            <p className="inquiry-question">사업자번호를 입력해주세요.</p>
+                            <h5 className="chatbot-submenu-title-h5">회사 정보 수집</h5>
+                            <p className="inquiry-question">회사명을 알려주세요.</p>
                         </div>
                     </div>
                     <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text">안녕하세요! 문의사항을 접수해드리겠습니다. <br />빠른 처리를 위해 몇 가지 정보를 수집하겠습니다.</p>
+                        <h6 className="chatbot-submenu-title-h6">{messageInput}님, 안녕하세요!</h6>
                         <br />
 
-                        <p className="assistant-text-bold">첫 번째로, 사업자번호를 입력하세요. </p>
-                        <p className="assistant-text">(예: 1234567890)</p>
+                        <p className="assistant-text">두 번째로, 거래처(회사명)을 알려주세요.<br />개인 문의인 경우 "개인"이라고 입력해주세요.<br />(예: 가람포스텍, 개인)</p>
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
+                        <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
@@ -607,22 +485,30 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>2</h4>/4 단계</div>
+                        <div className="inquiry-step"><h4>3</h4>/5 단계</div>
 
                         <div>
-                            <h5 className="chatbot-submenu-title-h5">상호명</h5>
-                            <p className="inquiry-question">상호명을 입력해주세요.</p>
+                            <h5 className="chatbot-submenu-title-h5">연락처</h5>
+                            <p className="inquiry-question">연락처를 기입해주세요</p>
                         </div>
                     </div>
                     <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">두 번째로, 상호명을 입력하세요. </p>
-                        <p className="assistant-text">(예: 가람포스텍)</p>
+
+                        <p className="assistant-text">
+                            세 번째로, 연락처를 알려주세요. <br />
+                            빠른 처리를 위해 필요합니다. <br /><br />
+                            (예: 010-1234-5678)
+                        </p>
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
+                        <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
@@ -631,21 +517,30 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>3</h4>/4 단계</div>
+                        <div className="inquiry-step"><h4>4</h4>/5 단계</div>
 
                         <div>
-                            <h5 className="chatbot-submenu-title-h5">전화번호</h5>
-                            <p className="inquiry-question">전화번호를 입력해주세요.</p>
+                            <h5 className="chatbot-submenu-title-h5">문의 내용</h5>
+                            <p className="inquiry-question">문의내용을 입력해주세요</p>
                         </div>
                     </div>
                     <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">세 번째로, 전화번호를 입력하세요. </p>
-                        <p className="assistant-text">(예: 010-1234-5678)</p>
+                        <p className="assistant-text">
+                            구체적인 문의 내용을 알려주세요.<br />
+                            자세히 설명해주실수록 더 정확한 지원이 가능합니다.<br /><br />
+
+                            (예: 카드리더기 오류로 결제가 안됩니다, POS 용지 부족으로 용지 요청드립니다)
+                        </p>
+                        <br />
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
+                        <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
@@ -655,34 +550,33 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>4</h4>/4 단계</div>
+                        <div className="inquiry-step"><h4>5</h4>/5 단계</div>
 
                         <div>
-                            <h5 className="chatbot-submenu-title-h5">문의 내용</h5>
-                            <p className="inquiry-question">문의내용을 입력해주세요.</p>
+                            <h5 className="chatbot-submenu-title-h5">이메일</h5>
+                            <p className="inquiry-question">이메일을 입력해주세요</p>
                         </div>
                     </div>
                     <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">마지막으로, 문의내용을 입력하세요. </p>
-                        <p className="assistant-text">(예: 카드리더기 오류로 결제가 안됩니다, POS 용지 부족으로 용지 요청드립니다)</p>
+                        <p className="assistant-text">
+                            이메일을 입력해주세요<br /><br />
+
+                            (예: bct@bctone.kr)
+                        </p>
                         <br />
-
-                        <input
-                            className="inquiry-file-input"
-                            type="file"
-                            onChange={handleFileChange}
-                            multiple
-                            accept="image/*"
-                        />
-
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
+                        <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
+                        <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div> */}
                     </div>
                 </div>
             ]);
+
         } else if (status === 6) {
             InquiryCreate();
             setSectionContent(prev => [
@@ -693,29 +587,11 @@ export default function Main() {
                         📝문의가 접수 되었습니다.<br />
                         <br />
                         접수 정보:<br />
-                        • 사업자번호: {inquiryInfo.businessNumber}<br />
-                        • 상호명: {inquiryInfo.companyName}<br />
+                        • 작성자: {inquiryInfo.name}<br />
+                        • 거래처: {inquiryInfo.group}<br />
                         • 연락처: {inquiryInfo.phone}<br />
-                        • 문의 내용: {messageInput}<br />
-
-                        {filePreviews.length > 0 && (
-                            <>
-                                • 첨부파일: {filePreviews.map(preview => preview.name).join(', ')}<br />
-                                {filePreviews.map((preview, index) => (
-                                    <div key={index} className="file-preview-item">
-                                        {preview.type.startsWith('image/') && (
-                                            <div className="file-preview-image-wrapper">
-                                                <img
-                                                    src={preview.url}
-                                                    alt={preview.name}
-                                                    className="file-preview-image"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </>
-                        )}
+                        • 이메일: {messageInput}<br />
+                        • 문의 내용: {inquiryInfo.detail}<br />
                         <br />
                         귀하의 문의사항이 정상적으로 접수되었습니다.<br />
                         담당자가 확인 후 영업일 기준 1-2일 내에 연락드리겠습니다.<br />
@@ -755,6 +631,38 @@ export default function Main() {
                 </div>
             ]);
 
+            setinquiryStatus(false);
+        } else if (status === 7) {
+            setSectionContent(prev => [
+                ...prev,
+                <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
+                    <div className="inquiry-sky-form">
+                        <h3 className="chatbot-submenu-title-h3">긴급 기술지원</h3>
+                        <p className="inquiry-feedback-p">문제 상황을 사진으로 찍어서 이메일로 보내주시면 더 빠른 해결이 가능합니다.</p>
+
+                        <div className="inquiry-feedback-choice">
+                            <div className="feedback-button up">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M4.81646 0.752374C4.57883 0.183856 3.95919 -0.116947 3.36962 0.0424784L3.20419 0.0875988C1.26103 0.617012 -0.39937 2.50004 0.0849144 4.79216C1.20087 10.0562 5.34286 14.1983 10.6068 15.3142C12.9019 15.8016 14.7819 14.1381 15.3113 12.1949L15.3564 12.0295C15.5188 11.4369 15.215 10.8172 14.6495 10.5826L11.7228 9.36437C11.2265 9.15681 10.6519 9.3012 10.309 9.71931L9.14795 11.1391C7.03334 10.0893 5.33083 8.33261 4.35323 6.17585L5.68276 5.09296C6.10087 4.75305 6.24224 4.17852 6.0377 3.67919L4.81646 0.752374Z" fill="#323232" />
+                                </svg>
+                                대표번호 1588-1234
+                            </div>
+                            <div className="feedback-button down">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                                    <path d="M4.91875 4C3.85938 4 3 4.93099 3 6.07865C3 6.10911 3 6.1362 3.00312 6.16667H3V14.8333C3 16.0284 3.89688 17 5 17H17C18.1031 17 19 16.0284 19 14.8333V6.16667H18.9969C18.9969 6.1362 19 6.10911 19 6.07865C19 4.93099 18.1406 4 17.0812 4H4.91875ZM17.5 8.34349V14.8333C17.5 15.1313 17.275 15.375 17 15.375H5C4.725 15.375 4.5 15.1313 4.5 14.8333V8.34349L9.3375 12.318C10.3187 13.1271 11.6781 13.1271 12.6625 12.318L17.5 8.34349ZM4.5 6.07865C4.5 5.82812 4.6875 5.625 4.91875 5.625H17.0812C17.3125 5.625 17.5 5.82812 17.5 6.07865C17.5 6.22083 17.4375 6.35625 17.3344 6.44089L11.7563 11.0247C11.3094 11.3904 10.6906 11.3904 10.2437 11.0247L4.66563 6.44089C4.5625 6.35625 4.5 6.22083 4.5 6.07865Z" fill="#323232" />
+                                </svg>
+                                기술지원 이메일 tech@garampos.com
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div className="chatbot-bottom-nav">
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
+                    </div>
+                </div>
+            ]);
             setinquiryStatus(false);
         } else if (status === "feedback") {
             setSectionContent(prev => [
@@ -797,19 +705,9 @@ export default function Main() {
         if (!content) return;
 
         if (inquiryStatus === 1) {
-            let category = null;
-            if (content === 1) {
-                category = 'paper_request';
-            } else if (content === 2) {
-                category = 'sales_report';
-            } else if (content === 3) {
-                category = 'kiosk_menu_update';
-            } else if (content === 4) {
-                category = 'other';
-            }
             setInquiryInfo(prev => ({
                 ...prev,
-                category: content
+                name: content
             }));
             setSectionContent(prev => [
                 ...prev,
@@ -824,7 +722,7 @@ export default function Main() {
         } else if (inquiryStatus === 2) {
             setInquiryInfo(prev => ({
                 ...prev,
-                businessNumber: content
+                group: content
             }));
             setSectionContent(prev => [
                 ...prev,
@@ -839,7 +737,7 @@ export default function Main() {
         } else if (inquiryStatus === 3) {
             setInquiryInfo(prev => ({
                 ...prev,
-                companyName: content
+                phone: content
             }));
             setSectionContent(prev => [
                 ...prev,
@@ -854,7 +752,7 @@ export default function Main() {
         } else if (inquiryStatus === 4) {
             setInquiryInfo(prev => ({
                 ...prev,
-                phone: content
+                detail: content
             }));
             setSectionContent(prev => [
                 ...prev,
@@ -868,7 +766,7 @@ export default function Main() {
         } else if (inquiryStatus === 5) {
             setInquiryInfo(prev => ({
                 ...prev,
-                detail: content
+                email: content
             }));
             setSectionContent(prev => [
                 ...prev,
@@ -879,7 +777,6 @@ export default function Main() {
             ]);
             setMessageInput("");
             getinquiryform(6);
-
         } else if (!inquiryStatus) {
             setSectionContent(prev => [
                 ...prev,
@@ -1119,48 +1016,6 @@ export default function Main() {
                         </div>
 
                         {sectionContent.map((content) => content)}
-
-                        {/* 파일 미리보기 - inquiryStatus가 4일 때만 표시 */}
-                        {inquiryStatus === 5 && filePreviews.length > 0 && (
-                            <div className="inquiry-form" style={{ marginTop: '1rem' }}>
-                                <div className="inquiry-message">
-                                    <div className="file-preview-container">
-                                        {filePreviews.map((preview, index) => (
-                                            <div key={index} className="file-preview-item">
-                                                {preview.type.startsWith('image/') ? (
-                                                    <div className="file-preview-image-wrapper">
-                                                        <img
-                                                            src={preview.url}
-                                                            alt={preview.name}
-                                                            className="file-preview-image"
-                                                        />
-                                                        <button
-                                                            className="file-preview-remove"
-                                                            onClick={() => handleFileRemove(index)}
-                                                            aria-label="파일 삭제"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="file-preview-file">
-                                                        <div className="file-preview-file-icon">📄</div>
-                                                        <div className="file-preview-file-name">{preview.name}</div>
-                                                        <button
-                                                            className="file-preview-remove"
-                                                            onClick={() => handleFileRemove(index)}
-                                                            aria-label="파일 삭제"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
 
                         <div ref={sectionEndRef} />
 

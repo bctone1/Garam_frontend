@@ -15,7 +15,7 @@ export default function Knowledge() {
     const [FAQquery, setFAQquery] = useState('');
 
     const getCategory = () => {
-        console.log("카테고리를 불러옵니다.");
+        // console.log("카테고리를 불러옵니다.");
         axios.get(`${process.env.REACT_APP_API_URL}/system/quick-categories`).then((res) => {
             console.log(res.data);
             setCategories(res.data);
