@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 
 export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }) {
 
+
     const [adminUsers, setadminUsers] = useState([]);
     const [inquiries, setinquiries] = useState([]);
     const [currentAdminUser, setcurrentAdminUser] = useState("");
@@ -687,6 +688,41 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
 function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries, fetch_admin_users }) {
 
+    const wsRef = useRef(null);
+    useEffect(() => {
+        // 로컬환경
+        // const ws = new WebSocket("ws://localhost:5002/ws");
+        // 배포환경
+        const ws = new WebSocket("wss://garam.onecloud.kr:5002/ws");
+
+        wsRef.current = ws;
+
+        ws.onopen = () => {
+            console.log("🟢 WebSocket connected");
+        };
+
+        ws.onmessage = (event) => {
+            console.log("📩 실시간 알림:", event.data);
+
+            // 👉 여기서 알림 UI 처리
+            // showToast(event.data, "info");
+        };
+
+        ws.onclose = () => {
+            console.log("🔴 WebSocket disconnected");
+        };
+
+        ws.onerror = (err) => {
+            console.error("WebSocket error", err);
+        };
+
+        return () => {
+            ws.close(); // 컴포넌트 언마운트 시 종료
+        };
+    }, []);
+
+
+
     const getAssignedCount = (adminName) =>
         inquiries.filter(i => i.assignee === adminName && i.status === "processing").length + inquiries.filter(i => i.assignee === adminName && i.status === "on_hold").length;
 
@@ -712,19 +748,17 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
 
 
 
-            // 로컬환경
-            const ws = new WebSocket("ws://localhost:5002/ws");
+            if (wsRef.current?.readyState === WebSocket.OPEN) {
+                wsRef.current.send(`${admin.name} 관리자 전환`);
+            }
 
-            // 배포환경
-            // const ws = new WebSocket("wss://garam.onecloud.kr:5002/ws");
 
-            ws.onopen = () => {
-                ws.send(`${admin.id}hello websocket`);
-            };
-
-            ws.onmessage = (event) => {
-                console.log(event.data);
-            };
+            // ws.onopen = () => {
+            //     ws.send(`${admin.id}hello websocket`);
+            // };
+            // ws.onmessage = (event) => {
+            //     console.log(event.data);
+            // };
 
         } else {
             alert("❌ 비밀번호가 틀립니다.");
