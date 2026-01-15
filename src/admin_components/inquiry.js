@@ -35,7 +35,9 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     }
 
     useEffect(() => {
-        fetch_notificatoins(adminId);
+        if (adminId) {
+            fetch_notificatoins(adminId);
+        }
     }, [adminId]);
 
     const fetch_admin_users = () => {
