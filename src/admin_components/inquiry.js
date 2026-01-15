@@ -14,7 +14,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     const [openNotificationModal, setOpenNotificationModal] = useState(false);
     const [showNotificationContent, setShowNotificationContent] = useState(false);
     const admin_name = sessionStorage.getItem("admin_name");
-    // const admin_id = sessionStorage.getItem("admin_id");
+    const [adminId, setAdminId] = useState(sessionStorage.getItem("admin_id") ? sessionStorage.getItem("admin_id") : null);
 
     useEffect(() => {
         setcurrentAdminUser(admin_name);
@@ -24,6 +24,19 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         fetch_admin_users();
         fetch_inquiry_list();
     }, []);
+
+    const fetch_notificatoins = (admin_id) => {
+        axios.get(`${process.env.REACT_APP_API_URL}/notifications?recipient_admin_id=${admin_id}&unread_only=false&limit=10`).then((res) => {
+            console.log(res.data);
+            setNotifications(res.data);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
+    useEffect(() => {
+        fetch_notificatoins(adminId);
+    }, [adminId]);
 
     const fetch_admin_users = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/admin_users`, {
@@ -41,14 +54,53 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     const fetch_inquiry_list = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/inquiries/get_inquiry_list`).then((res) => {
             setinquiries(res.data);
-            console.log(res.data);
+            // console.log(res.data);
         }).catch((err) => {
             console.log(err);
         });
     }
+    // const [showNotificationModal, setShowNotificationModal] = useState(false);
+    // const showNotificationDetail = (notification) => {
+    //     console.log(notification);
+    //     setShowNotificationModal(true);
+    //     setShowNotificationContent(!showNotificationContent)
+    // }
+
+    const checkNotification = (notification) => {
+        console.log(notification);
+        console.log(adminId);
+        axios.post(`${process.env.REACT_APP_API_URL}/notifications/${notification.id}/read`, {
+            recipient_admin_id: adminId
+        });
+        setShowNotificationContent(!showNotificationContent)
+
+        setTimeout(() => {
+            fetch_notificatoins(adminId);
+        }, 500);
+    }
 
     return (
         <>
+            {/* <div className={`modal ${showNotificationModal ? "show" : ""}`} id="notificationModal" onClick={() => setShowNotificationModal(false)}>
+                <div
+                    className="modal-content"
+                    onClick={(event) => event.stopPropagation()}
+                >
+                    <div className="modal-header">
+                        <h3 className="modal-title">상세내용</h3>
+                        <button className="modal-close" onClick={() => setShowNotificationModal(false)}>
+                            &times;
+                        </button>
+                    </div>
+
+                    <div id="addAdminForm">
+                        <div>
+
+                        </div>
+                    </div>
+                </div>
+            </div> */}
+
             <div className={`modal ${openAddAdminModal ? "show" : ""}`} id="addAdminModal" onClick={() => setopenAddAdminModal(false)}>
                 <AddAdminModal setopenAddAdminModal={setopenAddAdminModal} fetch_admin_users={fetch_admin_users} />
             </div>
@@ -61,34 +113,29 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                         onClick={() => setShowNotificationContent(!showNotificationContent)}
                     >
                         <svg className="inquiry-notification-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                        <span className="inquiry-notification-badge">3</span>
+                        <span className="inquiry-notification-badge">{notifications.filter(notification => notification.read_at === null).length}</span>
                     </button>
 
                     <div className={`inquiry-notification-content ${showNotificationContent ? 'show' : ''}`}>
-                        <div className="inquiry-notification-item">
-                            <div className="inquiry-notification-item-title">
-                                <span className="inquiry-notification-item-title-text">
-                                    새로운 문의가 등록되었습니다.
-                                </span>
-                            </div>
-                        </div>
 
-                        <div className="inquiry-notification-item">
-                            <div className="inquiry-notification-item-title">
-                                <span className="inquiry-notification-item-title-text">
-                                    ~~문의가 완료되었습니다.
-                                </span>
-                            </div>
-                        </div>
+                        {notifications.map((notification) => (
+                            <div className={`inquiry-notification-item ${notification.read_at !== null ? 'read' : ''}`} key={notification.id}>
+                                <div className="inquiry-notification-item-title">
+                                    <span className="inquiry-notification-item-title-text">
+                                        {notification.body}
+                                    </span>
 
-                        <div className="inquiry-notification-item">
-                            <div className="inquiry-notification-item-title">
-                                <span className="inquiry-notification-item-title-text">
-                                    ~문의가 최인턴에서 임사원으로 이관되었습니다.
-                                </span>
+                                    {notification.read_at === null && (
+                                        <button className="btn btn-primary notification-read-btn" onClick={() => checkNotification(notification)}>확인</button>
+                                    )}
+
+                                </div>
                             </div>
-                        </div>
+                        ))}
+
                     </div>
+
+
                 </div>
 
                 <div className="page-header">
@@ -145,6 +192,8 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                             setadmin_name={setadmin_name}
                             inquiries={inquiries}
                             fetch_admin_users={fetch_admin_users}
+                            fetch_inquiry_list={fetch_inquiry_list}
+                            fetch_notificatoins={fetch_notificatoins}
                         />
                     </div>
                 </div>
@@ -183,7 +232,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                         />
                     </div>
                 </div>
-            </main>
+            </main >
         </>
     )
 }
@@ -686,26 +735,41 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
 
 
-function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries, fetch_admin_users }) {
+function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries, fetch_admin_users, fetch_inquiry_list, fetch_notificatoins }) {
 
+
+    const [adminId, setAdminId] = useState(sessionStorage.getItem("admin_id") ? sessionStorage.getItem("admin_id") : null);
     const wsRef = useRef(null);
+
     useEffect(() => {
-        // 로컬환경
-        // const ws = new WebSocket("ws://localhost:5002/ws");
+        if (adminId === null) return;
+
+        // 기존 소켓 정리
+        if (wsRef.current) {
+            wsRef.current.close();
+        }
+
         // 배포환경
-        const ws = new WebSocket("wss://garam.onecloud.kr:5002/ws");
+        // const ws = new WebSocket("wss://garam.onecloud.kr:5002/ws");
+
+        const ws = new WebSocket(
+            `ws://localhost:5002/ws/notifications?admin_id=${adminId}`
+        );
 
         wsRef.current = ws;
 
         ws.onopen = () => {
-            console.log("🟢 WebSocket connected");
+            console.log(`🟢 WebSocket connected (admin_id=${adminId})`);
         };
 
         ws.onmessage = (event) => {
-            console.log("📩 실시간 알림:", event.data);
-
-            // 👉 여기서 알림 UI 처리
-            // showToast(event.data, "info");
+            const data = JSON.parse(event.data);
+            console.log("실시간 알림:", data);
+            if (data.type === "notification_created") {
+                fetch_inquiry_list();
+                fetch_notificatoins(adminId);
+                showToast(data.notification.body, "info");
+            }
         };
 
         ws.onclose = () => {
@@ -713,13 +777,13 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
         };
 
         ws.onerror = (err) => {
-            console.error("WebSocket error", err);
+            console.log(err);
         };
 
         return () => {
-            ws.close(); // 컴포넌트 언마운트 시 종료
+            ws.close();
         };
-    }, []);
+    }, [adminId]);
 
 
 
@@ -742,23 +806,14 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
             setRole(newRole); // <-- React state 갱신
             setadmin_email(admin.email);
             setadmin_name(admin.name);
-
             setcurrentAdminUser(admin.name);
+
+            fetch_notificatoins(admin.id);
+            setAdminId(admin.id); // ⭐ 여기서 WebSocket 재연결 트리거
+            fetch_inquiry_list();
+
+
             showToast(`${admin.name}으로 전환되었습니다.`, "info");
-
-
-
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
-                wsRef.current.send(`${admin.name} 관리자 전환`);
-            }
-
-
-            // ws.onopen = () => {
-            //     ws.send(`${admin.id}hello websocket`);
-            // };
-            // ws.onmessage = (event) => {
-            //     console.log(event.data);
-            // };
 
         } else {
             alert("❌ 비밀번호가 틀립니다.");
