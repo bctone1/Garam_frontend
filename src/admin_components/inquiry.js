@@ -712,7 +712,11 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
 
 
 
-            const ws = new WebSocket("ws://garam.onecloud.kr:5002/ws");
+            // 로컬환경
+            // const ws = new WebSocket("ws://localhost:5002/ws");
+
+            // 배포환경
+            const ws = new WebSocket("wss://garam.onecloud.kr:5002/ws");
 
             ws.onopen = () => {
                 ws.send(`${admin.id}hello websocket`);
