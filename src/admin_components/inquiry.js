@@ -659,7 +659,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                 {inquiry.attachments.map((attachment, index) => {
                                     return (
                                         <div key={index} className="inquiry-file-preview-item">
-                                            {attachment.contentType.startsWith('image/') && (
+                                            {attachment.contentType && attachment.contentType.startsWith('image/') && (
                                                 <div className="inquiry-file-preview-image-wrapper">
                                                     <img
                                                         src={`http://localhost:5002${attachment.storageKey}`}
@@ -713,10 +713,10 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
 
 
             // 로컬환경
-            // const ws = new WebSocket("ws://localhost:5002/ws");
+            const ws = new WebSocket("ws://localhost:5002/ws");
 
             // 배포환경
-            const ws = new WebSocket("wss://garam.onecloud.kr:5002/ws");
+            // const ws = new WebSocket("wss://garam.onecloud.kr:5002/ws");
 
             ws.onopen = () => {
                 ws.send(`${admin.id}hello websocket`);
