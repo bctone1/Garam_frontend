@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import User from "./pages/User";
-import Admin from "./pages/Admin";
 
+import Admin from "./pages/Admin";
 import Main from "../src/user_components/Main";
 
 function App() {
@@ -11,7 +10,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Main />} /> {/* 로그인 페이지 */}
-          <Route path="/user" element={<User />} />
+          
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </Router>

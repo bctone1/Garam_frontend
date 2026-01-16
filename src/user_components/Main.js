@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import "../user_styles/main.css";
 
 export default function Main() {
 
