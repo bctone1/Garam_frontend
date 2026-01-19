@@ -365,7 +365,7 @@ body {
 }
 
 .model-card::before {
-    content: '현재 사용중';
+    content: 'Currently in use';
     position: absolute;
     top: 12px;
     right: 12px;
