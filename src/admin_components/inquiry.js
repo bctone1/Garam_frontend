@@ -714,7 +714,8 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                             {attachment.contentType && attachment.contentType.startsWith('image/') && (
                                                 <div className="inquiry-file-preview-image-wrapper">
                                                     <img
-                                                        src={`http://localhost:5002${attachment.storageKey}`}
+                                                        // src={`http://localhost:5002${attachment.storageKey}`}
+                                                        src={`https://garam.onecloud.kr:5002${attachment.storageKey}`}
                                                         className="inquiry-file-preview-image"
                                                     />
                                                 </div>
