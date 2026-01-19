@@ -27,7 +27,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
 
     const fetch_notificatoins = (admin_id) => {
         axios.get(`${process.env.REACT_APP_API_URL}/notifications?recipient_admin_id=${admin_id}&unread_only=false&limit=10`).then((res) => {
-            console.log(res.data);
+            // console.log(res.data);
             setNotifications(res.data);
         }).catch((err) => {
             console.log(err);
@@ -69,8 +69,8 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     // }
 
     const checkNotification = (notification) => {
-        console.log(notification);
-        console.log(adminId);
+        // console.log(notification);
+        // console.log(adminId);
         axios.post(`${process.env.REACT_APP_API_URL}/notifications/${notification.id}/read`, {
             recipient_admin_id: adminId
         });
@@ -418,7 +418,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                     method: "DELETE",
                 }
             );
-            console.log(response.data);
+            // console.log(response.data);
             fetch_inquiry_list();
             showToast(`문의가 삭제 되었습니다.`, "warning");
         } catch (err) {

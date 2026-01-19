@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { showToast } from '../utill/utill';
-
+import React from 'react';
 // wordcloud 라이브러리 로드
 const WordCloud = require('wordcloud');
 
@@ -13,8 +13,26 @@ export default function ChatHistory() {
     const [wordCloudData, setWordCloudData] = useState([]);
     const canvasRef = useRef(null);
 
+    const [dateFrom, setDateFrom] = useState(new Date(Date.now() - 86400000).toISOString().split('T')[0]);
+    const [dateTo, setDateTo] = useState(new Date().toISOString().split('T')[0]);
+
+    const [sessionCount, setSessionCount] = useState({
+        total: 0,
+        success: 0,
+        failed: 0
+    });
+    const fetchSessionCount = () => {
+        axios.get(`${process.env.REACT_APP_API_URL}/chat-history/sessions/count`).then((res) => {
+            // console.log(res.data);
+            setSessionCount(res.data);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
     const fetchSessions = () => {
-        axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions?offset=0&limit=100`).then((res) => {
+        // axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions?offset=0&limit=100`).then((res) => {
+        axios.get(`${process.env.REACT_APP_API_URL}/chat-history/sessions?date_from=${dateFrom}&date_to=${dateTo}`).then((res) => {
             console.log(res.data);
             setSessionsList(res.data);
             showToast("세션 목록 가져오기 성공", "success");
@@ -27,7 +45,7 @@ export default function ChatHistory() {
     const fetchMessages = (sessionId) => {
         setLoading(true);
         axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions/${sessionId}/messages`).then((res) => {
-            // console.log(res.data);
+            console.log(res.data);
             setMessages(res.data);
             setLoading(false);
         }).catch((err) => {
@@ -37,11 +55,24 @@ export default function ChatHistory() {
         });
     }
 
+    const [channel, setChannel] = useState(null);
+    const filterSessions = () => {
+        const filteredSessions = SessionsList.filter((session) => {
+            return session.channel === channel;
+        });
+        setSessionsList(filteredSessions);
+    }
+
 
     const handleSessionClick = (session) => {
-        setSelectedSession(session);
-        fetchMessages(session.id);
+        if (selectedSession?.session_id === session.session_id) {
+            setSelectedSession({});
+        } else {
+            setSelectedSession(session);
+            fetchMessages(session.session_id);
+        }
     }
+
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
@@ -185,11 +216,12 @@ export default function ChatHistory() {
     }
 
     const [mainTab, setMainTab] = useState("date");
-    
+
 
     useEffect(() => {
         fetchSessions();
         fetchWordCloudData();
+        fetchSessionCount();
     }, []);
 
     useEffect(() => {
@@ -209,7 +241,15 @@ export default function ChatHistory() {
         }
     }, [mainTab, wordCloudData]);
 
-    
+
+    const handleQuestionClick = (session) => {
+        setSelectedSession(session);
+        fetchMessages(session.session_id);
+        setMainTab("date");
+    }
+
+
+
 
     return (
         <main className="main">
@@ -237,9 +277,9 @@ export default function ChatHistory() {
                 <div id="dynamicFilters">
 
                     <div className="date-range-picker" style={{ display: mainTab === "date" ? "block" : "none" }}>
-                        <input type="date" value="2025-12-13" readOnly />
+                        <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); fetchSessions(); }} />
                         <span>~</span>
-                        <input type="date" value="2025-12-17" readOnly />
+                        <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); fetchSessions(); }} />
                     </div>
 
                     <div className="filter-group" style={{ display: mainTab === "category" ? "flex" : "none" }}>
@@ -283,11 +323,11 @@ export default function ChatHistory() {
                 <div className="stats-summary">
                     <span>
                         <i className="fas fa-check-circle" style={{ color: "var(--success)" }}></i> 응답
-                        <strong id="statSuccess">11</strong>
+                        <strong id="statSuccess">{sessionCount.success}</strong>
                     </span>
                     <span>
                         <i className="fas fa-times-circle" style={{ color: "var(--danger)" }}></i> 실패
-                        <strong id="statFailed">3</strong>
+                        <strong id="statFailed">{sessionCount.failed}</strong>
                     </span>
                 </div>
 
@@ -298,52 +338,65 @@ export default function ChatHistory() {
 
                 <div className="session-list" style={{ display: mainTab === "date" || mainTab === "category" ? "flex" : "none" }}>
 
-
-                    <div className="session-card active">
-                        <div className="session-header">
-                            <div className="session-toggle">
-                                <i className="fas fa-chevron-down"></i>
-                            </div>
-                            <div className="session-info">
-                                <div className="session-top">
-                                    <span className="session-id">#763</span>
-                                    <span className="badge channel ">웹</span>
-                                    <span className="badge cat">POS시스템</span>
-
-                                </div>
-                                <div className="session-preview">POS 카드결제 시 통신 오류가 발생해요</div>
-                            </div>
-                            <div className="session-meta">2025-12-17 오후 04:41</div>
-                        </div>
-                        <div className="session-content">
-                            <div className="chat-messages">
-
-                                <div className="message user ">
-                                    <div className="message-bubble">
-                                        <div className="msg-header">
-                                            <span className="msg-role">사용자</span>
-                                            <span className="msg-time">오후 04:41</span>
-                                        </div>
-                                        <div className="msg-text">POS 카드결제 시 통신 오류가 발생해요</div>
+                    {SessionsList.map((session) => {
+                        return (
+                            <div className={`session-card ${selectedSession?.session_id === session.session_id ? "active" : ""}`} key={session.session_id}
+                                onClick={() => handleSessionClick(session)}
+                            >
+                                <div className="session-header">
+                                    <div className="session-toggle">
+                                        <i className="fas fa-chevron-down"></i>
                                     </div>
-                                </div>
+                                    <div className="session-info">
+                                        <div className="session-top">
+                                            <span className="session-id">#{session.session_id}</span>
+                                            <span className="badge channel ">웹</span>
+                                            <span className="badge cat">{session.category}</span>
 
-                                <div className="message ai ">
-                                    <div className="message-bubble">
-                                        <div className="msg-header">
-                                            <span className="msg-role">AI</span>
-                                            <span className="msg-time">오후 04:41</span>
                                         </div>
-                                        <div className="msg-text">카드 결제 통신 오류 해결 방법을 안내드립니다. 1. 인터넷 연결 상태 확인 2. POS 기기 재부팅 3. VAN사 고객센터 문의</div>
+                                        <div className="session-preview">{session.first_question}</div>
                                     </div>
+                                    <div className="session-meta">{formatDate(session.created_at)}</div>
                                 </div>
+                                <div className="session-content">
+                                    <div className="chat-messages">
 
+                                        {messages.map((message, index) => (
+                                            <React.Fragment key={`${message.session_id}-message-${index}`}>
+                                                {message.role === 'user' ? (
+                                                    <div className="message user">
+                                                        <div className="message-bubble">
+                                                            <div className="msg-header">
+                                                                <span className="msg-role">사용자</span>
+                                                                <span className="msg-time">{formatDate(message.created_at)}</span>
+                                                            </div>
+                                                            <div className="msg-text">{message.content}</div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="message ai">
+                                                        <div className="message-bubble">
+                                                            <div className="msg-header">
+                                                                <span className="msg-role">AI</span>
+                                                                <span className="msg-time">{formatDate(message.created_at)}</span>
+                                                            </div>
+                                                            <div className="msg-text">{message.content}</div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+
+
+                                    </div>
+
+                                </div>
                             </div>
+                        )
+                    })}
 
-                        </div>
-                    </div>
 
-                    <div className="session-card active">
+                    {/* <div className="session-card active">
                         <div className="session-header">
                             <div className="session-toggle">
                                 <i className="fas fa-chevron-down"></i>
@@ -361,7 +414,6 @@ export default function ChatHistory() {
                         </div>
                         <div className="session-content">
                             <div className="chat-messages">
-
                                 <div className="message user ">
                                     <div className="message-bubble">
                                         <div className="msg-header">
@@ -371,7 +423,6 @@ export default function ChatHistory() {
                                         <div className="msg-text">키오스크 터치가 인식이 안돼요</div>
                                     </div>
                                 </div>
-
                                 <div className="message ai ">
                                     <div className="message-bubble">
                                         <div className="msg-header">
@@ -381,7 +432,6 @@ export default function ChatHistory() {
                                         <div className="msg-text">터치 보정이 필요할 수 있습니다.</div>
                                     </div>
                                 </div>
-
                                 <div className="message user ">
                                     <div className="message-bubble">
                                         <div className="msg-header">
@@ -391,7 +441,6 @@ export default function ChatHistory() {
                                         <div className="msg-text">관리자 메뉴 비밀번호가 뭔가요?</div>
                                     </div>
                                 </div>
-
                                 <div className="message ai failed">
                                     <div className="message-bubble">
                                         <div className="msg-header">
@@ -401,9 +450,7 @@ export default function ChatHistory() {
                                         <div className="msg-text">해당 내용은 찾을 수 없습니다.</div>
                                     </div>
                                 </div>
-
                             </div>
-
                             <div className="session-footer">
                                 <div className="footer-alert">
                                     <i className="fas fa-exclamation-triangle"></i>
@@ -414,19 +461,21 @@ export default function ChatHistory() {
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
+
+
                 </div>
 
                 <div className="question-list" style={{ display: mainTab === "questions" ? "flex" : "none" }}>
-                    <div className="history-question-item" >POS 카드결제 시 통신 오류가 발생해요</div>
-                    <div className="history-question-item" >키오스크 화면 밝기 조절은 어디서 하나요?</div>
-                    <div className="history-question-item" >결제단말기 영수증이 안나와요</div>
-                    <div className="history-question-item" >키오스크 터치가 인식이 안돼요</div>
-                    <div className="history-question-item" >관리자 메뉴 비밀번호가 뭔가요?</div>
-                    <div className="history-question-item" >영수증 프린터 용지 교체 방법</div>
-                    <div className="history-question-item" >결제 취소 방법 알려주세요</div>
-                    <div className="history-question-item" >AS 신청하려고 합니다</div>
-                    <div className="history-question-item" >WiFi 설정 방법이요</div>
+                    {SessionsList.map((session) => {
+                        return (
+                            <div className="history-question-item" key={`question-${session.session_id}`}
+                                onClick={() => handleQuestionClick(session)}
+                            >
+                                {session.first_question}
+                            </div>
+                        )
+                    })}
                 </div>
 
 
