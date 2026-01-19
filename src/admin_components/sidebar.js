@@ -3,13 +3,13 @@ export default function Sidebar({ view, handleMenuClick, role, admin_email, admi
 
     // 메뉴 데이터 정의
     const menuItems = [
-        { key: "dashboard", icon: "fas fa-tachometer-alt", label: "대시보드" },
-        { key: "knowledge", icon: "fas fa-book", label: "지식베이스 관리" },
-        { key: "assistant", icon: "fas fa-robot", label: "AI 모델 설정" },
-        { key: "chart", icon: "fas fa-chart-bar", label: "분석 및 보고서" },
-        { key: "chatbot", icon: "fas fa-comments", label: "챗봇 운영 설정" },
-        { key: "inquiry", icon: "fa-solid fa-address-book", label: "문의 관리" },
-        { key: "chat_history", icon: "fas fa-comment-dots", label: "대화 기록" },
+        { key: "dashboard", icon: "fas fa-tachometer-alt", label: "Dashboard" },
+        { key: "knowledge", icon: "fas fa-book", label: "Knowledge Base Management" },
+        { key: "assistant", icon: "fas fa-robot", label: "AI Model Settings" },
+        { key: "chart", icon: "fas fa-chart-bar", label: "Analysis and Reports" },
+        { key: "chatbot", icon: "fas fa-comments", label: "Chatbot Operation Settings" },
+        { key: "inquiry", icon: "fa-solid fa-address-book", label: "Inquiry Management" },
+        { key: "chat_history", icon: "fas fa-comment-dots", label: "Chat History" },
     ];
 
     // role이 admin이면 "문의 관리"만 보이도록 필터링
@@ -31,8 +31,8 @@ export default function Sidebar({ view, handleMenuClick, role, admin_email, admi
                     <i className="fas fa-microchip"></i>
                 </div>
                 <div className="brand-info">
-                    <h2 className="brand-name">가람포스텍</h2>
-                    <p className="brand-subtitle">AI 관리센터</p>
+                    <h2 className="brand-name">Garm Postech</h2>
+                    <p className="brand-subtitle">AI Management Center</p>
                 </div>
                 <button className="sidebar-toggle" id="sidebarToggle">
                     <i className="fas fa-bars"></i>
@@ -69,7 +69,7 @@ export default function Sidebar({ view, handleMenuClick, role, admin_email, admi
                     </div>
                 </div>
                 <div className="sidebar-actions">
-                    <button className="action-btn" title="로그아웃"
+                    <button className="action-btn" title="Logout"
                         onClick={() => handleLogout()}>
                         <i className="fas fa-sign-out-alt"></i>
                     </button>

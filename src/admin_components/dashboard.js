@@ -104,7 +104,7 @@ export default function Dashboard() {
         labels,
         datasets: [
           {
-            label: "일일 대화량",
+            label: "Daily Conversation Volume",
             data,
             borderColor: "#1e60e1",
             backgroundColor: "rgba(30, 96, 225, 0.1)",
@@ -114,7 +114,7 @@ export default function Dashboard() {
         ],
       };
     } catch (error) {
-      console.error("데이터 불러오기 오류:", error);
+      console.error("Data loading error:", error);
       return {
         labels: [],
         datasets: [],
@@ -144,7 +144,7 @@ export default function Dashboard() {
       (sum, item) => sum + (item.feedback_not_helpful || 0), 0
     );
     setFeedbackChart({
-      labels: ['도움됨', '개선필요'],
+      labels: ['Helpful', 'Improvement Needed'],
       datasets: [{
         data: [total_feedback_helpful, total_feedback_not_helpful],
         backgroundColor: [
@@ -192,7 +192,7 @@ export default function Dashboard() {
         labels: hours,
         datasets: [
           {
-            label: "대화량",
+            label: "Conversation Volume",
             data: inquiries,
             backgroundColor: "rgba(30, 96, 225, 0.8)",
             yAxisID: "y",
@@ -231,7 +231,7 @@ export default function Dashboard() {
             },
             title: {
               display: true,
-              text: "대화량",
+              text: "Conversation Volume",
             },
           },
           // y1: {
@@ -255,7 +255,7 @@ export default function Dashboard() {
       });
 
     } catch (error) {
-      console.error("데이터 불러오기 오류:", error);
+      console.error("Data loading error:", error);
     }
   };
 
@@ -276,27 +276,25 @@ export default function Dashboard() {
 
 
   const handlerefresh = async () => {
-    console.log("ENV:", process.env.REACT_APP_API_URL);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/system/referesh_dashboard`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          // body: JSON.stringify({ user_id: session?.user?.id }),
-        }
-      );
-      const data = await response.json();
-      console.log(data);
+    // try {
+    //   const response = await fetch(
+    //     `${process.env.REACT_APP_API_URL}/api/system/referesh_dashboard`,
+    //     {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       // body: JSON.stringify({ user_id: session?.user?.id }),
+    //     }
+    //   );
+    //   const data = await response.json();
+    // } catch (error) {
+    //   console.log(error);
+    // }
 
-    } catch (error) {
-
-    }
     setrefreshStatus(true);
     setTimeout(() => {
-      showNotification('데이터가 새로고침되었습니다.', 'success');
+      showNotification('Data has been refreshed.', 'success');
       setrefreshStatus(false);
     }, 1000);
   }
@@ -316,25 +314,25 @@ export default function Dashboard() {
               <i className="fas fa-bars"></i>
             </button>
             <div className="dashboard-page-title">
-              <h1>대시보드</h1>
-              <p className="dashboard-page-subtitle">Smart POS AI 기술지원 현황</p>
+              <h1>Dashboard</h1>
+              <p className="dashboard-page-subtitle">Smart POS AI Technical Support Status</p>
             </div>
           </div>
           <div className="header-right">
             <div className="header-stats">
               <div className="stat-item">
-                <span className="dashboard-stat-label">시스템 상태</span>
+                <span className="dashboard-stat-label">System Status</span>
                 <div className="dashboard-status-indicator online">
                   <span className="status-dot"></span>
-                  <span className="status-text">정상</span>
+                  <span className="status-text">Normal</span>
                 </div>
               </div>
-              <div className="stat-item">
-                <span className="dashboard-stat-label">마지막 업데이트</span>
-                <span className="dashboard-stat-value" id="lastUpdate">방금 전</span>
-              </div>
+              {/* <div className="stat-item">
+                <span className="dashboard-stat-label">Last Update</span>
+                <span className="dashboard-stat-value" id="lastUpdate">Just now</span>
+              </div> */}
             </div>
-            <button className={`refresh-btn ${refreshStatus ? "spinning" : ""} `} id="refreshBtn" title="새로고침" onClick={() => handlerefresh()}>
+            <button className={`refresh-btn ${refreshStatus ? "spinning" : ""} `} id="refreshBtn" title="Refresh" onClick={() => handlerefresh()}>
               <i className="fas fa-sync-alt"></i>
             </button>
           </div>
@@ -349,7 +347,7 @@ export default function Dashboard() {
               </div>
               <div className="metric-content">
                 <div className="dashboard-metric-value" id="totalConversations">{dashboard.total_sessions}</div>
-                <div className="metric-label">대화량</div>
+                <div className="metric-label">Conversation Volume</div>
                 {/* <div className="metric-change positive">
                   <i className="fas fa-arrow-up"></i>
                   <span>+15.3%</span>
@@ -364,7 +362,7 @@ export default function Dashboard() {
               </div>
               <div className="metric-content">
                 <div className="dashboard-metric-value" id="satisfactionRate">{(dashboard.satisfaction_rate * 100).toFixed(0)}%</div>
-                <div className="metric-label">사용자 만족도</div>
+                <div className="metric-label">User Satisfaction</div>
                 {/* <div className="metric-change positive">
                   <i className="fas fa-arrow-up"></i>
                   <span>+3.2%</span>
@@ -379,7 +377,7 @@ export default function Dashboard() {
               </div>
               <div className="metric-content">
                 <div className="dashboard-metric-value" id="avgResponseTime">{(dashboard.avg_response_ms / 1000).toFixed(2)}초</div>
-                <div className="metric-label">평균 응답시간</div>
+                <div className="metric-label">Average Response Time</div>
                 {/* <div className="metric-change neutral">
                   <i className="fas fa-minus"></i>
                   <span>-0.2초</span>
@@ -396,7 +394,7 @@ export default function Dashboard() {
             {/* 일별 대화량 */}
             <div className="dashboard-chart-card">
               <div className="chart-header">
-                <h3 className="chart-title">일별 대화량</h3>
+                <h3 className="chart-title">Daily Conversation Volume</h3>
                 <div className="chart-controls">
                   <select
                     className="chart-period"
@@ -404,9 +402,9 @@ export default function Dashboard() {
                     value={period}
                     onChange={(e) => setPeriod(Number(e.target.value))}
                   >
-                    <option value={7}>지난 7일</option>
-                    <option value={30}>지난 30일</option>
-                    <option value={90}>지난 90일</option>
+                    <option value={7}>Last 7 Days</option>
+                    <option value={30}>Last 30 Days</option>
+                    <option value={90}>Last 90 Days</option>
                   </select>
                   {/* <button className="chart-action" title="차트 다운로드">
                     <i className="fas fa-download"></i>
@@ -424,7 +422,7 @@ export default function Dashboard() {
             {/* 피드백 기반 만족도 분포 */}
             <div className="dashboard-chart-card">
               <div className="chart-header">
-                <h3 className="chart-title">사용자 피드백 분포</h3>
+                <h3 className="chart-title">User Feedback Distribution</h3>
                 <div className="chart-controls">
                   {/* <button className="chart-action" title="차트 다운로드">
                     <i className="fas fa-download"></i>
@@ -443,12 +441,12 @@ export default function Dashboard() {
           {/* 시간대별 사용량 */}
           <div className="dashboard-chart-card full-width">
             <div className="chart-header">
-              <h3 className="chart-title">시간대별 사용량</h3>
+              <h3 className="chart-title">Hourly Usage</h3>
               <div className="chart-controls">
                 <div className="chart-legend">
                   <span className="legend-item">
                     <span className="legend-color" style={{ background: "#1e60e1" }}></span>
-                    대화량
+                    Conversation Volume
                   </span>
                   {/* <span className="legend-item">
                     <span className="legend-color" style={{ background: "#28a745" }}></span>
@@ -474,10 +472,10 @@ export default function Dashboard() {
           <div className="activity-grid">
 
 
-            {/* 최근 대화  */}
+            {/* Recent Conversation  */}
             {/* <div className="activity-card">
               <div className="activity-header">
-                <h3 className="activity-title">최근 대화</h3>
+                <h3 className="activity-title">Recent Conversation</h3>
 
               </div>
               <div className="activity-content">

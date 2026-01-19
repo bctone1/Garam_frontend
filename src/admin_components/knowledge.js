@@ -165,24 +165,24 @@ export default function Knowledge() {
                 <header className="top-header">
                     <div className="header-left">
                         <div className="page-title">
-                            <h1>지식베이스 관리</h1>
-                            <p className="page-subtitle">파일 업로드하면 즉시 챗봇에서 활용 가능합니다</p>
+                            <h1>Knowledge Base Management</h1>
+                            <p className="page-subtitle">Upload files to be immediately available in the chatbot.</p>
                         </div>
                     </div>
                     <div className="header-right">
                         <div className="header-stats">
                             <div className="stat-item">
-                                <span className="stat-label">활성 문서</span>
+                                <span className="stat-label">Active Documents</span>
                                 <span className="stat-value" id="totalDocuments">{documents.length}</span>
                             </div>
                             <div className="stat-item">
-                                <span className="stat-label">FAQ</span>
+                                <span className="stat-label">FAQs</span>
                                 <span className="stat-value">{faqs.length}</span>
                             </div>
                         </div>
                         <div className="status-indicator">
                             <div className="status-dot"></div>
-                            <span>정상 운영</span>
+                            <span>Normal Operation</span>
                         </div>
                     </div>
                 </header>
@@ -192,11 +192,11 @@ export default function Knowledge() {
                     <div className="tab-container">
                         <button className={`tab-btn ${contentTap === "documentsTab" ? "active" : ""}`} data-tab="documents" onClick={() => setcontentTap("documentsTab")}>
                             <i className="fas fa-file-upload"></i>
-                            문서 관리
+                            Document Management
                         </button>
                         <button className={`tab-btn ${contentTap === "faqTab" ? "active" : ""}`} data-tab="faq" onClick={() => setcontentTap("faqTab")}>
                             <i className="fas fa-question-circle"></i>
-                            FAQ 관리
+                            FAQ Management
                         </button>
                     </div>
                 </section>
@@ -211,21 +211,21 @@ export default function Knowledge() {
                         >
                             <div className={`upload-overlay ${uploadStatus ? "show" : ""}`} id="uploadOverlay">
                                 <div className="spinner"></div>
-                                <p style={{ color: " var(--primary-color)", fontWeight: "500" }}>파일을 처리하고 있습니다...</p>
+                                <p style={{ color: " var(--primary-color)", fontWeight: "500" }}>Processing files...</p>
                             </div>
                             <div style={{ display: `${uploadStatus ? "none" : ""}` }}>
                                 <div className="upload-icon">
                                     <i className="fas fa-cloud-upload-alt"></i>
                                 </div>
                                 <div className="upload-text">
-                                    <h3>파일을 드래그하거나 클릭해서 업로드</h3>
-                                    <p>PDF, Word, 텍스트 파일 지원 • 업로드 즉시 챗봇에서 사용 가능</p>
+                                    <h3>Drag and drop files or click to upload</h3>
+                                    <p>PDF, Word, Text file supported • Upload immediately available in the chatbot</p>
                                 </div>
                                 <input type="file" id="documentFileInput" multiple accept=".pdf,.doc,.docx,.txt" style={{ display: "none" }} />
                                 <div className="upload-buttons">
                                     <button className="btn btn-primary" onClick={() => fileInputRef.current?.click()}>
                                         <i className="fas fa-file-upload"></i>
-                                        파일 선택
+                                        Select File
                                     </button>
                                     <input
                                         type="file"
@@ -243,20 +243,20 @@ export default function Knowledge() {
                     <div className="documents-section">
                         <div className="section-header">
                             <div className="header-left">
-                                <h3>업로드된 문서</h3>
-                                <span className="document-count" id="documentCount">3개 문서</span>
+                                <h3>Uploaded Documents</h3>
+                                <span className="document-count" id="documentCount">3 Documents</span>
                             </div>
                             <div className="header-actions">
                                 <div className="search-box">
                                     <i className="fas fa-search"></i>
-                                    <input type="text" placeholder="문서 검색..." id="documentSearch"
+                                    <input type="text" placeholder="Search Documents..." id="documentSearch"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                 </div>
                                 <button className="btn btn-danger" >
                                     <i className="fas fa-trash"></i>
-                                    선택 삭제
+                                    Select Delete
                                 </button>
                             </div>
                         </div>
@@ -268,11 +268,11 @@ export default function Knowledge() {
                                         <th style={{ width: "50px" }}>
                                             <input type="checkbox" id="selectAllDocuments" />
                                         </th>
-                                        <th style={{ width: "auto", minWidth: "300px" }}>문서명</th>
-                                        <th style={{ width: "100px" }}>크기</th>
-                                        <th style={{ width: "120px" }}>업로드일</th>
+                                        <th style={{ width: "auto", minWidth: "300px" }}>Document Name</th>
+                                        <th style={{ width: "100px" }}>Size</th>
+                                        <th style={{ width: "120px" }}>Upload Date</th>
                                         {/* <th style={{ width: "100px" }}>상태</th> */}
-                                        <th style={{ width: "100px" }}>관리</th>
+                                        <th style={{ width: "100px" }}>Management</th>
                                     </tr>
                                 </thead>
                                 <tbody id="documentsTableBody">
@@ -292,13 +292,13 @@ export default function Knowledge() {
                                 <i className="fas fa-question-circle"></i>
                             </div>
                             <div className="upload-text">
-                                <h3>새로운 FAQ를 추가하세요</h3>
-                                <p>고객이 자주 묻는 질문과 답변을 체계적으로 관리할 수 있습니다</p>
+                                <h3>Add New FAQ</h3>
+                                <p>You can systematically manage frequently asked questions and answers.</p>
                             </div>
                             <div className="upload-buttons">
                                 <button className="btn btn-primary" onClick={() => setshowAddFaqModal(true)}>
                                     <i className="fas fa-plus"></i>
-                                    FAQ 추가
+                                    Add FAQ
                                 </button>
                             </div>
                         </div>
@@ -307,13 +307,13 @@ export default function Knowledge() {
                     <div className="documents-section">
                         <div className="section-header">
                             <div className="header-left">
-                                <h3>FAQ 목록</h3>
-                                <span className="document-count">{filteredFAQ.length}개 FAQ</span>
+                                <h3>FAQ List</h3>
+                                <span className="document-count">{filteredFAQ.length} FAQs</span>
                             </div>
                             <div className="header-actions">
                                 <div className="search-box">
                                     <i className="fas fa-search"></i>
-                                    <input type="text" placeholder="FAQ 검색..." id="faqSearch"
+                                    <input type="text" placeholder="Search FAQs..." id="faqSearch"
                                         vlaue={FAQquery}
                                         onChange={(e) => setFAQquery(e.target.value)}
                                     />
@@ -342,7 +342,7 @@ export default function Knowledge() {
                                             </div>
                                             <div className="faq-actions">
                                                 <div className="faq-stats">
-                                                    <span>{Categories.find(cat => cat.id === faq.quick_category_id)?.name || "카테고리 없음"}</span>
+                                                    <span>{Categories.find(cat => cat.id === faq.quick_category_id)?.name || "No Category"}</span>
                                                 </div>
                                                 <div className="faq-stats">
                                                     <span>
@@ -357,7 +357,7 @@ export default function Knowledge() {
                                                     title="편집"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
-                                                        showToast('FAQ 편집 기능은 개발 중입니다.', 'info');
+                                                        showToast('FAQ edit feature is under development.', 'info');
                                                     }}
                                                 >
                                                     <i className="fas fa-edit"></i>
@@ -402,12 +402,12 @@ export default function Knowledge() {
                                                     }}
                                                 />
                                                 <div
-                                                    style={{ 
+                                                    style={{
                                                         display: `${FixIndex === faq.id ? "none" : "block"}`,
                                                         whiteSpace: "pre-wrap",
                                                         wordWrap: "break-word"
                                                     }}
-                                                    dangerouslySetInnerHTML={{ 
+                                                    dangerouslySetInnerHTML={{
                                                         __html: (faq.answer || "")
                                                             .replace(/\n/g, "<br>")
                                                             .replace(/\r\n/g, "<br>")
@@ -418,13 +418,13 @@ export default function Knowledge() {
 
                                             <div className="faq-meta">
                                                 <span>
-                                                    <strong>생성일:</strong> {new Date(faq.created_at).toISOString().split('T')[0]}
+                                                    <strong>Created Date:</strong> {new Date(faq.created_at).toISOString().split('T')[0]}
                                                 </span>
                                                 <span>
-                                                    <strong>만족도:</strong> {faq.satisfaction_rate}
+                                                    <strong>Satisfaction Rate:</strong> {faq.satisfaction_rate}
                                                 </span>
                                                 <span>
-                                                    <strong>카테고리:</strong> {Categories.find(cat => cat.id === faq.quick_category_id)?.name || "카테고리 없음"}
+                                                    <strong>Category:</strong> {Categories.find(cat => cat.id === faq.quick_category_id)?.name || "No Category"}
                                                 </span>
                                                 <select
                                                     value={faq.quick_category_id}
@@ -439,7 +439,7 @@ export default function Knowledge() {
                                                     }}
                                                     style={{ display: `${FixIndex === faq.id ? "block" : "none"}` }}
                                                 >
-                                                    <option value="카테고리 없음">카테고리 없음</option>
+                                                    <option value="No Category">No Category</option>
                                                     {Categories.map(catetory => (
                                                         <option key={catetory.id} value={catetory.id}>{catetory.name}</option>
                                                     ))}
@@ -449,7 +449,7 @@ export default function Knowledge() {
                                                     className="action-btn-small"
                                                     onClick={() => handleFix(faq)}
                                                 >
-                                                    {FixIndex === faq.id ? "저장" : "수정"}
+                                                    {FixIndex === faq.id ? "Save" : "Edit"}
                                                 </button>
 
                                             </div>
@@ -470,7 +470,7 @@ export default function Knowledge() {
 function LoadDocuments({ documents, fetch_Knowledge }) {
 
     const handleDelete = async (doc) => {
-        if (!window.confirm(doc.id + "." + doc.original_name + " 정말 삭제하시겠습니까?")) return;
+        if (!window.confirm(doc.id + "." + doc.original_name + " Do you really want to delete?")) return;
         try {
             const response = await fetch(
                 `${process.env.REACT_APP_API_URL}/knowledge/${doc.id}`,
@@ -479,7 +479,7 @@ function LoadDocuments({ documents, fetch_Knowledge }) {
                 }
             );
             fetch_Knowledge();
-            showToast('문서가 삭제되었습니다.', 'success')
+            showToast('Document has been deleted.', 'success')
         } catch (error) {
             console.log(error)
         }
@@ -594,7 +594,7 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
             <div className="modal-backdrop" onClick={() => setshowAddFaqModal(false)}></div>
             <div className="modal-container" style={{ maxWidth: "700px" }}>
                 <div className="modal-header">
-                    <h3 className="modal-title">새 FAQ 추가</h3>
+                    <h3 className="modal-title">Add New FAQ</h3>
                     <button className="modal-close" onClick={() => setshowAddFaqModal(false)}>
                         <i className="fas fa-times"></i>
                     </button>
@@ -610,12 +610,12 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
                                     color: "var(--text-primary)",
                                 }}
                             >
-                                질문 <span style={{ color: "var(--danger-color)" }}>*</span>
+                                Question <span style={{ color: "var(--danger-color)" }}>*</span>
                             </label>
                             <input
                                 type="text"
                                 id="faqQuestion"
-                                placeholder="자주 묻는 질문을 입력하세요..."
+                                placeholder="Enter frequently asked questions..."
                                 style={{
                                     width: "100%",
                                     padding: "0.75rem",
@@ -640,7 +640,7 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
                                     color: "var(--text-primary)",
                                 }}
                             >
-                                카테고리 <span style={{ color: "var(--danger-color)" }}>*</span>
+                                Category <span style={{ color: "var(--danger-color)" }}>*</span>
                             </label>
 
                             <select
@@ -656,7 +656,7 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
                                     setnewFAQ((prev) => ({ ...prev, quick_category_id: e.target.value }))
                                 }
                             >
-                                <option value="">카테고리를 선택해주세요</option>
+                                <option value="">Select Category</option>
                                 {Categories.map(category => (
                                     <option key={category.id} value={category.id}>{category.name}</option>
                                 ))}
@@ -675,11 +675,11 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
                                     color: "var(--text-primary)",
                                 }}
                             >
-                                답변 <span style={{ color: "var(--danger-color)" }}>*</span>
+                                Answer <span style={{ color: "var(--danger-color)" }}>*</span>
                             </label>
                             <textarea
                                 id="faqAnswer"
-                                placeholder="상세한 답변을 입력하세요..."
+                                placeholder="Enter detailed answers..."
                                 rows={6}
                                 style={{
                                     width: "100%",
@@ -707,7 +707,7 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
                         >
                             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
                                 <i className="fas fa-lightbulb" style={{ color: "var(--primary-color)" }}></i>
-                                <strong style={{ color: "var(--text-primary)" }}>작성 팁</strong>
+                                <strong style={{ color: "var(--text-primary)" }}>Writing Tips</strong>
                             </div>
                             <ul
                                 style={{
@@ -718,21 +718,21 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
                                     lineHeight: 1.4,
                                 }}
                             >
-                                <li>구체적이고 명확한 질문으로 작성해주세요</li>
-                                <li>답변은 단계별로 나누어 설명하면 좋습니다</li>
-                                <li>필요시 연락처 정보를 포함해주세요</li>
+                                <li>Write specific and clear questions</li>
+                                <li>Explain the answer in stages</li>
+                                <li>Include contact information if needed</li>
                             </ul>
                         </div>
                     </div>
                 </div>
                 <div className="modal-footer">
                     <button className="btn btn-secondary" onClick={() => setshowAddFaqModal(false)}>
-                        취소
+                        Cancel
                     </button>
                     <button className="btn btn-primary"
                         onClick={() => createFAQ()}
                     >
-                        <i className="fas fa-plus"></i> FAQ 추가
+                        <i className="fas fa-plus"></i> Add FAQ
                     </button>
                 </div>
             </div>

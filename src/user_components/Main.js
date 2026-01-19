@@ -75,8 +75,8 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
                     <div className="inquiry-sky-form">
-                        <h3 className="chatbot-submenu-title-h3">잠깐만요!</h3>
-                        <p className="inquiry-feedback-p">오늘 상담이 도움이 되셨나요? <br />여러분의 소중한 의견을 들려주세요.</p>
+                        <h3 className="chatbot-submenu-title-h3">Just a moment!</h3>
+                        <p className="inquiry-feedback-p"> Was today’s support helpful?<br />We’d love to hear your feedback.</p>
 
                         <div className="inquiry-feedback-choice">
                             <div className="feedback-button up"
@@ -85,15 +85,15 @@ export default function Main() {
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                     <path d="M9.17802 4.86094C9.85374 3.73019 11.2896 3.27528 12.5079 3.84716L12.7418 3.97063C13.8723 4.64974 14.3271 6.08593 13.7554 7.30441L13.2973 8.2792H16.8611L17.1015 8.2922C18.2807 8.41243 19.2001 9.40996 19.2001 10.6187C19.2001 11.0476 19.0831 11.444 18.8817 11.7884C19.0799 12.1329 19.1968 12.5293 19.2001 12.9582C19.2001 13.5528 18.9759 14.089 18.6153 14.5016C18.6576 14.6738 18.6803 14.8525 18.6803 15.0377C18.6803 15.8533 18.2612 16.5649 17.6343 16.9841C17.5725 18.1376 16.6791 19.0701 15.5421 19.1839L15.3017 19.1968H11.9199C11.3351 19.1968 10.7536 19.0864 10.2111 18.8752L9.98044 18.7777L9.9577 18.7679L9.74329 18.664L9.72055 18.6542L9.32421 18.443C8.92463 18.2318 8.56728 17.9654 8.25541 17.6599C8.12221 18.534 7.36853 19.2001 6.45891 19.2001H5.41934C4.41551 19.2001 3.6001 18.3845 3.6001 17.3805L3.60659 10.0988C3.60659 9.09478 4.42201 8.2792 5.42584 8.2792H6.4654C6.81626 8.2792 7.14437 8.37993 7.42375 8.5554L9.05133 5.09489L9.07082 5.0559L9.15853 4.89344L9.17802 4.86419V4.86094ZM5.42584 9.83887C5.2829 9.83887 5.16595 9.95584 5.16595 10.0988V17.3772C5.16595 17.5202 5.2829 17.6372 5.42584 17.6372H6.4654C6.60834 17.6372 6.7253 17.5202 6.7253 17.3772V10.0988C6.7253 9.95584 6.60834 9.83887 6.4654 9.83887H5.42584ZM11.8452 5.25736C11.3644 5.03315 10.7958 5.20537 10.523 5.64727L10.4515 5.77724L8.60626 9.70565C8.49256 9.94934 8.42759 10.2093 8.41134 10.4757L8.40809 10.6122V14.2807L8.41459 14.5374C8.49256 15.5999 9.1098 16.5552 10.0617 17.0621L10.4353 17.2603L10.6399 17.361C11.0427 17.543 11.4781 17.6372 11.9199 17.6372H15.3017L15.3797 17.6339C15.7728 17.5949 16.0814 17.2603 16.0814 16.8574L16.0749 16.7729C16.0717 16.7436 16.0684 16.7176 16.0619 16.6884C15.9742 16.2952 16.2016 15.9021 16.5817 15.7786C16.8968 15.6779 17.121 15.3822 17.121 15.0377C17.121 14.898 17.0852 14.7713 17.0203 14.6543C16.8156 14.2937 16.9293 13.8355 17.2801 13.6146C17.5011 13.4748 17.644 13.2311 17.644 12.9582C17.644 12.7275 17.5433 12.5195 17.3776 12.3733C17.2087 12.2239 17.1112 12.0126 17.1112 11.7884C17.1112 11.5642 17.2087 11.353 17.3776 11.2036C17.5433 11.0574 17.644 10.8494 17.644 10.6187L17.6407 10.5407C17.605 10.1735 17.3126 9.88111 16.9455 9.84537L16.8676 9.84212H12.0758C11.8094 9.84212 11.5625 9.70565 11.4196 9.48145C11.2766 9.25724 11.2572 8.97131 11.3709 8.73086L12.3455 6.64156C12.5729 6.15416 12.3909 5.57904 11.9394 5.30935L11.8452 5.25736Z" fill="#323232" />
                                 </svg>
-                                네, 도움이 되었어요
+                                Yes, it was helpful
                             </div>
-                            <div className="feedback-button down" onClick={() => handleReview("not_helpful")}><i className="icon-down"></i>아니요, 더 개선이 필요해요</div>
+                            <div className="feedback-button down" onClick={() => handleReview("not_helpful")}><i className="icon-down"></i> No, it needs improvement</div>
                         </div>
                     </div>
                     <br />
 
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> Home</div>
                         <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
                     </div>
                 </div>
@@ -239,9 +239,9 @@ export default function Main() {
                     <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                     <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
                         <h5 className="chatbot-submenu-title-h5">{category.name}</h5>
-                        <p>등록된 질문이 없습니다.</p>
+                        <p>No questions have been registered.</p>
                         <div className="chatbot-bottom-nav">
-                            <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                            <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i>  Back to Previous Menu</div>
                         </div>
                     </div>
                 ]);
@@ -251,7 +251,7 @@ export default function Main() {
                     <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                     <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
                         <h5 className="chatbot-submenu-title-h5">{category.name}</h5>
-                        <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
+                        <p>Enter a number or click to select a detailed issue.</p>
 
                         {faqs?.map((faq, index) => (
                             <div className="chatbot-submenu-single" key={faq.id}
@@ -265,7 +265,7 @@ export default function Main() {
                         ))}
 
                         <div className="chatbot-bottom-nav">
-                            <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                            <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> Back to Previous Menu</div>
                         </div>
                     </div>
                 ]);
@@ -306,11 +306,11 @@ export default function Main() {
 
                 <div className="chatbot-bottom-nav">
                     {category === "mostqna" ? (
-                        <div className="chatbot-submenu back" onClick={() => loadFAQList()}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                        <div className="chatbot-submenu back" onClick={() => loadFAQList()}><i className="icon-back"></i> Back to Previous Menu</div>
                     ) : (
-                        <div className="chatbot-submenu back" onClick={() => getSubmenu(category)}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                        <div className="chatbot-submenu back" onClick={() => getSubmenu(category)}><i className="icon-back"></i> Back to Previous Menu</div>
                     )}
-                    <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                    <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> Home</div>
                     {/* <div className="chatbot-submenu up"><i className="icon-up"></i> </div>
                     <div className="chatbot-submenu down"><i className="icon-down"></i> </div>
                     <div className="chatbot-submenu copy"><i className="icon-copy"></i> </div>
@@ -329,16 +329,16 @@ export default function Main() {
                     <div className="chatbot-button" onClick={() => getinquiryform(1)}>
                         <div className="chatbot-button-icon icon-headset"></div>
                         <div>
-                            <div className="chatbot-button-title ">문의하기</div>
-                            <div className="chatbot-button-desc">직접 상담 및 지원 요청</div>
+                            <div className="chatbot-button-title">Contact Us</div>
+                            <div className="chatbot-button-desc">Request direct support or consultation</div>
                         </div>
                     </div>
 
                     <div className="chatbot-button" onClick={() => loadFAQList()}>
                         <div className="chatbot-button-icon icon-headset"></div>
                         <div>
-                            <div className="chatbot-button-title ">자주하는 질문</div>
-                            <div className="chatbot-button-desc">질문 목록 보기</div>
+                            <div className="chatbot-button-title">FAQ</div>
+                            <div className="chatbot-button-desc">View frequently asked questions</div>
                         </div>
                     </div>
 
@@ -351,6 +351,7 @@ export default function Main() {
                             </div>
                         </div>
                     ))}
+
                 </div>
             </div>
         ]);
@@ -386,7 +387,7 @@ export default function Main() {
                     ))}
 
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                        <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> Back to Previous Menu</div>
                     </div>
                 </div>
             ]);
@@ -571,7 +572,7 @@ export default function Main() {
                     </div>
 
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                        <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> Back to Previous Menu</div>
                     </div>
                 </div>
             ]);
@@ -581,25 +582,30 @@ export default function Main() {
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>1</h4>/4 단계</div>
+                        <div className="inquiry-step"><h4>1</h4>/4 Steps</div>
 
                         <div>
-                            <h5 className="chatbot-submenu-title-h5">문의 정보 수집</h5>
-                            <p className="inquiry-question">사업자번호를 입력해주세요.</p>
+                            <h5 className="chatbot-submenu-title-h5">Inquiry Information</h5>
+                            <p className="inquiry-question">Please enter your business registration number.</p>
                         </div>
                     </div>
                     <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text">안녕하세요! 문의사항을 접수해드리겠습니다. <br />빠른 처리를 위해 몇 가지 정보를 수집하겠습니다.</p>
+                        <p className="assistant-text">
+                            Hello! We’ll help you submit your inquiry.<br />
+                            To ensure faster processing, we’ll first collect a few details.
+                        </p>
                         <br />
 
-                        <p className="assistant-text-bold">첫 번째로, 사업자번호를 입력하세요. </p>
-                        <p className="assistant-text">(예: 1234567890)</p>
+                        <p className="assistant-text-bold">
+                            First, please enter your business registration number.
+                        </p>
+                        <p className="assistant-text">(e.g., 1234567890)</p>
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> Home</div>
                     </div>
                 </div>
             ]);
@@ -608,22 +614,24 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>2</h4>/4 단계</div>
+                        <div className="inquiry-step"><h4>2</h4>/4 Steps</div>
 
                         <div>
-                            <h5 className="chatbot-submenu-title-h5">상호명</h5>
-                            <p className="inquiry-question">상호명을 입력해주세요.</p>
+                            <h5 className="chatbot-submenu-title-h5">Company Name</h5>
+                            <p className="inquiry-question">Please enter your company name.</p>
                         </div>
                     </div>
                     <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">두 번째로, 상호명을 입력하세요. </p>
-                        <p className="assistant-text">(예: 가람포스텍)</p>
+                        <p className="assistant-text-bold">
+                            Next, please enter your company name.
+                        </p>
+                        <p className="assistant-text">(e.g., Garam Postech)</p>
                         <br />
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> Home</div>
                     </div>
                 </div>
             ]);
@@ -632,21 +640,23 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>3</h4>/4 단계</div>
+                        <div className="inquiry-step"><h4>3</h4>/4 Steps</div>
 
                         <div>
-                            <h5 className="chatbot-submenu-title-h5">전화번호</h5>
-                            <p className="inquiry-question">전화번호를 입력해주세요.</p>
+                            <h5 className="chatbot-submenu-title-h5">Phone Number</h5>
+                            <p className="inquiry-question">Please enter your phone number.</p>
                         </div>
                     </div>
                     <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">세 번째로, 전화번호를 입력하세요. </p>
-                        <p className="assistant-text">(예: 010-1234-5678)</p>
+                        <p className="assistant-text-bold">
+                            Next, please enter your phone number.
+                        </p>
+                        <p className="assistant-text">(e.g., +82 10-1234-5678)</p>
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> Home</div>
                     </div>
                 </div>
             ]);
@@ -656,18 +666,23 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>4</h4>/4 단계</div>
+                        <div className="inquiry-step"><h4>4</h4>/4 Steps</div>
 
                         <div>
-                            <h5 className="chatbot-submenu-title-h5">문의 내용</h5>
-                            <p className="inquiry-question">문의내용을 입력해주세요.</p>
+                            <h5 className="chatbot-submenu-title-h5">Inquiry Details</h5>
+                            <p className="inquiry-question">Please enter the details of your inquiry.</p>
                         </div>
                     </div>
                     <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">마지막으로, 문의내용을 입력하세요. </p>
-                        <p className="assistant-text">(예: 카드리더기 오류로 결제가 안됩니다, POS 용지 부족으로 용지 요청드립니다)</p>
+                        <p className="assistant-text-bold">
+                            Finally, please describe your inquiry.
+                        </p>
+                        <p className="assistant-text">
+                            (e.g., Payment is not processing due to a card reader error;
+                            requesting receipt paper for the POS system)
+                        </p>
                         <br />
 
                         <input
@@ -680,7 +695,7 @@ export default function Main() {
 
                     </div>
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> Home</div>
                     </div>
                 </div>
             ]);
@@ -691,17 +706,17 @@ export default function Main() {
                 <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date assistant">{formattedTime}</div>
                     <div className="bubble-message assistant">
-                        📝문의가 접수 되었습니다.<br />
+                        📝 Your inquiry has been successfully submitted.<br />
                         <br />
-                        접수 정보:<br />
-                        • 사업자번호: {inquiryInfo.businessNumber}<br />
-                        • 상호명: {inquiryInfo.companyName}<br />
-                        • 연락처: {inquiryInfo.phone}<br />
-                        • 문의 내용: {messageInput}<br />
+                        Submission details:<br />
+                        • Business Registration Number: {inquiryInfo.businessNumber}<br />
+                        • Company Name: {inquiryInfo.companyName}<br />
+                        • Contact Number: {inquiryInfo.phone}<br />
+                        • Inquiry Details: {messageInput}<br />
 
                         {filePreviews.length > 0 && (
                             <>
-                                • 첨부파일: {filePreviews.map(preview => preview.name).join(', ')}<br />
+                                • Attachments: {filePreviews.map(preview => preview.name).join(', ')}<br />
                                 {filePreviews.map((preview, index) => (
                                     <div key={index} className="file-preview-item">
                                         {preview.type.startsWith('image/') && (
@@ -718,12 +733,12 @@ export default function Main() {
                             </>
                         )}
                         <br />
-                        귀하의 문의사항이 정상적으로 접수되었습니다.<br />
-                        담당자가 확인 후 영업일 기준 1-2일 내에 연락드리겠습니다.<br />
+                        Your inquiry has been received successfully.<br />
+                        Our support team will review it and contact you within 1–2 business days.<br />
                         <br />
-                        긴급한 사항인 경우 1588-1234로 직접 연락주시기 바랍니다.<br />
+                        For urgent matters, please contact us directly at +82-1588-1234.<br />
                         <br />
-                        감사합니다! 🙏<br />
+                        Thank you! 🙏<br />
                     </div>
                 </div>
             ]);
@@ -732,8 +747,8 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
                     <div className="inquiry-sky-form">
-                        <h3 className="chatbot-submenu-title-h3">잠깐만요!</h3>
-                        <p className="inquiry-feedback-p">오늘 상담이 도움이 되셨나요? <br />여러분의 소중한 의견을 들려주세요.</p>
+                        <h3 className="chatbot-submenu-title-h3">Just a moment!</h3>
+                        <p className="inquiry-feedback-p"> Was today’s support helpful?<br />We’d love to hear your feedback.</p>
 
                         <div className="inquiry-feedback-choice">
                             <div className="feedback-button up"
@@ -742,15 +757,15 @@ export default function Main() {
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                     <path d="M9.17802 4.86094C9.85374 3.73019 11.2896 3.27528 12.5079 3.84716L12.7418 3.97063C13.8723 4.64974 14.3271 6.08593 13.7554 7.30441L13.2973 8.2792H16.8611L17.1015 8.2922C18.2807 8.41243 19.2001 9.40996 19.2001 10.6187C19.2001 11.0476 19.0831 11.444 18.8817 11.7884C19.0799 12.1329 19.1968 12.5293 19.2001 12.9582C19.2001 13.5528 18.9759 14.089 18.6153 14.5016C18.6576 14.6738 18.6803 14.8525 18.6803 15.0377C18.6803 15.8533 18.2612 16.5649 17.6343 16.9841C17.5725 18.1376 16.6791 19.0701 15.5421 19.1839L15.3017 19.1968H11.9199C11.3351 19.1968 10.7536 19.0864 10.2111 18.8752L9.98044 18.7777L9.9577 18.7679L9.74329 18.664L9.72055 18.6542L9.32421 18.443C8.92463 18.2318 8.56728 17.9654 8.25541 17.6599C8.12221 18.534 7.36853 19.2001 6.45891 19.2001H5.41934C4.41551 19.2001 3.6001 18.3845 3.6001 17.3805L3.60659 10.0988C3.60659 9.09478 4.42201 8.2792 5.42584 8.2792H6.4654C6.81626 8.2792 7.14437 8.37993 7.42375 8.5554L9.05133 5.09489L9.07082 5.0559L9.15853 4.89344L9.17802 4.86419V4.86094ZM5.42584 9.83887C5.2829 9.83887 5.16595 9.95584 5.16595 10.0988V17.3772C5.16595 17.5202 5.2829 17.6372 5.42584 17.6372H6.4654C6.60834 17.6372 6.7253 17.5202 6.7253 17.3772V10.0988C6.7253 9.95584 6.60834 9.83887 6.4654 9.83887H5.42584ZM11.8452 5.25736C11.3644 5.03315 10.7958 5.20537 10.523 5.64727L10.4515 5.77724L8.60626 9.70565C8.49256 9.94934 8.42759 10.2093 8.41134 10.4757L8.40809 10.6122V14.2807L8.41459 14.5374C8.49256 15.5999 9.1098 16.5552 10.0617 17.0621L10.4353 17.2603L10.6399 17.361C11.0427 17.543 11.4781 17.6372 11.9199 17.6372H15.3017L15.3797 17.6339C15.7728 17.5949 16.0814 17.2603 16.0814 16.8574L16.0749 16.7729C16.0717 16.7436 16.0684 16.7176 16.0619 16.6884C15.9742 16.2952 16.2016 15.9021 16.5817 15.7786C16.8968 15.6779 17.121 15.3822 17.121 15.0377C17.121 14.898 17.0852 14.7713 17.0203 14.6543C16.8156 14.2937 16.9293 13.8355 17.2801 13.6146C17.5011 13.4748 17.644 13.2311 17.644 12.9582C17.644 12.7275 17.5433 12.5195 17.3776 12.3733C17.2087 12.2239 17.1112 12.0126 17.1112 11.7884C17.1112 11.5642 17.2087 11.353 17.3776 11.2036C17.5433 11.0574 17.644 10.8494 17.644 10.6187L17.6407 10.5407C17.605 10.1735 17.3126 9.88111 16.9455 9.84537L16.8676 9.84212H12.0758C11.8094 9.84212 11.5625 9.70565 11.4196 9.48145C11.2766 9.25724 11.2572 8.97131 11.3709 8.73086L12.3455 6.64156C12.5729 6.15416 12.3909 5.57904 11.9394 5.30935L11.8452 5.25736Z" fill="#323232" />
                                 </svg>
-                                네, 도움이 되었어요
+                                Yes, it was helpful
                             </div>
-                            <div className="feedback-button down" onClick={() => handleReview("not_helpful")}><i className="icon-down"></i>아니요, 더 개선이 필요해요</div>
+                            <div className="feedback-button down" onClick={() => handleReview("not_helpful")}><i className="icon-down"></i> No, it needs improvement</div>
                         </div>
                     </div>
                     <br />
 
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> Home</div>
                         <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
                     </div>
                 </div>
@@ -762,28 +777,29 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-feedback-form" key={`inquiry-${Date.now()}`}>
                     <div className="inquiry-sky-form">
-                        <h3 className="chatbot-submenu-title-h3">감사합니다!</h3>
-                        <p className="inquiry-feedback-p">소중한 의견이 반영되었습니다!</p>
+                        <h3 className="chatbot-submenu-title-h3">Thank You!</h3>
+                        <p className="inquiry-feedback-p">Your feedback has been successfully recorded.</p>
+
 
                         <div className="inquiry-feedback-choice">
                             <div className="feedback-button up">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                                     <path d="M4.81646 0.752374C4.57883 0.183856 3.95919 -0.116947 3.36962 0.0424784L3.20419 0.0875988C1.26103 0.617012 -0.39937 2.50004 0.0849144 4.79216C1.20087 10.0562 5.34286 14.1983 10.6068 15.3142C12.9019 15.8016 14.7819 14.1381 15.3113 12.1949L15.3564 12.0295C15.5188 11.4369 15.215 10.8172 14.6495 10.5826L11.7228 9.36437C11.2265 9.15681 10.6519 9.3012 10.309 9.71931L9.14795 11.1391C7.03334 10.0893 5.33083 8.33261 4.35323 6.17585L5.68276 5.09296C6.10087 4.75305 6.24224 4.17852 6.0377 3.67919L4.81646 0.752374Z" fill="#323232" />
                                 </svg>
-                                대표번호 1588-1234
+                                Representative Number: +82-1588-1234
                             </div>
                             <div className="feedback-button down">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
                                     <path d="M4.91875 4C3.85938 4 3 4.93099 3 6.07865C3 6.10911 3 6.1362 3.00312 6.16667H3V14.8333C3 16.0284 3.89688 17 5 17H17C18.1031 17 19 16.0284 19 14.8333V6.16667H18.9969C18.9969 6.1362 19 6.10911 19 6.07865C19 4.93099 18.1406 4 17.0812 4H4.91875ZM17.5 8.34349V14.8333C17.5 15.1313 17.275 15.375 17 15.375H5C4.725 15.375 4.5 15.1313 4.5 14.8333V8.34349L9.3375 12.318C10.3187 13.1271 11.6781 13.1271 12.6625 12.318L17.5 8.34349ZM4.5 6.07865C4.5 5.82812 4.6875 5.625 4.91875 5.625H17.0812C17.3125 5.625 17.5 5.82812 17.5 6.07865C17.5 6.22083 17.4375 6.35625 17.3344 6.44089L11.7563 11.0247C11.3094 11.3904 10.6906 11.3904 10.2437 11.0247L4.66563 6.44089C4.5625 6.35625 4.5 6.22083 4.5 6.07865Z" fill="#323232" />
                                 </svg>
-                                기술지원 이메일 tech@garampos.com
+                                Technical Support Email: tech@garampos.com
                             </div>
                         </div>
                     </div>
                     <br />
 
                     <div className="chatbot-bottom-nav">
-                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> Home</div>
                         <div className="chatbot-submenu speak"><i className="icon-speak"></i> </div>
                     </div>
                 </div>
@@ -915,7 +931,10 @@ export default function Main() {
                     ...prev,
                     <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
                         <div className="bubble-date assistant">{formattedTime}</div>
-                        <div className="bubble-message assistant">⚠️ 서버 연결 오류가 발생했습니다. 관리자에 문의해주세요</div>
+                        <div className="bubble-message assistant">
+                            ⚠️ A server connection error has occurred. Please contact the administrator.
+                        </div>
+
                     </div>
                 ]);
             } finally {
@@ -1051,8 +1070,8 @@ export default function Main() {
                     <div className="chatbot-header-inner">
                         <i className="chatbot-logo"></i>
                         <div style={{ display: "flex" }}>
-                            <div className="chatbot-header-title">가람포스텍 AI 지원센터</div>
-                            <div className="chatbot-header-subtitle">24시간 스마트 고객지원 서비스</div>
+                            <div className="chatbot-header-title">Garam Postech AI Support Center</div>
+                            <div className="chatbot-header-subtitle">24/7 Smart Customer Support</div>
                         </div>
                     </div>
                     {/* <div className="chatbot-header-buttons">
@@ -1076,8 +1095,8 @@ export default function Main() {
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <h1>가람포스텍 AI 지원센터</h1>
-                        <p>24시간 스마트 고객지원</p>
+                        <h1>Garam AI Support Center</h1>
+                        <p>24/7 Smart Customer Support</p>
                     </div>
 
                     <section className={`chatbot-chat-section ${welecome ? "fade-in" : "fade-out"}`} >
@@ -1085,7 +1104,6 @@ export default function Main() {
                             <div className="chatbot-welecome-section">
                                 <h1 className="chatbot-intro-title">{systemSettings.welcome_title}</h1>
                                 <p className="chatbot-intro-text">
-                                    {/* POS 시스템, 키오스크, 결제 단말기 관련 궁금한 점이나 문제가 있으시면 <br /> 언제든지 말씀해 주세요! */}
                                     {systemSettings.welcome_message}
                                 </p>
                             </div>
@@ -1093,16 +1111,16 @@ export default function Main() {
                                 <div className="chatbot-button" onClick={() => getinquiryform(1)}>
                                     <div className="chatbot-button-icon icon-headset"></div>
                                     <div>
-                                        <div className="chatbot-button-title ">문의하기</div>
-                                        <div className="chatbot-button-desc">직접 상담 및 지원 요청</div>
+                                        <div className="chatbot-button-title">Contact Us</div>
+                                        <div className="chatbot-button-desc">Request direct support or consultation</div>
                                     </div>
                                 </div>
 
                                 <div className="chatbot-button" onClick={() => loadFAQList()}>
                                     <div className="chatbot-button-icon icon-headset"></div>
                                     <div>
-                                        <div className="chatbot-button-title ">자주하는 질문</div>
-                                        <div className="chatbot-button-desc">질문 목록 보기</div>
+                                        <div className="chatbot-button-title">FAQ</div>
+                                        <div className="chatbot-button-desc">View frequently asked questions</div>
                                     </div>
                                 </div>
 
@@ -1171,7 +1189,7 @@ export default function Main() {
 
                 <footer className="chatbot-input-area">
                     <div className="chatbot-input-box">
-                        <textarea className="chatbot-input-message" placeholder="메시지를 입력하세요..."
+                        <textarea className="chatbot-input-message" placeholder="Enter your message..."
                             value={messageInput}
                             onChange={(e) => setMessageInput(e.target.value)}
                             onKeyDown={(e) => {

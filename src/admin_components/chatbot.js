@@ -84,7 +84,7 @@ export default function Chatbot() {
 
 
     const addCategory = () => {
-        showNotification('카테고리가 추가되었습니다.', 'success');
+        showNotification('Category added successfully.', 'success');
         setCategories((prevCategories) => {
             const newId = prevCategories.length
                 ? Math.max(...prevCategories.map((c) => c.id)) + 1
@@ -93,8 +93,8 @@ export default function Chatbot() {
             const newCategory = {
                 id: newId,
                 icon_emoji: "📋",
-                name: `새 카테고리 ${newId}`,
-                description: "설명을 입력해주세요",
+                name: `New Category ${newId}`,
+                description: "Enter the description.",
             };
 
             return [...prevCategories, newCategory];
@@ -136,7 +136,7 @@ export default function Chatbot() {
 
             console.log("System setting saved:", settingData);
             console.log("Categories saved:", categoryData);
-            showNotification("저장 완료", "success");
+            showNotification("Settings saved successfully.", "success");
 
         } catch (error) {
             console.error(error);
@@ -145,7 +145,7 @@ export default function Chatbot() {
     };
 
     const handleDelete = async (category_id) => {
-        if (!window.confirm("정말 삭제하시겠습니까?")) return;
+        if (!window.confirm("Are you sure you want to delete this category?")) return;
 
         try {
             const response = await fetch(
@@ -156,18 +156,18 @@ export default function Chatbot() {
             );
 
             if (!response.ok) {
-                throw new Error(`삭제 실패: ${response.status}`);
+                throw new Error(`Delete failed: ${response.status}`);
             }
 
             // 상태에서 삭제된 카테고리 제거
             setCategories((prev) =>
                 prev.filter((category) => category.id !== category_id)
             );
-            showNotification("해당 카테코리를 삭제했습니다.", "success");
+            showNotification("The category has been deleted.", "success");
 
         } catch (error) {
             console.error(error);
-            alert("카테고리 삭제 중 오류 발생");
+            alert("Error occurred while deleting the category.");
         }
     };
 
@@ -179,14 +179,14 @@ export default function Chatbot() {
                 <header className="top-header">
                     <div className="header-left">
                         <div className="page-title">
-                            <h1>챗봇 운영 설정</h1>
-                            <p className="page-subtitle">챗봇의 외관과 동작을 설정합니다</p>
+                            <h1>Chatbot Operation Settings</h1>
+                            <p className="page-subtitle">Set the appearance and behavior of the chatbot.</p>
                         </div>
                     </div>
                     {/* <div className="header-right">
                         <a href="../09.10-가람포스텍 챗봇(수정).html" target="_blank" className="preview-btn">
                             <i className="fas fa-external-link-alt"></i>
-                            챗봇 미리보기
+                            Chatbot Preview
                         </a>
                     </div> */}
                 </header>
@@ -196,11 +196,11 @@ export default function Chatbot() {
                     <div className="card">
                         <h2 className="card-title">
                             <i className="fas fa-home"></i>
-                            환영 메시지
+                            Welcome Message
                         </h2>
 
                         <div className="form-group">
-                            <label className="form-label">환영 제목</label>
+                            <label className="form-label">Welcome Title</label>
                             <input
                                 type="text"
                                 className="form-input"
@@ -213,11 +213,11 @@ export default function Chatbot() {
                                     }))
                                 }
                             />
-                            <div className="form-help">사용자가 처음 보는 메시지 제목</div>
+                            <div className="form-help">The title of the message displayed to the user for the first time.</div>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">환영 내용</label>
+                            <label className="form-label">Welcome Message</label>
                             <textarea
                                 className="form-input form-textarea"
                                 id="welcomeMessage"
@@ -230,7 +230,7 @@ export default function Chatbot() {
                                 }
                             />
 
-                            <div className="form-help">환영 제목 아래 표시되는 설명</div>
+                            <div className="form-help">The description displayed below the welcome title.</div>
                         </div>
                     </div>
 
@@ -238,7 +238,7 @@ export default function Chatbot() {
                     <div className="card">
                         <h2 className="card-title">
                             <i className="fas fa-th-large"></i>
-                            빠른 지원 카테고리
+                            Quick Support Categories
                         </h2>
 
                         <div className="categories-list" id="categoriesList">
@@ -297,7 +297,7 @@ export default function Chatbot() {
                                         <button
                                             onClick={() => handleDelete(category.id)}
                                             className="category-action-btn btn-delete"
-                                            title="삭제"
+                                            title="Delete"
                                         >
                                             <i className="fas fa-trash"></i>
                                         </button>
@@ -310,7 +310,7 @@ export default function Chatbot() {
 
                     <button className="add-category-btn" onClick={() => addCategory()}>
                         <i className="fas fa-plus"></i>
-                        새 카테고리 추가
+                        Add New Category
                     </button>
 
                     {/* 이모지 선택기 (화면에 하나만 띄우기, 절대 좌표로 배치) */}
@@ -341,19 +341,19 @@ export default function Chatbot() {
                         </div>
                     )}
 
-                    <div className="form-help">카테고리명과 설명을 직접 수정할 수 있습니다. 이모지를 클릭하여 아이콘을 변경하세요.</div>
+                    <div className="form-help">You can directly modify the category name and description. Click on the emoji to change the icon.</div>
                 </div>
 
                 {/* 긴급 연락처 */}
                 <div className="card">
                     <h2 className="card-title">
                         <i className="fas fa-phone"></i>
-                        긴급 연락처
+                        Emergency Contact
                     </h2>
 
                     <div className="contact-grid">
                         <div className="form-group">
-                            <label className="form-label">기술지원 전화번호</label>
+                            <label className="form-label">Technical Support Phone Number</label>
                             <input type="tel" className="form-input" value={systemSettings?.emergency_phone} id="emergencyPhone"
                                 onChange={(e) =>
                                     setsystemSettings((prev) => ({
@@ -362,11 +362,11 @@ export default function Chatbot() {
                                     }))
                                 }
                             />
-                            <div className="form-help">긴급 상황 시 연결될 번호</div>
+                            <div className="form-help">The number connected in case of emergency.</div>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">기술지원 이메일</label>
+                            <label className="form-label">Technical Support Email</label>
                             <input type="email" className="form-input" value={systemSettings?.emergency_email} id="emergencyEmail"
                                 onChange={(e) =>
                                     setsystemSettings((prev) => ({
@@ -375,12 +375,12 @@ export default function Chatbot() {
                                     }))
                                 }
                             />
-                            <div className="form-help">문의 접수용 이메일</div>
+                            <div className="form-help">The email for inquiries.</div>
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">운영 시간</label>
+                        <label className="form-label">Operating Hours</label>
                         <select className="form-input" id="operatingHours" value={systemSettings?.operating_hours}
                             onChange={(e) =>
                                 setsystemSettings((prev) => ({
@@ -389,11 +389,11 @@ export default function Chatbot() {
                                 }))
                             }
                         >
-                            <option value="24/7">연중무휴 24시간</option>
-                            <option value="business">평일 09:00-18:00</option>
-                            <option value="extended">평일 08:00-22:00</option>
+                            <option value="24/7">24/7</option>
+                            <option value="business">Weekdays 09:00-18:00</option>
+                            <option value="extended">Weekdays 08:00-22:00</option>
                         </select>
-                        <div className="form-help">기술지원 서비스 운영 시간</div>
+                        <div className="form-help">The operating hours of the technical support service.</div>
                     </div>
                 </div>
 
@@ -403,7 +403,7 @@ export default function Chatbot() {
                 <div className="card">
                     <h2 className="card-title">
                         <i className="fas fa-cog"></i>
-                        기본 동작 설정
+                        Default Behavior Settings
                     </h2>
 
                     {/* <div className="form-group">
@@ -424,7 +424,7 @@ export default function Chatbot() {
                     </div> */}
 
                     <div className="form-group">
-                        <label className="form-label">세션 유지 시간</label>
+                        <label className="form-label">Session Duration</label>
                         <select className="form-input" id="sessionDuration" value={systemSettings?.session_duration}
                             onChange={(e) =>
                                 setsystemSettings((prev) => ({
@@ -433,16 +433,16 @@ export default function Chatbot() {
                                 }))
                             }
                         >
-                            <option value="30">30분</option>
-                            <option value="60" >1시간</option>
-                            <option value="120">2시간</option>
-                            <option value="unlimited">무제한</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60" >1 hour</option>
+                            <option value="120">2 hours</option>
+                            <option value="unlimited">Unlimited</option>
                         </select>
-                        <div className="form-help">대화 세션이 유지되는 시간</div>
+                        <div className="form-help">The duration of the chat session.</div>
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">최대 메시지 수</label>
+                        <label className="form-label">Maximum Message Count</label>
                         <select className="form-input" id="maxMessages" value={systemSettings?.max_messages}
                             onChange={(e) =>
                                 setsystemSettings((prev) => ({
@@ -452,11 +452,11 @@ export default function Chatbot() {
                             }
                         >
                             <option value="10">10개</option>
-                            <option value="30" >30개</option>
-                            <option value="50">50개</option>
-                            <option value="unlimited">제한 없음</option>
+                            <option value="30" >30 messages</option>
+                            <option value="50">50 messages</option>
+                            <option value="unlimited">Unlimited</option>
                         </select>
-                        <div className="form-help">한 세션에서 주고받을 수 있는 최대 메시지 수</div>
+                        <div className="form-help">The maximum number of messages that can be exchanged in a session.</div>
                     </div>
                 </div>
 
@@ -470,7 +470,7 @@ export default function Chatbot() {
                         onClick={() => handleSettings()}
                     >
                         <i className="fas fa-save"></i>
-                        설정 저장
+                        Save Settings
                     </button>
                 </div>
 

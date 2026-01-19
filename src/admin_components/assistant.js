@@ -54,14 +54,14 @@ export default function Assisstant() {
                 <header className="top-header">
                     <div className="header-left">
                         <div className="page-title">
-                            <h1>AI 모델 설정</h1>
-                            <p className="page-subtitle">GPT-4o-mini 모델의 성능과 동작을 조정하여 최적의 응답을 생성하세요</p>
+                            <h1>AI Model Settings</h1>
+                            <p className="page-subtitle">Adjust the performance and behavior of the GPT-4o-mini model to create the optimal response.</p>
                         </div>
                     </div>
                     <div className="header-right">
                         <div className="status-indicator">
                             <div className="status-dot"></div>
-                            <span>GPT-4o-mini 활성</span>
+                            <span>GPT-4o-mini Active</span>
                         </div>
                     </div>
                 </header>
@@ -70,30 +70,30 @@ export default function Assisstant() {
                     {/* 현재 상태 */}
                     <div className="status-card">
                         <div className="status-header">
-                            <h2 className="status-title">모델 운영 현황</h2>
+                            <h2 className="status-title">Model Operation Status</h2>
                             <div className="status-badge">
                                 <div className="status-dot"></div>
-                                <span>정상 운영중</span>
+                                <span>Normal Operation</span>
                             </div>
                         </div>
                         <div className="simple-metrics">
                             <div className="metric-item">
                                 <div className="metric-value">{modelSetting.accuracy}%</div>
-                                <div className="metric-label">응답 정확도</div>
+                                <div className="metric-label">Response Accuracy</div>
                             </div>
                             <div className="metric-item">
                                 <div className="metric-value">
-                                    {(modelSetting.avg_response_time_ms / 1000).toFixed(3)}초
+                                    {(modelSetting.avg_response_time_ms / 1000).toFixed(3)} seconds
                                 </div>
-                                <div className="metric-label">평균 응답시간</div>
+                                <div className="metric-label">Average Response Time</div>
                             </div>
                             <div className="metric-item">
                                 <div className="metric-value">{modelSetting.month_conversations}</div>
-                                <div className="metric-label">이번 달 처리 문의</div>
+                                <div className="metric-label">Inquiries this month</div>
                             </div>
                             <div className="metric-item">
                                 <div className="metric-value">{modelSetting.uptime_percent}%</div>
-                                <div className="metric-label">모델 가동률</div>
+                                <div className="metric-label">Model Uptime</div>
                             </div>
                         </div>
                     </div>
@@ -102,7 +102,7 @@ export default function Assisstant() {
                     <div className="section">
                         <h2 className="section-title">
                             <i className="fas fa-brain"></i>
-                            현재 AI 모델
+                            Current AI Model
                         </h2>
                         <div className="model-card">
                             <div className="model-header">
@@ -116,13 +116,13 @@ export default function Assisstant() {
                             </div>
 
                             <div className="model-description">
-                                OpenAI의 경량화 모델로 빠른 응답 속도와 안정적인 성능을 제공합니다. 고객 기술 지원 문의 응대에 최적화되어 있습니다.
+                                OpenAI's lightweight model provides fast response times and stable performance. It is optimized for customer technical support inquiries.
                             </div>
 
                             <div className="model-features">
-                                <span className="feature-tag">고속 응답</span>
-                                <span className="feature-tag">안정적 성능</span>
-                                <span className="feature-tag">기술지원 최적화</span>
+                                <span className="feature-tag">Fast Response</span>
+                                <span className="feature-tag">Stable Performance</span>
+                                <span className="feature-tag">Technical Support Optimization</span>
                             </div>
                         </div>
                     </div>
@@ -131,28 +131,28 @@ export default function Assisstant() {
                     <div className="section">
                         <h2 className="section-title">
                             <i className="fas fa-comments"></i>
-                            응답 스타일 설정
+                            Response Style Settings
                         </h2>
                         <div className="settings-grid">
                             <div className="setting-card">
                                 <div className="setting-title">
                                     <i className="fas fa-user-tie"></i>
-                                    응답 톤앤매너
+                                    Response Tone and Manner
                                 </div>
                                 <div className="setting-group">
-                                    <label className="setting-label">응답 스타일</label>
+                                    <label className="setting-label">Response Style</label>
                                     <select className="input-field" id="responseStyle" value={modelSetting.response_style}
                                         onChange={(e) => setmodelSetting({
                                             ...modelSetting,
                                             response_style: e.target.value,
                                         })}
                                     >
-                                        <option value="professional">전문적이고 정확한 답변</option>
-                                        <option value="friendly">친근하고 대화형 답변</option>
-                                        <option value="concise">간결하고 핵심적인 답변</option>
+                                        <option value="professional">Professional and Accurate Answer</option>
+                                        <option value="friendly">Friendly and Conversational Answer</option>
+                                        <option value="concise">Concise and Core Answer</option>
                                     </select>
                                     <small style={{ color: "var(--text-secondary)" }}>
-                                        챗봇의 답변 톤앤매너를 설정합니다
+                                        Set the tone and manner of the chatbot's response.
                                     </small>
                                 </div>
                             </div>
@@ -163,18 +163,18 @@ export default function Assisstant() {
                     <div className="section">
                         <h2 className="section-title">
                             <i className="fas fa-cog"></i>
-                            응답 품질 설정
+                            Response Quality Settings
                         </h2>
                         <div className="settings-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
                             <div className="setting-card">
                                 <div className="setting-title">
                                     <i className="fas fa-shield-alt"></i>
-                                    안전성 및 필터링
+                                    Safety and Filtering
                                 </div>
                                 <div className="toggle-switch">
                                     <div className="toggle-info">
-                                        <h4>부적절한 질문 차단</h4>
-                                        <div className="toggle-description">욕설, 스팸 자동 차단</div>
+                                        <h4>Block Inappropriate Questions</h4>
+                                        <div className="toggle-description">Block inappropriate questions automatically.</div>
                                     </div>
                                     <div className={`toggle ${modelSetting.block_inappropriate ? "active" : ""}`}
                                         onClick={() => handleSettings("block_inappropriate")}
@@ -182,8 +182,8 @@ export default function Assisstant() {
                                 </div>
                                 <div className="toggle-switch">
                                     <div className="toggle-info">
-                                        <h4>기술 외 문의 제한</h4>
-                                        <div className="toggle-description">기술지원 외 주제 응답 제한</div>
+                                        <h4>Restrict Non-Technical Inquiries</h4>
+                                        <div className="toggle-description">Restrict responses to non-technical inquiries.</div>
                                     </div>
                                     <div className={`toggle ${modelSetting.restrict_non_tech ? "active" : ""}`}
                                         onClick={() => handleSettings("restrict_non_tech")}
@@ -194,12 +194,12 @@ export default function Assisstant() {
                             <div className="setting-card">
                                 <div className="setting-title">
                                     <i className="fas fa-clock"></i>
-                                    응답 최적화
+                                    Response Optimization
                                 </div>
                                 <div className="toggle-switch">
                                     <div className="toggle-info">
-                                        <h4>빠른 응답 모드</h4>
-                                        <div className="toggle-description">간단한 질문에 즉시 답변</div>
+                                        <h4>Fast Response Mode</h4>
+                                        <div className="toggle-description">Answer simple questions immediately.</div>
                                     </div>
                                     <div className={`toggle ${modelSetting.fast_response_mode ? "active" : ""}`}
                                         onClick={() => handleSettings("fast_response_mode")}
@@ -207,8 +207,8 @@ export default function Assisstant() {
                                 </div>
                                 <div className="toggle-switch">
                                     <div className="toggle-info">
-                                        <h4>상담원 연결 추천</h4>
-                                        <div className="toggle-description">복잡한 문의시 상담원 연결 안내</div>
+                                        <h4>Recommend Agent Connection</h4>
+                                        <div className="toggle-description">Guide to connect with an agent for complex inquiries.</div>
                                     </div>
                                     <div className={`toggle ${modelSetting.suggest_agent_handoff ? "active" : ""}`}
                                         onClick={() => handleSettings("suggest_agent_handoff")}
@@ -235,17 +235,17 @@ export default function Assisstant() {
                         >
                             {status === "idle" && (
                                 <>
-                                    <i className="fas fa-save"></i> 설정 저장
+                                    <i className="fas fa-save"></i> Save Settings
                                 </>
                             )}
                             {status === "saving" && (
                                 <>
-                                    <i className="fas fa-spinner fa-spin"></i> 저장 중...
+                                    <i className="fas fa-spinner fa-spin"></i> Saving...
                                 </>
                             )}
                             {status === "done" && (
                                 <>
-                                    <i className="fas fa-check"></i> 저장 완료!
+                                    <i className="fas fa-check"></i> Saved!
                                 </>
                             )}
                         </button>

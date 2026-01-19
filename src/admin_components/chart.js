@@ -129,7 +129,7 @@ export default function Chart() {
             (sum, item) => sum + (item.feedback_not_helpful || 0), 0
         );
         setFeedbackChart({
-            labels: ['도움됨', '개선필요'],
+            labels: ['Helpful', 'Improvement Needed'],
             datasets: [{
                 data: [total_feedback_helpful, total_feedback_not_helpful],
                 backgroundColor: [
@@ -175,7 +175,7 @@ export default function Chart() {
         setSatisfactionChart({
             labels,
             datasets: [{
-                label: '만족도 (%)',
+                label: 'Satisfaction (%)',
                 data: groupdata,
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -201,10 +201,10 @@ export default function Chart() {
         }, {});
         const orderedData = [1, 2, 3, 4, 5, 6, 7].map(day => groupedByWeekday[day] || 0);
         setConversationChart({
-            labels: ['월', '화', '수', '목', '금', '토', '일'],
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             datasets: [
                 {
-                    label: '대화 수',
+                    label: 'Conversation Count',
                     data: orderedData,
                     borderColor: '#1e60e1',
                     backgroundColor: 'rgba(30, 96, 225, 0.1)',
@@ -544,7 +544,7 @@ export default function Chart() {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: '대화 수'
+                        text: 'Conversation Count'
                     }
                 }
             }
@@ -573,9 +573,9 @@ export default function Chart() {
                             const value = context.parsed.y;
 
                             if (label.includes('STT')) {
-                                return `${label}: ${value}초`;
+                                return `${label}: ${value} seconds`;
                             } else {
-                                return `${label}: ${value}토큰`;
+                                return `${label}: ${value} tokens`;
                             }
                         }
                     }
@@ -590,12 +590,12 @@ export default function Chart() {
                     stacked: false,
                     ticks: {
                         callback: function (value) {
-                            return value + '토큰';
+                            return value + ' tokens';
                         }
                     },
                     title: {
                         display: true,
-                        text: '토큰 사용량'
+                        text: 'Token Usage'
                     }
                 },
                 y1: {
@@ -607,12 +607,12 @@ export default function Chart() {
                     },
                     ticks: {
                         callback: function (value) {
-                            return value + '초';
+                            return value + ' seconds';
                         }
                     },
                     title: {
                         display: true,
-                        text: '음성 사용량'
+                        text: 'Speech Usage'
                     }
                 }
 
@@ -664,8 +664,8 @@ export default function Chart() {
                 <header className="top-header">
                     <div className="header-left">
                         <div className="page-title">
-                            <h1>분석 및 보고서</h1>
-                            <p className="page-subtitle">챗봇 성능과 사용자 인사이트를 분석하세요</p>
+                            <h1>Analysis and Reports</h1>
+                            <p className="page-subtitle">Analyze chatbot performance and user insights.</p>
                         </div>
                     </div>
                     <div className="header-right">
@@ -674,9 +674,9 @@ export default function Chart() {
                                 onChange={(e) => setPeriod(Number(e.target.value))}
                                 value={period}
                             >
-                                <option value={1}>오늘</option>
-                                <option value={7}>지난 7일</option>
-                                <option value={30}>지난 30일</option>
+                                <option value={1}>Today</option>
+                                <option value={7}>Last 7 days</option>
+                                <option value={30}>Last 30 days</option>
                                 {/* <option value={90}>지난 90일</option> */}
                             </select>
                         </div>
@@ -689,7 +689,7 @@ export default function Chart() {
                     <div className="section" style={{ marginBottom: "2rem" }}>
                         <h2 className="section-title">
                             <i className="fas fa-brain"></i>
-                            AI API 사용량 및 비용
+                            AI API Usage and Cost
                         </h2>
 
                         {/* API 요약 카드 (요청수 / 비용) */}
@@ -698,40 +698,40 @@ export default function Chart() {
                                 <div className="metric-value purple">
                                     <div className="metric-value info">
                                         {APICost?.[0]
-                                            ? `${APICost[0].total_embedding_tokens.toLocaleString()} 토큰 / $${APICost[0].total_cost_usd?.toFixed(2)}`
-                                            : "로딩 중..."}
+                                            ? `${APICost[0].total_embedding_tokens.toLocaleString()} tokens / $${APICost[0].total_cost_usd?.toFixed(2)}`
+                                            : "Loading..."}
                                     </div>
                                 </div>
-                                <div className="chart-metric-label">임베딩</div>
-                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>지식베이스 벡터화</small>
+                                <div className="chart-metric-label">Embedding</div>
+                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>Knowledge Base Vectorization</small>
                             </div>
 
                             <div className="metric-card">
                                 <div className="metric-value info">
                                     {APICost?.[1]
-                                        ? `${APICost[1].total_llm_tokens.toLocaleString()} 토큰 / $${APICost[1].total_cost_usd?.toFixed(2)}`
-                                        : "로딩 중..."}
+                                        ? `${APICost[1].total_llm_tokens.toLocaleString()} tokens / $${APICost[1].total_cost_usd?.toFixed(2)}`
+                                        : "Loading..."}
                                 </div>
-                                <div className="chart-metric-label">LLM API</div>
-                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>EXAONE 4.0 (32B)</small>
+                                <div className="chart-metric-label">API</div>
+                                <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>GPT-4o-mini</small>
                             </div>
 
                             <div className="metric-card">
                                 <div className="metric-value warning">
                                     {APICost?.[2]
-                                        ? `${APICost[2].total_audio_seconds.toLocaleString()} 초 / $${APICost[2].total_cost_usd?.toFixed(2)}`
-                                        : "로딩 중..."}
+                                        ? `${APICost[2].total_audio_seconds.toLocaleString()} seconds / $${APICost[2].total_cost_usd?.toFixed(2)}`
+                                        : "Loading..."}
                                 </div>
-                                <div className="chart-metric-label">음성 API</div>
+                                <div className="chart-metric-label">Speech API</div>
                                 <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>NAVER Clova Speech STT</small>
                             </div>
 
                             <div className="metric-card">
                                 <div className="metric-value success">
 
-                                    {APICost?.[3] ? `$ ${APICost[3].total_cost_usd?.toFixed(2)}` : "로딩 중..."}
+                                    {APICost?.[3] ? `$ ${APICost[3].total_cost_usd?.toFixed(2)}` : "Loading..."}
                                 </div>
-                                <div className="chart-metric-label">총 API 사용량</div>
+                                <div className="chart-metric-label">Total API Usage</div>
                                 {/* <small style={{ color: "#6c757d", fontSize: "0.75rem" }}>이번 달 누적</small> */}
                             </div>
                         </div>
@@ -739,7 +739,7 @@ export default function Chart() {
                         {/* 일별 요청 수 추이 차트 */}
                         <div className="chart-card" style={{ marginBottom: "1.5rem" }}>
                             <div className="chart-header">
-                                <h3 className="chart-title">일별 사용량</h3>
+                                <h3 className="chart-title">Daily Usage</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="apiRequestTrendChart" style={{ height: "270px" }}>
@@ -751,7 +751,7 @@ export default function Chart() {
                         {/* 일별 API 비용 추이 차트 */}
                         <div className="chart-card" style={{ marginBottom: "1.5rem" }}>
                             <div className="chart-header">
-                                <h3 className="chart-title">일별 API 비용</h3>
+                                <h3 className="chart-title">Daily API Cost</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="apiCostTrendChart" style={{ height: "270px" }}>
@@ -763,31 +763,31 @@ export default function Chart() {
                         {/* 상세 비용 내역 테이블 */}
                         <div className="questions-card" style={{ marginBottom: "1.5rem" }}>
                             <div className="chart-header">
-                                <h3 className="chart-title">날짜별 API 사용 내역</h3>
+                                <h3 className="chart-title">Daily API Usage History</h3>
                             </div>
                             <div className="satisfaction-content">
                                 <table className="satisfaction-table">
                                     <thead>
                                         <tr>
-                                            <th>날짜</th>
-                                            <th>임베딩 토큰</th>
-                                            <th>임베딩 비용</th>
-                                            <th>LLM 토큰</th>
-                                            <th>LLM 비용</th>
-                                            <th>음성 사용량</th>
-                                            <th>음성 비용</th>
-                                            <th>총 비용</th>
+                                            <th>Date</th>
+                                            <th>Embedding Tokens</th>
+                                            <th>Embedding Cost</th>
+                                            <th>LLM Tokens</th>
+                                            <th>LLM Cost</th>
+                                            <th>Speech Usage</th>
+                                            <th>Speech Cost</th>
+                                            <th>Total Cost</th>
                                         </tr>
                                     </thead>
                                     <tbody id="apiUsageTableBody">
                                         {currentItems.map(cost => (
                                             <tr key={cost.date}>
                                                 <td>{cost.date}</td>
-                                                <td>{cost.embedding} 토큰</td>
+                                                <td>{cost.embedding} tokens</td>
                                                 <td>$ {cost.embedding_cost.toFixed(2)}</td>
-                                                <td>{cost.llm} 토큰</td>
+                                                <td>{cost.llm} tokens</td>
                                                 <td>$ {cost.llm_cost.toFixed(2)}</td>
-                                                <td>{cost.stt} 초</td>
+                                                <td>{cost.stt} seconds</td>
                                                 <td>$ {cost.stt_cost.toFixed(2)}</td>
                                                 <td><strong>$ {cost.total_cost.toFixed(2)}</strong></td>
                                             </tr>
@@ -799,7 +799,7 @@ export default function Chart() {
                             {/* 페이지네이션 */}
                             <div className="pagination-container">
                                 <div className="pagination-info">
-                                    {startIndex + 1} - {Math.min(endIndex, TotalCost.length)} / 총 {TotalCost.length}건
+                                    {startIndex + 1} - {Math.min(endIndex, TotalCost.length)} / Total {TotalCost.length} items
                                 </div>
                                 <div className="pagination-controls">
                                     <button
@@ -807,7 +807,7 @@ export default function Chart() {
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         disabled={currentPage === 1}
                                     >
-                                        <i className="fas fa-chevron-left"></i> 이전
+                                        <i className="fas fa-chevron-left"></i> Previous
                                     </button>
 
                                     <div className="page-numbers">
@@ -827,7 +827,7 @@ export default function Chart() {
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         disabled={currentPage === totalPages}
                                     >
-                                        다음 <i className="fas fa-chevron-right"></i>
+                                        Next <i className="fas fa-chevron-right"></i>
                                     </button>
                                 </div>
                             </div>
@@ -839,20 +839,20 @@ export default function Chart() {
                         <div className="info-box">
                             <h3>
                                 <i className="fas fa-info-circle"></i>
-                                API 비용 정보
+                                API Cost Information
                             </h3>
                             <ul>
                                 <li>
                                     <i className="fas fa-check" style={{ color: "#28a745", marginRight: "0.5rem" }}></i>
-                                    <strong>임베딩 비용:</strong> 지식베이스에 파일 등록 시 문서를 벡터화하는 과정에서 발생 (1회성)
+                                    <strong>Embedding Cost:</strong> Occurs during the vectorization process of documents when registering files in the knowledge base (one-time)
                                 </li>
                                 <li>
                                     <i className="fas fa-check" style={{ color: "#28a745", marginRight: "0.5rem" }}></i>
-                                    <strong>LLM API 비용:</strong> 챗봇이 검색 결과를 기반으로 답변을 생성할 때 발생 (EXAONE 4.0 32B 기준)
+                                    <strong>LLM API Cost:</strong> Occurs when the chatbot generates answers based on search results (GPT-4o-mini 32B baseline)
                                 </li>
                                 <li>
                                     <i className="fas fa-check" style={{ color: "#28a745", marginRight: "0.5rem" }}></i>
-                                    <strong>음성 API 비용:</strong> 음성 입력을 텍스트로 변환하는 비용 (네이버 클로바 STT 기준, 분당 약 $0.047)
+                                    <strong>Speech API Cost:</strong> Cost of converting speech input to text (NAVER Clova Speech STT baseline, $0.047 per minute)
                                 </li>
                             </ul>
                         </div>
@@ -861,34 +861,34 @@ export default function Chart() {
                     <div className="section" style={{ marginBottom: "2rem" }}>
                         <h2 className="section-title">
                             <i className="fas fa-chart-line"></i>
-                            챗봇 성능 지표
+                            Chatbot Performance Metrics
                         </h2>
 
                         <div className="metrics-row">
                             <div className="metric-card">
                                 <div className="metric-value success">{WindowData.resolve_rate_excluding_noresp}%</div>
-                                <div className="chart-metric-label">문제 해결률</div>
+                                <div className="chart-metric-label">Resolution Rate</div>
                             </div>
 
                             <div className="metric-card">
                                 <div className="metric-value info">
-                                    {Number(WindowData.avg_response_ms * 0.001 || 0).toFixed(2)} 초
+                                    {Number(WindowData.avg_response_ms * 0.001 || 0).toFixed(2)} seconds
                                 </div>
-                                <div className="chart-metric-label">평균 응답 시간</div>
+                                <div className="chart-metric-label">Average Response Time</div>
                             </div>
 
                             <div className="metric-card">
                                 <div className="metric-value purple">
-                                    {Number(WindowData.avg_turns).toFixed(2)} 턴
+                                    {Number(WindowData.avg_turns).toFixed(2)} turns
                                 </div>
-                                <div className="chart-metric-label">평균 대화 턴수</div>
+                                <div className="chart-metric-label">Average Conversation Turn Count</div>
                             </div>
 
                             <div className="metric-card">
                                 <div className="metric-value info" id="dailyAverage">
-                                    {Number(WindowData?.avg_messages || 0).toFixed(2)} 건/일
+                                    {Number(WindowData?.avg_messages || 0).toFixed(2)} inquiries/day
                                 </div>
-                                <div className="chart-metric-label">일평균 대화량</div>
+                                <div className="chart-metric-label">Average Daily Inquiry Count</div>
                             </div>
                         </div>
                     </div>
@@ -897,7 +897,7 @@ export default function Chart() {
                     <div className="content-grid">
                         <div className="chart-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">일별 대화량</h3>
+                                <h3 className="chart-title">Daily Conversation Count</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="conversationChart" style={{ height: "270px" }}>
@@ -908,7 +908,7 @@ export default function Chart() {
 
                         <div className="chart-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">사용자 피드백 분포</h3>
+                                <h3 className="chart-title">User Feedback Distribution</h3>
                             </div>
                             <div className="chart-container">
                                 <div id="feedbackChart" style={{ height: "270px" }}>
@@ -946,7 +946,7 @@ export default function Chart() {
                     {/* 시간대별 대화량 */}
                     <div className="chart-card full-width" style={{ marginBottom: "2rem" }}>
                         <div className="chart-header">
-                            <h3 className="chart-title">시간대별 대화량</h3>
+                            <h3 className="chart-title">Hourly Conversation Count</h3>
                         </div>
                         <div className="chart-container">
                             <div id="hourlyChart" style={{ height: "270px" }}>
@@ -959,7 +959,7 @@ export default function Chart() {
                     <div className="content-grid">
                         <div className="questions-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">인기 질문 TOP 5</h3>
+                                <h3 className="chart-title">Top 5 Frequently Asked Questions</h3>
                             </div>
 
                             <div className="questions-content">
@@ -968,7 +968,7 @@ export default function Chart() {
                                         <div className="question-rank">{index + 1}</div>
                                         <div className="question-content">
                                             <div className="question-text">{faq.question}</div>
-                                            <div className="question-count">{faq.views}회 질문 (+{faq.satisfaction_rate}%)</div>
+                                            <div className="question-count">{faq.views} inquiries (+{faq.satisfaction_rate}%)</div>
                                         </div>
                                     </div>
                                 ))}
@@ -977,15 +977,15 @@ export default function Chart() {
 
                         <div className="questions-card">
                             <div className="chart-header">
-                                <h3 className="chart-title">최근 등록된 파일</h3>
+                                <h3 className="chart-title">Recently Uploaded Files</h3>
                             </div>
                             <div className="satisfaction-content">
                                 <table className="satisfaction-table">
                                     <thead>
                                         <tr>
-                                            <th>업로드일</th>
-                                            <th>제목</th>
-                                            <th>크기</th>
+                                            <th>Upload Date</th>
+                                            <th>Title</th>
+                                            <th>Size</th>
                                         </tr>
                                     </thead>
                                     <tbody>
