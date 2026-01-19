@@ -56,12 +56,12 @@ export default function ChatHistory() {
     }
 
     const [channel, setChannel] = useState(null);
-    const filterSessions = () => {
-        const filteredSessions = SessionsList.filter((session) => {
-            return session.channel === channel;
-        });
-        setSessionsList(filteredSessions);
-    }
+
+    const filteredSessions = SessionsList.filter((session) => {
+        return session.channel === channel;
+        
+    });
+
 
 
     const handleSessionClick = (session) => {
