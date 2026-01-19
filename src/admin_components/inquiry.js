@@ -753,7 +753,8 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
         }
 
         // 배포환경
-        const ws = new WebSocket(`wss://garam.onecloud.kr:5002/ws/notifications?admin_id=${adminId}`);
+        // const ws = new WebSocket(`wss://garam.onecloud.kr:5002/ws/notifications?admin_id=${adminId}`);
+        const ws = new WebSocket(`wss://globalgaram.onecloud.kr:5005/ws/notifications?admin_id=${adminId}`);
 
         // const ws = new WebSocket(`ws://localhost:5002/ws/notifications?admin_id=${adminId}`);
 
