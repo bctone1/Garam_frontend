@@ -78,7 +78,7 @@ export default function Adminpage() {
             <div className={`loading-overlay ${loading ? ' ' : 'hidden'}`} id="loadingOverlay">
                 <div className="loading-content">
                     <div className="loading-spinner"></div>
-                    <p>관리자 시스템 로딩 중...</p>
+                    <p>Loading...</p>
                 </div>
             </div >
 
