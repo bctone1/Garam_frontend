@@ -111,31 +111,38 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                 <div className="inquiry-page-header">
                     <button
                         className="inquiry-notification-btn"
-                        title="알림"
+                        title="alarm"
                         onClick={() => setShowNotificationContent(!showNotificationContent)}
                     >
                         <svg className="inquiry-notification-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                         <span className="inquiry-notification-badge">{notifications.filter(notification => notification.read_at === null).length}</span>
                     </button>
 
+                   
                     <div className={`inquiry-notification-content ${showNotificationContent ? 'show' : ''}`}>
-
-                        {notifications.map((notification) => (
-                            <div className={`inquiry-notification-item ${notification.read_at !== null ? 'read' : ''}`} key={notification.id}>
-                                <div className="inquiry-notification-item-title">
-                                    <span className="inquiry-notification-item-title-text">
-                                        {notification.body}
-                                    </span>
-
-                                    {notification.read_at === null && (
-                                        <button className="btn btn-primary notification-read-btn" onClick={() => checkNotification(notification)}>확인</button>
-                                    )}
-
-                                </div>
+                        {notifications.length === 0 ? (
+                            <div className="inquiry-notification-item">
+                                No new notifications
                             </div>
-                        ))}
+                        ) : (
+                            notifications.map((notification) => (
+                                <div className={`inquiry-notification-item ${notification.read_at !== null ? 'read' : ''}`} key={notification.id}>
+                                    <div className="inquiry-notification-item-title">
+                                        <span className="inquiry-notification-item-title-text">
+                                            {notification.body}
+                                        </span>
+
+                                        {notification.read_at === null && (
+                                            <button className="btn btn-primary notification-read-btn" onClick={() => checkNotification(notification)}>확인</button>
+                                        )}
+
+                                    </div>
+                                </div>
+                            ))
+                        )}
 
                     </div>
+
 
 
                 </div>

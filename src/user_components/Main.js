@@ -531,8 +531,8 @@ export default function Main() {
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                 <div className="chatbot-submenu-wrap" key={`inquiry-${Date.now()}`}>
 
-                    <h5 className="chatbot-submenu-title-h5">문의 하기</h5>
-                    <p>번호를 입력하거나 클릭하여 카테고리를 선택하세요.</p>
+                    <h5 className="chatbot-submenu-title-h5">Contact Us</h5>
+                    <p>Enter the number or click to select the category.</p>
 
 
                     <div className="chatbot-submenu-single"
@@ -540,7 +540,7 @@ export default function Main() {
                     >
                         <div className="chatbot-submenu-id">1</div>
                         <div>
-                            <h3>용지 요청</h3>
+                            <h3>Paper Request</h3>
                         </div>
                     </div>
 
@@ -549,7 +549,7 @@ export default function Main() {
                     >
                         <div className="chatbot-submenu-id">2</div>
                         <div>
-                            <h3>매출 내역</h3>
+                            <h3>Sales Report</h3>
                         </div>
                     </div>
 
@@ -558,7 +558,7 @@ export default function Main() {
                     >
                         <div className="chatbot-submenu-id">3</div>
                         <div>
-                            <h3>메뉴 수정 및 추가</h3>
+                            <h3>Menu Update and Add</h3>
                         </div>
                     </div>
 
@@ -567,7 +567,7 @@ export default function Main() {
                     >
                         <div className="chatbot-submenu-id">4</div>
                         <div>
-                            <h3>기타</h3>
+                            <h3>Other</h3>
                         </div>
                     </div>
 
