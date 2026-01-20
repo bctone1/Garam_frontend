@@ -372,8 +372,8 @@ export default function Main() {
                 ...prev,
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                 <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
-                    <h5 className="chatbot-submenu-title-h5">자주하는 질문</h5>
-                    <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
+                    <h5 className="chatbot-submenu-title-h5">Frequently Asked Questions</h5>
+                    <p>Enter a number or click to select a detailed issue.</p>
 
                     {qnaList?.map((faq, index) => (
                         <div className="chatbot-submenu-single" key={faq.id}
@@ -458,7 +458,7 @@ export default function Main() {
             const newCount = currentCount + newFiles.length;
 
             if (newCount > 3) {
-                alert("파일은 최대 3개까지 선택할 수 있습니다.");
+                alert("You can select up to 3 files.");
                 e.target.value = "";
                 return prev; // 상태 변경 없이 반환
             }
@@ -914,7 +914,7 @@ export default function Main() {
                 const latencyMs = Math.round(performance.now() - start);
 
                 const data = await requestAssistantAnswer(content);
-                const answer = data.answer?.trim?.() ? data.answer.trim() : "응답을 가져올 수 없습니다.";
+                const answer = data.answer?.trim?.() ? data.answer.trim() : "Unable to retrieve response.";
 
                 setSectionContent(prev => [
                     ...prev,
@@ -956,7 +956,7 @@ export default function Main() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             } catch (err) {
-                alert("마이크를 찾지 못했습니다. 장치를 확인하거나 권한을 허용해주세요.");
+                alert("Microphone not found. Please check your device or grant permission.");
                 console.error("getUserMedia 오류:", err);
                 return; // 녹음 시작 중단
             }
@@ -998,7 +998,7 @@ export default function Main() {
                     ]);
 
                     const answerdata = await requestAssistantAnswer(data.text);
-                    const answer = answerdata.answer?.trim?.() ? answerdata.answer.trim() : "응답을 가져올 수 없습니다.";
+                    const answer = answerdata.answer?.trim?.() ? answerdata.answer.trim() : "Unable to retrieve response.";
 
                     setSectionContent(prev => [
                         ...prev,
@@ -1156,7 +1156,7 @@ export default function Main() {
                                                         <button
                                                             className="file-preview-remove"
                                                             onClick={() => handleFileRemove(index)}
-                                                            aria-label="파일 삭제"
+                                                            aria-label="Remove file"
                                                         >
                                                             ×
                                                         </button>
@@ -1168,7 +1168,7 @@ export default function Main() {
                                                         <button
                                                             className="file-preview-remove"
                                                             onClick={() => handleFileRemove(index)}
-                                                            aria-label="파일 삭제"
+                                                            aria-label="Remove file"
                                                         >
                                                             ×
                                                         </button>
@@ -1213,7 +1213,7 @@ export default function Main() {
                                         <div className="menu-item" >
                                             <div className="menu-item-icon"><i className="icon-clip"></i></div>
                                             <div className="menu-item-text">
-                                                <div className="menu-item-title">사진 및 파일 첨부</div>
+                                                <div className="menu-item-title">Attach Photo or File</div>
                                             </div>
                                         </div>
                                     </div>
@@ -1266,7 +1266,7 @@ async function parseError(response) {
             const text = await response.clone().text();
             return text || fallback;
         } catch {
-            return fallback || "요청 처리에 실패했습니다.";
+            return fallback || "Failed to process the request.";
         }
     }
 }
