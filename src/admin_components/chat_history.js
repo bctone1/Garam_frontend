@@ -474,6 +474,7 @@ export default function ChatHistory() {
                                                 {session.category && <span className="badge cat">{session.category}</span>}
 
                                                 {session.status === 'failed' && <span className="badge failed">실패</span>}
+                                                {session.status === 'commit' && <span className="badge" style={{ background: "rgb(214 237 253)", color: "var(--accent)" }}>수정됨</span>}
 
                                             </div>
                                             <div className="session-preview">{session.first_question}</div>
@@ -590,7 +591,7 @@ export default function ChatHistory() {
 
 
                 </div>
-            </main>
+            </main >
         </>
     );
 }
