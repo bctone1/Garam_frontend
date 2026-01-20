@@ -772,7 +772,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log("실시간 알림:", data);
+            // console.log("실시간 알림:", data);
             if (data.type === "notification_created") {
                 fetch_inquiry_list();
                 fetch_notificatoins(adminId);
@@ -781,11 +781,11 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
         };
 
         ws.onclose = () => {
-            console.log("🔴 WebSocket disconnected");
+            // console.log("🔴 WebSocket disconnected");
         };
 
         ws.onerror = (err) => {
-            console.log(err);
+            // console.log(err);
         };
 
         return () => {

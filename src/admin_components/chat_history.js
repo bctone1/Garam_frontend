@@ -21,8 +21,9 @@ export default function ChatHistory() {
         success: 0,
         failed: 0
     });
-    const fetchSessionCount = () => {
-        axios.get(`${process.env.REACT_APP_API_URL}/chat-history/sessions/count`).then((res) => {
+    const fetchSessionCount = (dateFrom, dateTo) => {
+        console.log(dateFrom, dateTo);
+        axios.get(`${process.env.REACT_APP_API_URL}/chat-history/sessions/count?date_from=${dateFrom}&date_to=${dateTo}`).then((res) => {
             // console.log(res.data);
             setSessionCount(res.data);
         }).catch((err) => {
@@ -30,7 +31,7 @@ export default function ChatHistory() {
         });
     }
 
-    const fetchSessions = () => {
+    const fetchSessions = (dateFrom, dateTo) => {
         // axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions?offset=0&limit=100`).then((res) => {
         axios.get(`${process.env.REACT_APP_API_URL}/chat-history/sessions?date_from=${dateFrom}&date_to=${dateTo}`).then((res) => {
             console.log(res.data);
@@ -55,12 +56,19 @@ export default function ChatHistory() {
         });
     }
 
-    const [channel, setChannel] = useState(null);
-
-    const filteredSessions = SessionsList.filter((session) => {
-        return session.channel === channel;
-        
+    const [failedMessageId, setFailedMessageId] = useState({
+        question_text: "",
+        assistant_answer: "",
     });
+    const getFailedMessageId = (sessionId) => {
+        axios.get(`${process.env.REACT_APP_API_URL}/chat-history/suggestions?session_id=${sessionId}`).then((res) => {
+            console.log(res.data[0]);
+            setFailedMessageId(res.data[0]);
+        }).catch((err) => {
+            console.log(err);
+        });
+
+    }
 
 
 
@@ -70,6 +78,9 @@ export default function ChatHistory() {
         } else {
             setSelectedSession(session);
             fetchMessages(session.session_id);
+            if (session.status === 'failed') {
+                getFailedMessageId(session.session_id);
+            }
         }
     }
 
@@ -219,9 +230,9 @@ export default function ChatHistory() {
 
 
     useEffect(() => {
-        fetchSessions();
+        fetchSessions(dateFrom, dateTo);
         fetchWordCloudData();
-        fetchSessionCount();
+        fetchSessionCount(dateFrom, dateTo);
     }, []);
 
     useEffect(() => {
@@ -243,289 +254,329 @@ export default function ChatHistory() {
 
 
     const handleQuestionClick = (session) => {
-        setSelectedSession(session);
-        fetchMessages(session.session_id);
+        handleSessionClick(session);
         setMainTab("date");
     }
 
 
+    const [addKnowledgeModal, setAddKnowledgeModal] = useState(false);
 
+    const PostKnowledge = (event) => {
+        event.preventDefault(); // ⭐ 필수
+        const formData = new FormData(event.target);
+        const answer = formData.get("answer");
+        console.log(answer);
+
+        axios.post(
+            `${process.env.REACT_APP_API_URL}/chat-history/suggestions/${failedMessageId.message_id}/ingest`,
+            {
+                final_answer: answer,
+                target_knowledge_id: 50,
+            }
+        ).then((res) => {
+
+        }).catch((err) => {
+            console.log(err);
+        });
+
+        setAddKnowledgeModal(false);
+    }
+
+    const [filterChannel, setFilterChannel] = useState({
+        channel: "all",
+        category: "all",
+    });
+
+    const filteredSessions = (SessionsList ?? []).filter((session) => {
+        const channelMatch =
+            !filterChannel.channel ||
+            filterChannel.channel === "all" ||
+            session.channel === filterChannel.channel;
+
+        const categoryMatch =
+            !filterChannel.category ||
+            filterChannel.category === "all" ||
+            session.category === filterChannel.category;
+
+        return channelMatch && categoryMatch;
+    });
 
     return (
-        <main className="main">
-            {/* 페이지 헤더  */}
-            <div className="history-page-header">
-                <h1 className="page-title">대화 기록 <span id="totalCount">(14건)</span></h1>
-                <div className="history-header-actions">
-                    <button className="history-refresh-btn">
-                        <i className="fas fa-sync-alt"></i> 새로고침
-                    </button>
-                </div>
-            </div>
-
-            {/* 필터 바 */}
-            <div className="filter-bar">
-                <div className="main-tabs">
-                    <button className={`main-tab ${mainTab === "date" ? "active" : ""}`} onClick={() => setMainTab("date")}>날짜별</button>
-                    <button className={`main-tab ${mainTab === "category" ? "active" : ""}`} onClick={() => setMainTab("category")}>분류별</button>
-                    <button className={`main-tab ${mainTab === "questions" ? "active" : ""}`} onClick={() => setMainTab("questions")}>질문만</button>
-                    <button className={`main-tab ${mainTab === "keywords" ? "active" : ""}`} onClick={() => setMainTab("keywords")}>키워드</button>
-                </div>
-
-                <div className="filter-divider"></div>
-
-                <div id="dynamicFilters">
-
-                    <div className="date-range-picker" style={{ display: mainTab === "date" ? "block" : "none" }}>
-                        <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); fetchSessions(); }} />
-                        <span>~</span>
-                        <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); fetchSessions(); }} />
+        <>
+            <div className={`modal ${addKnowledgeModal ? "show" : ""}`} onClick={() => setAddKnowledgeModal(false)}>
+                <div className="modal-content" onClick={(event) => event.stopPropagation()} style={{ maxWidth: "1000px" }}>
+                    <div className="modal-header">
+                        <h3 className="modal-title">지식베이스 추가</h3>
+                        <button className="modal-close" onClick={() => setAddKnowledgeModal(false)}>
+                            &times;
+                        </button>
                     </div>
 
-                    <div className="filter-group" style={{ display: mainTab === "category" ? "flex" : "none" }}>
-                        <span className="filter-label">채널</span>
-                        <div className="channel-btns">
-                            <button className="channel-btn active" >전체</button>
-                            <button className="channel-btn "><i className="fas fa-globe"></i> 웹</button>
-                            <button className="channel-btn "><i className="fas fa-mobile-alt"></i> 모바일</button>
+                    <form onSubmit={PostKnowledge}>
+                        <div className="form-group">
+                            <label className="form-label">오류 질문</label>
+                            <input type="text" className="form-input" readOnly value={failedMessageId.question_text} />
                         </div>
-                    </div>
-                    <div className="filter-group" style={{ marginLeft: "1rem", display: mainTab === "category" ? "flex" : "none" }}>
-                        <span className="filter-label">분류</span>
-                        <select className="category-select">
-                            <option value="all">전체</option>
-                            <option value="pos">POS시스템</option>
-                            <option value="kiosk">키오스크</option>
-                            <option value="terminal">결제단말기</option>
-                            <option value="install">설치/설정</option>
-                            <option value="etc">기타</option>
-                        </select>
-                    </div>
 
-
-                    <span style={{ color: "var(--text-muted)", fontSize: "0.8125rem", display: mainTab === "questions" ? "block" : "none" }}>
-                        <i className="fas fa-info-circle" style={{ marginRight: "0.375rem" }}></i>사용자 질문만 표시됩니다
-                    </span>
-
-                    <div className="date-range-picker" style={{ display: mainTab === "keywords" ? "block" : "none" }}>
-                        <input type="date" value="2025-12-11" readOnly />
-                        <span>~</span>
-                        <input type="date" value="2025-12-17" readOnly />
-                    </div>
-
-                    <span style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginLeft: "0.5rem", display: mainTab === "keywords" ? "block" : "none" }}>
-                        <i className="fas fa-info-circle" style={{ marginRight: "0.375rem" }}></i>선택 기간의 키워드 분석
-                    </span>
-
-
-                </div>
-
-                <div className="stats-summary">
-                    <span>
-                        <i className="fas fa-check-circle" style={{ color: "var(--success)" }}></i> 응답
-                        <strong id="statSuccess">{sessionCount.success}</strong>
-                    </span>
-                    <span>
-                        <i className="fas fa-times-circle" style={{ color: "var(--danger)" }}></i> 실패
-                        <strong id="statFailed">{sessionCount.failed}</strong>
-                    </span>
-                </div>
-
-            </div>
-
-            {/* 컨텐츠 영역 */}
-            <div id="contentArea">
-
-                <div className="session-list" style={{ display: mainTab === "date" || mainTab === "category" ? "flex" : "none" }}>
-
-                    {SessionsList.map((session) => {
-                        return (
-                            <div className={`session-card ${selectedSession?.session_id === session.session_id ? "active" : ""}`} key={session.session_id}
-                                onClick={() => handleSessionClick(session)}
-                            >
-                                <div className="session-header">
-                                    <div className="session-toggle">
-                                        <i className="fas fa-chevron-down"></i>
-                                    </div>
-                                    <div className="session-info">
-                                        <div className="session-top">
-                                            <span className="session-id">#{session.session_id}</span>
-                                            <span className="badge channel ">웹</span>
-                                            <span className="badge cat">{session.category}</span>
-
-                                        </div>
-                                        <div className="session-preview">{session.first_question}</div>
-                                    </div>
-                                    <div className="session-meta">{formatDate(session.created_at)}</div>
-                                </div>
-                                <div className="session-content">
-                                    <div className="chat-messages">
-
-                                        {messages.map((message, index) => (
-                                            <React.Fragment key={`${message.session_id}-message-${index}`}>
-                                                {message.role === 'user' ? (
-                                                    <div className="message user">
-                                                        <div className="message-bubble">
-                                                            <div className="msg-header">
-                                                                <span className="msg-role">사용자</span>
-                                                                <span className="msg-time">{formatDate(message.created_at)}</span>
-                                                            </div>
-                                                            <div className="msg-text">{message.content}</div>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="message ai">
-                                                        <div className="message-bubble">
-                                                            <div className="msg-header">
-                                                                <span className="msg-role">AI</span>
-                                                                <span className="msg-time">{formatDate(message.created_at)}</span>
-                                                            </div>
-                                                            <div className="msg-text">{message.content}</div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </React.Fragment>
-                                        ))}
-
-
-                                    </div>
-
-                                </div>
-                            </div>
-                        )
-                    })}
-
-
-                    {/* <div className="session-card active">
-                        <div className="session-header">
-                            <div className="session-toggle">
-                                <i className="fas fa-chevron-down"></i>
-                            </div>
-                            <div className="session-info">
-                                <div className="session-top">
-                                    <span className="session-id">#760</span>
-                                    <span className="badge channel mobile">모바일</span>
-                                    <span className="badge cat">키오스크</span>
-                                    <span className="badge failed">실패</span>
-                                </div>
-                                <div className="session-preview">키오스크 터치가 인식이 안돼요</div>
-                            </div>
-                            <div className="session-meta">2025-12-17 오후 12:22</div>
+                        <div className="form-group">
+                            <label className="form-label">답변 작성</label>
+                            <textarea className="form-input" rows={6} name="answer"
+                                required
+                                value={failedMessageId.assistant_answer}
+                                onChange={(e) => {
+                                    setFailedMessageId((prev) => ({ ...prev, assistant_answer: e.target.value }));
+                                }}
+                            />
                         </div>
-                        <div className="session-content">
-                            <div className="chat-messages">
-                                <div className="message user ">
-                                    <div className="message-bubble">
-                                        <div className="msg-header">
-                                            <span className="msg-role">사용자</span>
-                                            <span className="msg-time">오후 12:22</span>
-                                        </div>
-                                        <div className="msg-text">키오스크 터치가 인식이 안돼요</div>
-                                    </div>
-                                </div>
-                                <div className="message ai ">
-                                    <div className="message-bubble">
-                                        <div className="msg-header">
-                                            <span className="msg-role">AI</span>
-                                            <span className="msg-time">오후 12:22</span>
-                                        </div>
-                                        <div className="msg-text">터치 보정이 필요할 수 있습니다.</div>
-                                    </div>
-                                </div>
-                                <div className="message user ">
-                                    <div className="message-bubble">
-                                        <div className="msg-header">
-                                            <span className="msg-role">사용자</span>
-                                            <span className="msg-time">오후 12:24</span>
-                                        </div>
-                                        <div className="msg-text">관리자 메뉴 비밀번호가 뭔가요?</div>
-                                    </div>
-                                </div>
-                                <div className="message ai failed">
-                                    <div className="message-bubble">
-                                        <div className="msg-header">
-                                            <span className="msg-role">AI</span>
-                                            <span className="msg-time">오후 12:24</span>
-                                        </div>
-                                        <div className="msg-text">해당 내용은 찾을 수 없습니다.</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="session-footer">
-                                <div className="footer-alert">
-                                    <i className="fas fa-exclamation-triangle"></i>
-                                    답변 실패 - 지식베이스 등록 필요
-                                </div>
-                                <button className="kb-btn">
-                                    <i className="fas fa-plus"></i> 지식베이스 추가
-                                </button>
-                            </div>
-                        </div>
-                    </div> */}
 
-
-                </div>
-
-                <div className="question-list" style={{ display: mainTab === "questions" ? "flex" : "none" }}>
-                    {SessionsList.map((session) => {
-                        return (
-                            <div className="history-question-item" key={`question-${session.session_id}`}
-                                onClick={() => handleQuestionClick(session)}
-                            >
-                                {session.first_question}
-                            </div>
-                        )
-                    })}
-                </div>
-
-
-                <div className="keyword-stats-view" style={{ display: mainTab === "keywords" ? "block" : "none" }}>
-                    <div className="keyword-header">
-                        <h2><i className="fas fa-cloud" style={{ color: "var(--primary)", marginRight: "0.5rem" }}></i>키워드 통계</h2>
-                        <p>선택한 기간의 고객 문의에서 추출된 키워드</p>
-                    </div>
-
-                    <div className="keyword-period">
-                        <i className="fas fa-calendar-alt" style={{ marginRight: "0.5rem" }}></i>2025-12-11 ~ 2025-12-17 (15건의 대화)
-                    </div>
-
-                    <div className="wordcloud-main">
-                        <canvas
-                            ref={canvasRef}
-                            id="wordcloud-canvas"
-                            width="800"
-                            height="350"
+                        <div
+                            style={{
+                                display: "flex",
+                                gap: "0.5rem",
+                                justifyContent: "flex-end",
+                                marginTop: "1.5rem",
+                            }}
                         >
-                        </canvas>
-                    </div>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setAddKnowledgeModal(false)}
+                            >
+                                취소
+                            </button>
+                            <button type="submit" className="btn btn-primary">
+                                추가
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-                    <div className="keyword-hint">
-                        <i className="fas fa-mouse-pointer"></i>
-                        키워드를 클릭하면 해당 대화로 이동합니다
-                    </div>
 
-                    <div className="stats-cards">
-                        <div className="stat-card">
-                            <div className="stat-value">15</div>
-                            <div className="stat-label">전체 대화</div>
-                        </div>
-                        <div className="stat-card success">
-                            <div className="stat-value">12</div>
-                            <div className="stat-label">응답 성공</div>
-                        </div>
-                        <div className="stat-card danger">
-                            <div className="stat-value">3</div>
-                            <div className="stat-label">응답 실패</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-value">47</div>
-                            <div className="stat-label">고유 키워드</div>
-                        </div>
+            <main className="main">
+                {/* 페이지 헤더  */}
+                <div className="history-page-header">
+                    <h1 className="page-title">대화 기록 <span >({sessionCount.total}건)</span></h1>
+                    <div className="history-header-actions">
+                        <button className="history-refresh-btn">
+                            <i className="fas fa-sync-alt"></i> 새로고침
+                        </button>
                     </div>
                 </div>
 
+                {/* 필터 바 */}
+                <div className="filter-bar">
+                    <div className="main-tabs">
+                        <button className={`main-tab ${mainTab === "date" ? "active" : ""}`} onClick={() => setMainTab("date")}>날짜별</button>
+                        <button className={`main-tab ${mainTab === "category" ? "active" : ""}`} onClick={() => setMainTab("category")}>분류별</button>
+                        <button className={`main-tab ${mainTab === "questions" ? "active" : ""}`} onClick={() => setMainTab("questions")}>질문만</button>
+                        <button className={`main-tab ${mainTab === "keywords" ? "active" : ""}`} onClick={() => setMainTab("keywords")}>키워드</button>
+                    </div>
 
-            </div>
-        </main>
+                    <div className="filter-divider"></div>
+
+                    <div>
+
+                        <div className="date-range-picker" style={{ display: mainTab === "date" ? "block" : "none" }}>
+                            <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); fetchSessions(e.target.value, dateTo); fetchSessionCount(e.target.value, dateTo); }} />
+                            <span>~</span>
+                            <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); fetchSessions(dateFrom, e.target.value); fetchSessionCount(dateFrom, e.target.value); }} />
+                        </div>
+
+                        <div className="filter-group" style={{ display: mainTab === "category" ? "flex" : "none" }}>
+                            <span className="filter-label">채널</span>
+                            <div className="channel-btns">
+                                <button className={`channel-btn ${filterChannel.channel === "all" ? "active" : ""}`} onClick={() => setFilterChannel({ ...filterChannel, channel: "all" })}>전체</button>
+                                <button className={`channel-btn ${filterChannel.channel === "web" ? "active" : ""}`} onClick={() => setFilterChannel({ ...filterChannel, channel: "web" })}><i className="fas fa-globe"></i> 웹</button>
+                                <button className={`channel-btn ${filterChannel.channel === "mobile" ? "active" : ""}`} onClick={() => setFilterChannel({ ...filterChannel, channel: "mobile" })}><i className="fas fa-mobile-alt"></i> 모바일</button>
+                            </div>
+                        </div>
+                        <div className="filter-group" style={{ marginLeft: "1rem", display: mainTab === "category" ? "flex" : "none" }}>
+                            <span className="filter-label">분류</span>
+                            <select className="category-select"
+                                value={filterChannel.category}
+                                onChange={(e) => setFilterChannel({ ...filterChannel, category: e.target.value })}
+                            >
+                                <option value="all">전체</option>
+                                <option value="POS 시스템">POS시스템</option>
+                                <option value="키오스크">키오스크</option>
+                                <option value="결제 단말기">결제단말기</option>
+                                <option value="설치/설정">설치/설정</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+
+
+                        <span style={{ color: "var(--text-muted)", fontSize: "0.8125rem", display: mainTab === "questions" ? "block" : "none" }}>
+                            <i className="fas fa-info-circle" style={{ marginRight: "0.375rem" }}></i>사용자 질문만 표시됩니다
+                        </span>
+
+                        <div className="date-range-picker" style={{ display: mainTab === "keywords" ? "block" : "none" }}>
+                            <input type="date" value="2025-12-11" readOnly />
+                            <span>~</span>
+                            <input type="date" value="2025-12-17" readOnly />
+                        </div>
+
+                        <span style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginLeft: "0.5rem", display: mainTab === "keywords" ? "block" : "none" }}>
+                            <i className="fas fa-info-circle" style={{ marginRight: "0.375rem" }}></i>선택 기간의 키워드 분석
+                        </span>
+
+
+                    </div>
+
+                    <div className="stats-summary">
+                        <span>
+                            <i className="fas fa-check-circle" style={{ color: "var(--success)" }}></i> 응답
+                            <strong>{sessionCount.success}</strong>
+                        </span>
+                        <span>
+                            <i className="fas fa-times-circle" style={{ color: "var(--danger)" }}></i> 실패
+                            <strong >{sessionCount.failed}</strong>
+                        </span>
+                    </div>
+
+                </div>
+
+                {/* 컨텐츠 영역 */}
+                <div>
+
+                    <div className="session-list" style={{ display: mainTab === "date" || mainTab === "category" ? "flex" : "none" }}>
+
+                        {filteredSessions.map((session) => {
+                            return (
+                                <div className={`session-card ${selectedSession?.session_id === session.session_id ? "active" : ""}`} key={session.session_id}
+                                    onClick={() => handleSessionClick(session)}
+                                >
+                                    <div className="session-header">
+                                        <div className="session-toggle">
+                                            <i className="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div className="session-info">
+                                            <div className="session-top">
+                                                <span className="session-id">#{session.session_id}</span>
+                                                <span className="badge channel ">웹</span>
+                                                <span className="badge channel mobile">모바일</span>
+
+                                                {session.category && <span className="badge cat">{session.category}</span>}
+
+                                                {session.status === 'failed' && <span className="badge failed">실패</span>}
+
+                                            </div>
+                                            <div className="session-preview">{session.first_question}</div>
+                                        </div>
+                                        <div className="session-meta">{formatDate(session.created_at)}</div>
+                                    </div>
+                                    <div className="session-content"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <div className="chat-messages">
+                                            {messages.map((message, index) => (
+                                                <React.Fragment key={`${message.session_id}-message-${index}`}>
+                                                    {message.role === 'user' ? (
+                                                        <div className="message user">
+                                                            <div className="message-bubble">
+                                                                <div className="msg-header">
+                                                                    <span className="msg-role">사용자</span>
+                                                                    <span className="msg-time">{formatDate(message.created_at)}</span>
+                                                                </div>
+                                                                <div className="msg-text">{message.content}</div>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className={`message ai ${failedMessageId.message_id === message.id ? "failed" : ""}`}>
+                                                            <div className="message-bubble">
+                                                                <div className="msg-header">
+                                                                    <span className="msg-role">AI #{message.id}</span>
+                                                                    <span className="msg-time">{formatDate(message.created_at)}</span>
+                                                                </div>
+                                                                <div className="msg-text">{message.content}</div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </React.Fragment>
+                                            ))}
+                                        </div>
+                                        {session.status === 'failed' && (
+                                            <div className="session-footer">
+                                                <div className="footer-alert">
+                                                    <i className="fas fa-exclamation-triangle"></i>
+                                                    답변 실패 - 지식베이스 등록 필요
+                                                </div>
+                                                <button className="kb-btn" onClick={() => {
+                                                    setAddKnowledgeModal(true)
+
+                                                }}>
+                                                    <i className="fas fa-plus"></i> 지식베이스 추가
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        })}
+
+                    </div>
+
+                    <div className="question-list" style={{ display: mainTab === "questions" ? "flex" : "none" }}>
+                        {SessionsList.map((session) => {
+                            return (
+                                <div className="history-question-item" key={`question-${session.session_id}`}
+                                    onClick={() => handleQuestionClick(session)}
+                                >
+                                    {session.first_question}{session.status === 'failed' && <span className="badge failed">실패</span>}
+                                </div>
+                            )
+                        })}
+                    </div>
+
+
+                    <div className="keyword-stats-view" style={{ display: mainTab === "keywords" ? "block" : "none" }}>
+                        <div className="keyword-header">
+                            <h2><i className="fas fa-cloud" style={{ color: "var(--primary)", marginRight: "0.5rem" }}></i>키워드 통계</h2>
+                            <p>선택한 기간의 고객 문의에서 추출된 키워드</p>
+                        </div>
+
+                        <div className="keyword-period">
+                            <i className="fas fa-calendar-alt" style={{ marginRight: "0.5rem" }}></i>2025-12-11 ~ 2025-12-17 (15건의 대화)
+                        </div>
+
+                        <div className="wordcloud-main">
+                            <canvas
+                                ref={canvasRef}
+                                width="800"
+                                height="350"
+                            >
+                            </canvas>
+                        </div>
+
+                        <div className="keyword-hint">
+                            <i className="fas fa-mouse-pointer"></i>
+                            키워드를 클릭하면 해당 대화로 이동합니다
+                        </div>
+
+                        <div className="stats-cards">
+                            <div className="stat-card">
+                                <div className="stat-value">15</div>
+                                <div className="stat-label">전체 대화</div>
+                            </div>
+                            <div className="stat-card success">
+                                <div className="stat-value">12</div>
+                                <div className="stat-label">응답 성공</div>
+                            </div>
+                            <div className="stat-card danger">
+                                <div className="stat-value">3</div>
+                                <div className="stat-label">응답 실패</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-value">47</div>
+                                <div className="stat-label">고유 키워드</div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </main>
+        </>
     );
 }
