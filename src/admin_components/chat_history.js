@@ -468,8 +468,8 @@ export default function ChatHistory() {
                                         <div className="session-info">
                                             <div className="session-top">
                                                 <span className="session-id">#{session.session_id}</span>
-                                                <span className="badge channel ">웹</span>
-                                                <span className="badge channel mobile">모바일</span>
+                                                {session.channel === 'web' && <span className="badge channel web">웹</span>}
+                                                {session.channel === 'mobile' && <span className="badge channel mobile">모바일</span>}
 
                                                 {session.category && <span className="badge cat">{session.category}</span>}
 
