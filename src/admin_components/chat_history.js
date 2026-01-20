@@ -22,7 +22,7 @@ export default function ChatHistory() {
         failed: 0
     });
     const fetchSessionCount = (dateFrom, dateTo) => {
-        console.log(dateFrom, dateTo);
+        // console.log(dateFrom, dateTo);
         axios.get(`${process.env.REACT_APP_API_URL}/chat-history/sessions/count?date_from=${dateFrom}&date_to=${dateTo}`).then((res) => {
             // console.log(res.data);
             setSessionCount(res.data);
@@ -34,7 +34,7 @@ export default function ChatHistory() {
     const fetchSessions = (dateFrom, dateTo) => {
         // axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions?offset=0&limit=100`).then((res) => {
         axios.get(`${process.env.REACT_APP_API_URL}/chat-history/sessions?date_from=${dateFrom}&date_to=${dateTo}`).then((res) => {
-            console.log(res.data);
+            // console.log(res.data);
             setSessionsList(res.data);
             showToast("세션 목록 가져오기 성공", "success");
         }).catch((err) => {
@@ -46,7 +46,7 @@ export default function ChatHistory() {
     const fetchMessages = (sessionId) => {
         setLoading(true);
         axios.get(`${process.env.REACT_APP_API_URL}/chat/sessions/${sessionId}/messages`).then((res) => {
-            console.log(res.data);
+            // console.log(res.data);
             setMessages(res.data);
             setLoading(false);
         }).catch((err) => {
@@ -62,7 +62,7 @@ export default function ChatHistory() {
     });
     const getFailedMessageId = (sessionId) => {
         axios.get(`${process.env.REACT_APP_API_URL}/chat-history/suggestions?session_id=${sessionId}`).then((res) => {
-            console.log(res.data[0]);
+            // console.log(res.data[0]);
             setFailedMessageId(res.data[0]);
         }).catch((err) => {
             console.log(err);
@@ -111,41 +111,37 @@ export default function ChatHistory() {
         '#DC143C', // 크림슨
     ];
 
-    const fetchWordCloudData = () => {
-        setWordCloudData([
-            ['POS', 15],
-            ['결제', 12],
-            ['키오스크', 10],
-            ['영수증', 8],
-            ['터치', 7],
-            ['설정', 6],
-            ['네트워크', 5],
-            ['블루투스', 4],
-            ['관리자', 3],
-            ['화면', 2]
-        ]);
+    const fetchWordCloudData = (dateFrom, dateTo) => {
 
-        // axios.get(`${process.env.REACT_APP_API_URL}/chat/keywords`)
-        //     .then((res) => {
-        //         const wordData = res.data.map(item => [item.word, item.count]);
-        //         setWordCloudData(wordData);
-        //     })
-        //     .catch((err) => {
-        //         console.log("워드클라우드 데이터 가져오기 오류:", err);
-        //         // 테스트용 더미 데이터
-        //         setWordCloudData([
-        //             ['POS', 15],
-        //             ['결제', 12],
-        //             ['키오스크', 10],
-        //             ['영수증', 8],
-        //             ['터치', 7],
-        //             ['설정', 6],
-        //             ['네트워크', 5],
-        //             ['블루투스', 4],
-        //             ['관리자', 3],
-        //             ['화면', 2]
-        //         ]);
-        //     });
+        axios.get(`${process.env.REACT_APP_API_URL}/chat-history/wordcloud?top_n=100&date_from=${dateFrom}&date_to=${dateTo}`).then((res) => {
+            // API 응답 예: [{ keyword: '어떻게', count: 3 }, ...]
+            // console.log(res.data.items);
+            const normalized = (res.data.items ?? [])
+                .map((item) => [
+                    item.keyword ?? item.word ?? item.text ?? "",
+                    Number(item.count ?? item.value ?? 0),
+                ])
+                .filter(([keyword, count]) => Boolean(keyword) && Number.isFinite(count) && count > 0)
+                .sort((a, b) => b[1] - a[1]); // renderWordCloud가 [0]을 max로 쓰므로 내림차순 정렬 필수
+
+            // console.log(normalized);
+            setWordCloudData(normalized);
+        }).catch((err) => {
+            console.log(err);
+        });
+
+        // setWordCloudData([
+        //     ['POS', 15],
+        //     ['결제', 12],
+        //     ['키오스크', 10],
+        //     ['영수증', 8],
+        //     ['터치', 7],
+        //     ['설정', 6],
+        //     ['네트워크', 5],
+        //     ['블루투스', 4],
+        //     ['관리자', 3],
+        //     ['화면', 2]
+        // ]);
     }
 
     const renderWordCloud = (wordData) => {
@@ -222,7 +218,7 @@ export default function ChatHistory() {
     const searchKeyword = (keyword) => {
         // 키워드 검색 기능 구현
         // 예: 해당 키워드가 포함된 세션으로 이동
-        console.log("검색 키워드:", keyword);
+        // console.log("검색 키워드:", keyword);
         // TODO: 키워드로 세션 필터링 또는 해당 세션으로 스크롤
     }
 
@@ -231,7 +227,7 @@ export default function ChatHistory() {
 
     useEffect(() => {
         fetchSessions(dateFrom, dateTo);
-        fetchWordCloudData();
+        fetchWordCloudData(dateFrom, dateTo);
         fetchSessionCount(dateFrom, dateTo);
     }, []);
 
@@ -265,7 +261,7 @@ export default function ChatHistory() {
         event.preventDefault(); // ⭐ 필수
         const formData = new FormData(event.target);
         const answer = formData.get("answer");
-        console.log(answer);
+        // console.log(answer);
 
         axios.post(
             `${process.env.REACT_APP_API_URL}/chat-history/suggestions/${failedMessageId.message_id}/ingest`,
@@ -412,9 +408,27 @@ export default function ChatHistory() {
                         </span>
 
                         <div className="date-range-picker" style={{ display: mainTab === "keywords" ? "block" : "none" }}>
-                            <input type="date" value="2025-12-11" readOnly />
+                            <input
+                                type="date"
+                                value={dateFrom}
+                                onChange={(e) => {
+                                    setDateFrom(e.target.value);
+                                    fetchSessions(e.target.value, dateTo);
+                                    fetchSessionCount(e.target.value, dateTo);
+                                    fetchWordCloudData(e.target.value, dateTo);
+                                }}
+                            />
                             <span>~</span>
-                            <input type="date" value="2025-12-17" readOnly />
+                            <input
+                                type="date"
+                                value={dateTo}
+                                onChange={(e) => {
+                                    setDateTo(e.target.value);
+                                    fetchSessions(dateFrom, e.target.value);
+                                    fetchSessionCount(dateFrom, e.target.value);
+                                    fetchWordCloudData(dateFrom, e.target.value);
+                                }}
+                            />
                         </div>
 
                         <span style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginLeft: "0.5rem", display: mainTab === "keywords" ? "block" : "none" }}>
@@ -537,7 +551,7 @@ export default function ChatHistory() {
                         </div>
 
                         <div className="keyword-period">
-                            <i className="fas fa-calendar-alt" style={{ marginRight: "0.5rem" }}></i>2025-12-11 ~ 2025-12-17 (15건의 대화)
+                            <i className="fas fa-calendar-alt" style={{ marginRight: "0.5rem" }}></i>{dateFrom} ~ {dateTo} ({sessionCount.total}건의 대화)
                         </div>
 
                         <div className="wordcloud-main">
@@ -549,26 +563,26 @@ export default function ChatHistory() {
                             </canvas>
                         </div>
 
-                        <div className="keyword-hint">
+                        {/* <div className="keyword-hint">
                             <i className="fas fa-mouse-pointer"></i>
                             키워드를 클릭하면 해당 대화로 이동합니다
-                        </div>
+                        </div> */}
 
                         <div className="stats-cards">
                             <div className="stat-card">
-                                <div className="stat-value">15</div>
+                                <div className="stat-value">{sessionCount.total}</div>
                                 <div className="stat-label">전체 대화</div>
                             </div>
                             <div className="stat-card success">
-                                <div className="stat-value">12</div>
+                                <div className="stat-value">{sessionCount.success}</div>
                                 <div className="stat-label">응답 성공</div>
                             </div>
                             <div className="stat-card danger">
-                                <div className="stat-value">3</div>
+                                <div className="stat-value">{sessionCount.failed}</div>
                                 <div className="stat-label">응답 실패</div>
                             </div>
                             <div className="stat-card">
-                                <div className="stat-value">47</div>
+                                <div className="stat-value">{wordCloudData.length}</div>
                                 <div className="stat-label">고유 키워드</div>
                             </div>
                         </div>
