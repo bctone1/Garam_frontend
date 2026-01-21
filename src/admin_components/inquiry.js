@@ -203,6 +203,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                             fetch_admin_users={fetch_admin_users}
                             fetch_inquiry_list={fetch_inquiry_list}
                             fetch_notificatoins={fetch_notificatoins}
+                            setAdminId={setAdminId}
                         />
                     </div>
                 </div>
@@ -835,10 +836,10 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
 
 
-function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries, fetch_admin_users, fetch_inquiry_list, fetch_notificatoins }) {
+function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, setRole, role, setadmin_email, setadmin_name, inquiries, fetch_admin_users, fetch_inquiry_list, fetch_notificatoins, setAdminId }) {
 
 
-    const [adminId, setAdminId] = useState(sessionStorage.getItem("admin_id") ? sessionStorage.getItem("admin_id") : null);
+    const [adminId, setAdminIdLocal] = useState(sessionStorage.getItem("admin_id") ? sessionStorage.getItem("admin_id") : null);
     const wsRef = useRef(null);
 
     useEffect(() => {
@@ -907,7 +908,8 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
             setcurrentAdminUser(admin.name);
 
             fetch_notificatoins(admin.id);
-            setAdminId(admin.id); // ⭐ 여기서 WebSocket 재연결 트리거
+            setAdminIdLocal(admin.id); // RenderAdminGrid의 로컬 state 업데이트
+            setAdminId(admin.id); // Inquiry 컴포넌트의 adminId state 업데이트
             fetch_inquiry_list();
 
 
