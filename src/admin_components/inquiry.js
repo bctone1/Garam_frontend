@@ -249,6 +249,9 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
 function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries, fetch_inquiry_list }) {
 
     const [openDropdownId, setOpenDropdownId] = useState(null);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [currentImages, setCurrentImages] = useState([]);
     const sudo = role === "superadmin" ? true : false
     const statusText = {
         new: "신규",
@@ -282,17 +285,6 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         if (sudo) return true;
         return inquiry.assignee && inquiry.assignee === currentAdminUser;
     });
-
-    if (inquiries.length === 0) {
-        return (
-            <div className="empty-state">
-                <div className="empty-icon">
-                    <i className="fas fa-inbox"></i>
-                </div>
-                <p>아직 접수된 문의가 없습니다.</p>
-            </div>
-        );
-    }
 
     const toggleDropdown = (id) => {
         setOpenDropdownId((prev) => (prev === id ? null : id));
@@ -557,8 +549,102 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         if (type === "other") return "기타";
     }
 
+    const handleImageClick = (attachments, clickedAttachmentIndex) => {
+        const imageAttachments = attachments.filter(att => att.contentType && att.contentType.startsWith('image/'));
+        if (imageAttachments.length > 0) {
+            // 클릭된 attachment가 이미지 중 몇 번째인지 찾기
+            let imageCount = 0;
+            let foundIndex = 0;
+            for (let i = 0; i <= clickedAttachmentIndex; i++) {
+                if (attachments[i].contentType && attachments[i].contentType.startsWith('image/')) {
+                    if (i === clickedAttachmentIndex) {
+                        foundIndex = imageCount;
+                        break;
+                    }
+                    imageCount++;
+                }
+            }
+            setCurrentImages(imageAttachments);
+            setCurrentImageIndex(foundIndex);
+            setIsImageModalOpen(true);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsImageModalOpen(false);
+        setCurrentImageIndex(0);
+        setCurrentImages([]);
+    };
+
+    const handlePrevImage = () => {
+        setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : currentImages.length - 1));
+    };
+
+    const handleNextImage = () => {
+        setCurrentImageIndex((prev) => (prev < currentImages.length - 1 ? prev + 1 : 0));
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!isImageModalOpen) return;
+            if (e.key === 'Escape') {
+                handleCloseModal();
+            } else if (e.key === 'ArrowLeft') {
+                handlePrevImage();
+            } else if (e.key === 'ArrowRight') {
+                handleNextImage();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isImageModalOpen, currentImages.length]);
+
+    if (inquiries.length === 0) {
+        return (
+            <div className="empty-state">
+                <div className="empty-icon">
+                    <i className="fas fa-inbox"></i>
+                </div>
+                <p>아직 접수된 문의가 없습니다.</p>
+            </div>
+        );
+    }
+
     return (
         <>
+            {/* 이미지 모달 */}
+            {isImageModalOpen && currentImages.length > 0 && (
+                <div className="image-modal" onClick={handleCloseModal}>
+                    <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="image-modal-close" onClick={handleCloseModal}>
+                            &times;
+                        </button>
+                        {currentImages.length > 1 && (
+                            <>
+                                <button className="image-modal-nav image-modal-prev" onClick={handlePrevImage}>
+                                    &#8249;
+                                </button>
+                                <button className="image-modal-nav image-modal-next" onClick={handleNextImage}>
+                                    &#8250;
+                                </button>
+                            </>
+                        )}
+                        <div className="image-modal-image-wrapper">
+                            <img
+                                src={`https://garam.onecloud.kr:5002${currentImages[currentImageIndex].storageKey}`}
+                                alt={`이미지 ${currentImageIndex + 1}`}
+                                className="image-modal-image"
+                            />
+                        </div>
+                        {currentImages.length > 1 && (
+                            <div className="image-modal-counter">
+                                {currentImageIndex + 1} / {currentImages.length}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {filteredInquiries.length === 0 && (
                 <div className="empty-state">
                     <div className="empty-icon">
@@ -715,15 +801,19 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
                         <div className="inquiry-content">
                             <div className="inquiry-file-preview-container">
-                                {inquiry.attachments.map((attachment, index) => {
+                                {inquiry.attachments.map((attachment, attachmentIndex) => {
                                     return (
-                                        <div key={index} className="inquiry-file-preview-item">
+                                        <div key={attachmentIndex} className="inquiry-file-preview-item">
                                             {attachment.contentType && attachment.contentType.startsWith('image/') && (
-                                                <div className="inquiry-file-preview-image-wrapper">
+                                                <div 
+                                                    className="inquiry-file-preview-image-wrapper"
+                                                    onClick={() => handleImageClick(inquiry.attachments, attachmentIndex)}
+                                                >
                                                     <img
                                                         // src={`http://localhost:5002${attachment.storageKey}`}
                                                         src={`https://garam.onecloud.kr:5002${attachment.storageKey}`}
                                                         className="inquiry-file-preview-image"
+                                                        alt={`첨부 이미지 ${attachmentIndex + 1}`}
                                                     />
                                                 </div>
                                             )}
