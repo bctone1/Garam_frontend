@@ -251,7 +251,7 @@ export default function Main() {
                     <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                     <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
                         <h5 className="chatbot-submenu-title-h5">{category.name}</h5>
-                        <p>Enter a number or click to select a detailed issue.</p>
+                        <p>Click to select a detailed issue.</p>
 
                         {faqs?.map((faq, index) => (
                             <div className="chatbot-submenu-single" key={faq.id}
@@ -373,7 +373,7 @@ export default function Main() {
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                 <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
                     <h5 className="chatbot-submenu-title-h5">Frequently Asked Questions</h5>
-                    <p>Enter a number or click to select a detailed issue.</p>
+                    <p>Click to select a detailed issue.</p>
 
                     {qnaList?.map((faq, index) => (
                         <div className="chatbot-submenu-single" key={faq.id}
