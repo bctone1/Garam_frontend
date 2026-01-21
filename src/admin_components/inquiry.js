@@ -111,14 +111,15 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                 <div className="inquiry-page-header">
                     <button
                         className="inquiry-notification-btn"
-                        title="alarm"
+                        title="Notifications"
                         onClick={() => setShowNotificationContent(!showNotificationContent)}
                     >
                         <svg className="inquiry-notification-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                        <span className="inquiry-notification-badge">{notifications.filter(notification => notification.read_at === null).length}</span>
+                        {notifications.filter(notification => notification.read_at === null).length > 0 && (
+                            <span className="inquiry-notification-badge">{notifications.filter(notification => notification.read_at === null).length}</span>
+                        )}
                     </button>
 
-                   
                     <div className={`inquiry-notification-content ${showNotificationContent ? 'show' : ''}`}>
                         {notifications.length === 0 ? (
                             <div className="inquiry-notification-item">
@@ -133,7 +134,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                                         </span>
 
                                         {notification.read_at === null && (
-                                            <button className="btn btn-primary notification-read-btn" onClick={() => checkNotification(notification)}>확인</button>
+                                            <button className="btn btn-primary notification-read-btn" onClick={() => checkNotification(notification)}>Mark as Read</button>
                                         )}
 
                                     </div>
@@ -144,12 +145,11 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                     </div>
 
 
-
                 </div>
 
                 <div className="page-header">
                     <h1 className="page-title">Inquiry Management</h1>
-                    <p className="page-subtitle">Manage inquiries received through the chatbot.</p>
+                    <p className="page-subtitle">Manage customer inquiries received through the chatbot</p>
 
                     <div className="stats-grid">
                         <div className="stat-card">
@@ -166,11 +166,11 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                         </div>
                         <div className="stat-card">
                             <div className="stat-number">{inquiries.filter(i => i.status === "on_hold").length}</div>
-                            <div className="stat-label">Processing On Hold</div>
+                            <div className="stat-label">On Hold</div>
                         </div>
                         <div className="stat-card">
                             <div className="stat-number">{inquiries.filter(i => i.status === "completed").length}</div>
-                            <div className="stat-label">Processing Completed</div>
+                            <div className="stat-label">Completed</div>
                         </div>
                     </div>
                 </div>
@@ -209,7 +209,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
 
                 <div className="inquiry-section">
                     <div className="section-header">
-                        <h3 className="section-title"> Inquiry List</h3>
+                        <h3 className="section-title">Inquiry List</h3>
 
                         <div className="inquiry-filter">
                             <select
@@ -220,7 +220,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                                 <option value="all">All</option>
                                 <option value="paper_request">Paper Request</option>
                                 <option value="sales_report">Sales Report</option>
-                                <option value="kiosk_menu_update">Menu Update and Add</option>
+                                <option value="kiosk_menu_update">Menu Update</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
@@ -249,6 +249,9 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
 function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries, fetch_inquiry_list }) {
 
     const [openDropdownId, setOpenDropdownId] = useState(null);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [currentImages, setCurrentImages] = useState([]);
     const sudo = role === "superadmin" ? true : false
     const statusText = {
         new: "New",
@@ -266,14 +269,14 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
     const actionsReturn = (action) => {
         const actions = {
             "new": "Inquiry Received",
-            "assign": "Assignee Assignment",
-            "on_hold": "Processing On Hold",
-            "resume": "Processing Resume",
-            "transfer": "Assignee Transfer",
-            "complete": "Processing Complete",
-            "note": "Note Add",
-            "contact": "Customer Contact",
-            "delete": "Inquiry Delete",
+            "assign": "Assignee Assigned",
+            "on_hold": "On Hold",
+            "resume": "Resumed",
+            "transfer": "Transferred",
+            "complete": "Completed",
+            "note": "Note Added",
+            "contact": "Customer Contacted",
+            "delete": "Inquiry Deleted",
         };
         return actions[action] ?? "icon-default";
     }
@@ -283,17 +286,6 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         return inquiry.assignee && inquiry.assignee === currentAdminUser;
     });
 
-    if (inquiries.length === 0) {
-        return (
-            <div className="empty-state">
-                <div className="empty-icon">
-                    <i className="fas fa-inbox"></i>
-                </div>
-                <p>No inquiries have been received yet.</p>
-            </div>
-        );
-    }
-
     const toggleDropdown = (id) => {
         setOpenDropdownId((prev) => (prev === id ? null : id));
     };
@@ -301,9 +293,9 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
     const superadmin_id = adminUsers.find(cat => cat.name === currentAdminUser)?.id
 
     const handleComplete = ({ inquiry }) => {
-        const inputreason = prompt("Please enter the processing result.");
-        if (inputreason === null) { console.log("The action has been canceled."); return; }
-        if (inputreason.trim() === "") { alert("Please enter the reason."); return; }
+        const inputreason = prompt("Please enter the processing result");
+        if (inputreason === null) { console.log("Action cancelled."); return; }
+        if (inputreason.trim() === "") { alert("Please enter a reason!"); return; }
 
         try {
             axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
@@ -333,18 +325,18 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                     ],
                 } : item)
             );
-            showToast("Inquiry has been processed and completed.", "info");
+            showToast("Inquiry has been completed.", "info");
         } catch (error) {
             console.log(error);
         }
     }
 
     const handleSelectAdmin = ({ admin, inquiry, action }) => {
-        if (action === "New Assignment") {
+        if (action === "신규배정") {
             try {
                 axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
                     admin_id: superadmin_id,
-                    details: `${admin.name} has been assigned to the inquiry.`,
+                    details: `${admin.name} has been assigned to handle this inquiry.`,
                     action: "assign"
                 });
                 axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/assign`, {
@@ -363,7 +355,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                 action: "assign",
                                 admin: currentAdminUser,
                                 timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
-                                details: `${admin.name} has been assigned to the inquiry.`,
+                                details: `${admin.name} has been assigned to handle this inquiry.`,
                             },
                         ],
                     } : item)
@@ -372,16 +364,16 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 console.log(error);
             }
         } else {
-            const inputreason = prompt("Please enter the transfer reason.");
-            if (inputreason === null) { console.log("The transfer has been canceled."); return; }
-            if (inputreason.trim() === "") { alert("Please enter the reason."); return; }
+            const inputreason = prompt("Please enter the transfer reason");
+            if (inputreason === null) { console.log("Transfer cancelled."); return; }
+            if (inputreason.trim() === "") { alert("Please enter a transfer reason!"); return; }
             const currentItem = inquiries.find((i) => i.id === inquiry.id);
             const prevAssignee = currentItem?.assignee || "Unassigned";
 
             try {
                 axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
                     admin_id: superadmin_id,
-                    details: `${prevAssignee || "Unassigned"} -> ${admin.name} (Reason:${inputreason})`,
+                    details: `${prevAssignee || "Unassigned"} -> ${admin.name} (Reason: ${inputreason})`,
                     // details: `테스트`,
                     action: "transfer"
                 });
@@ -403,7 +395,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                 action: "transfer",
                                 admin: currentAdminUser,
                                 timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
-                                details: `${prevAssignee || "Unassigned"} -> ${admin.name} (Reason:${inputreason})`,
+                                details: `${prevAssignee || "Unassigned"} -> ${admin.name} (Reason: ${inputreason})`,
                             },
                         ],
                     } : item)
@@ -412,7 +404,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 console.log(error);
             }
         }
-        showToast(`${admin.name} Inquiry has been ${action}.`, "info");
+        showToast(`Inquiry for ${admin.name} has been ${action === "신규배정" ? "assigned" : "transferred"}.`, "info");
         toggleDropdown(inquiry.id);
     };
 
@@ -429,15 +421,15 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
             fetch_inquiry_list();
             showToast(`Inquiry has been deleted.`, "warning");
         } catch (err) {
-            console.error("Deletion request error:", err);
+            console.error("Delete request error:", err);
         }
     }
 
 
     const handleNote = ({ inquiry }) => {
-        const inputreason = prompt("Please enter the note.");
-        if (inputreason === null) { console.log("The note has been canceled."); return; }
-        if (inputreason.trim() === "") { alert("Please enter the note."); return; }
+        const inputreason = prompt("Please enter a note");
+        if (inputreason === null) { console.log("Cancelled."); return; }
+        if (inputreason.trim() === "") { alert("Please enter a note!"); return; }
         try {
             axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
                 admin_id: superadmin_id,
@@ -469,9 +461,9 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
     }
 
     const handleHold = ({ inquiry }) => {
-        const inputreason = prompt("Please enter the on hold reason.");
-        if (inputreason === null) { console.log("The on hold has been canceled."); return; }
-        if (inputreason.trim() === "") { alert("Please enter the reason."); return; }
+        const inputreason = prompt("Please enter the hold reason");
+        if (inputreason === null) { console.log("Action cancelled."); return; }
+        if (inputreason.trim() === "") { alert("Please enter a reason!"); return; }
 
         try {
             axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
@@ -501,14 +493,14 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                     ],
                 } : item)
             );
-            showToast("Inquiry has been changed to on hold status.", "info");
+            showToast("Inquiry status has been changed to on hold.", "info");
         } catch (error) {
             console.log(error);
         }
     }
 
     const handleResume = ({ inquiry }) => {
-        if (!window.confirm("Do you want to resume the inquiry?")) return;
+        if (!window.confirm("Do you want to resume this inquiry?")) return;
 
         try {
             axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/status`, {
@@ -519,7 +511,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
             axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/histories/note`, {
                 admin_id: superadmin_id,
-                details: "Processing has been resumed from on hold status.",
+                details: "Resumed processing from hold status.",
                 action: "resume"
             });
 
@@ -535,7 +527,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                             action: "resume",
                             admin: currentAdminUser,
                             timestamp: new Date().toISOString().slice(0, 19).replace("T", " "),
-                            details: "Processing has been resumed from on hold status.",
+                            details: "Resumed processing from hold status.",
                         },
                     ],
                 } : item)
@@ -553,12 +545,106 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
     const labelType = (type) => {
         if (type === "paper_request") return "Paper Request";
         if (type === "sales_report") return "Sales Report";
-        if (type === "kiosk_menu_update") return "Menu Update and Add";
+        if (type === "kiosk_menu_update") return "Menu Update";
         if (type === "other") return "Other";
+    }
+
+    const handleImageClick = (attachments, clickedAttachmentIndex) => {
+        const imageAttachments = attachments.filter(att => att.contentType && att.contentType.startsWith('image/'));
+        if (imageAttachments.length > 0) {
+            // Find which image index was clicked
+            let imageCount = 0;
+            let foundIndex = 0;
+            for (let i = 0; i <= clickedAttachmentIndex; i++) {
+                if (attachments[i].contentType && attachments[i].contentType.startsWith('image/')) {
+                    if (i === clickedAttachmentIndex) {
+                        foundIndex = imageCount;
+                        break;
+                    }
+                    imageCount++;
+                }
+            }
+            setCurrentImages(imageAttachments);
+            setCurrentImageIndex(foundIndex);
+            setIsImageModalOpen(true);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsImageModalOpen(false);
+        setCurrentImageIndex(0);
+        setCurrentImages([]);
+    };
+
+    const handlePrevImage = () => {
+        setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : currentImages.length - 1));
+    };
+
+    const handleNextImage = () => {
+        setCurrentImageIndex((prev) => (prev < currentImages.length - 1 ? prev + 1 : 0));
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!isImageModalOpen) return;
+            if (e.key === 'Escape') {
+                handleCloseModal();
+            } else if (e.key === 'ArrowLeft') {
+                handlePrevImage();
+            } else if (e.key === 'ArrowRight') {
+                handleNextImage();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isImageModalOpen, currentImages.length]);
+
+    if (inquiries.length === 0) {
+        return (
+            <div className="empty-state">
+                <div className="empty-icon">
+                    <i className="fas fa-inbox"></i>
+                </div>
+                <p>No inquiries have been received yet.</p>
+            </div>
+        );
     }
 
     return (
         <>
+            {/* 이미지 모달 */}
+            {isImageModalOpen && currentImages.length > 0 && (
+                <div className="image-modal" onClick={handleCloseModal}>
+                    <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="image-modal-close" onClick={handleCloseModal}>
+                            &times;
+                        </button>
+                        {currentImages.length > 1 && (
+                            <>
+                                <button className="image-modal-nav image-modal-prev" onClick={handlePrevImage}>
+                                    &#8249;
+                                </button>
+                                <button className="image-modal-nav image-modal-next" onClick={handleNextImage}>
+                                    &#8250;
+                                </button>
+                            </>
+                        )}
+                        <div className="image-modal-image-wrapper">
+                            <img
+                                src={`https://garam.onecloud.kr:5002${currentImages[currentImageIndex].storageKey}`}
+                                alt={`Image ${currentImageIndex + 1}`}
+                                className="image-modal-image"
+                            />
+                        </div>
+                        {currentImages.length > 1 && (
+                            <div className="image-modal-counter">
+                                {currentImageIndex + 1} / {currentImages.length}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {filteredInquiries.length === 0 && (
                 <div className="empty-state">
                     <div className="empty-icon">
@@ -598,7 +684,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                             <div className="assign-dropdown">
                                 <div className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`} id={`dropdown-${inquiry.id}`}>
                                     {adminUsers.map((admin) => (
-                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "New Assignment" })}>
+                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "신규배정" })}>
                                             <div className="admin-avatar">{admin.name.charAt(0)}</div>
                                             <div>
                                                 <div style={{ fontWeight: 600 }}>{admin.name}</div>
@@ -612,7 +698,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                             </div>
 
                             <button className="btn btn-warning btn-sm" onClick={() => toggleDropdown(inquiry.id)}>
-                                <i className="fas fa-user-plus"></i> Assignee Assignment
+                                <i className="fas fa-user-plus"></i> Assign
                             </button>
                         </>
                     );
@@ -626,14 +712,14 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                 <i className="fas fa-sticky-note"></i> Note
                             </button>
                             <button className="btn btn-warning btn-sm" onClick={() => handleHold({ inquiry })}>
-                                <i className="fas fa-pause"></i> On Hold
+                                <i className="fas fa-pause"></i> Hold
                             </button>
 
 
                             <div className="assign-dropdown">
                                 <div className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`} id={`dropdown-${inquiry.id}`}>
                                     {adminUsers.map((admin) => (
-                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "Transfer" })}>
+                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "이관" })}>
                                             <div className="admin-avatar">{admin.name.charAt(0)}</div>
                                             <div>
                                                 <div style={{ fontWeight: 600 }}>{admin.name}</div>
@@ -668,7 +754,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                             <div className="assign-dropdown">
                                 <div className={`assign-dropdown-menu ${openDropdownId === inquiry.id ? "show" : ""}`} id={`dropdown-${inquiry.id}`}>
                                     {adminUsers.map((admin) => (
-                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "Transfer" })}>
+                                        <div key={admin.name} className="assign-dropdown-item" onClick={() => handleSelectAdmin({ admin, inquiry, action: "이관" })}>
                                             <div className="admin-avatar">{admin.name.charAt(0)}</div>
                                             <div>
                                                 <div style={{ fontWeight: 600 }}>{admin.name}</div>
@@ -696,7 +782,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                             <div className="inquiry-info">
                                 <div className="inquiry-name">{inquiry.businessName}</div>
                                 <div className="inquiry-meta">
-                                    <span className="inquiry-meta-item">Category</span> : {labelType(inquiry.inquiryType)} | <span className="inquiry-meta-item">Business Number</span> : {inquiry.businessNumber} | <span className="inquiry-meta-item">Phone</span> : {inquiry.phone} | <span className="inquiry-meta-item">Received Date</span> : {inquiry.createdDate}
+                                    <span className="inquiry-meta-item">Category</span> : {labelType(inquiry.inquiryType)} | <span className="inquiry-meta-item">Business Number</span> : {inquiry.businessNumber} | <span className="inquiry-meta-item">Contact</span> : {inquiry.phone} | <span className="inquiry-meta-item">Received Date</span> : {inquiry.createdDate}
                                 </div>
                             </div>
 
@@ -715,15 +801,19 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
 
                         <div className="inquiry-content">
                             <div className="inquiry-file-preview-container">
-                                {inquiry.attachments.map((attachment, index) => {
+                                {inquiry.attachments.map((attachment, attachmentIndex) => {
                                     return (
-                                        <div key={index} className="inquiry-file-preview-item">
+                                        <div key={attachmentIndex} className="inquiry-file-preview-item">
                                             {attachment.contentType && attachment.contentType.startsWith('image/') && (
-                                                <div className="inquiry-file-preview-image-wrapper">
+                                                <div
+                                                    className="inquiry-file-preview-image-wrapper"
+                                                    onClick={() => handleImageClick(inquiry.attachments, attachmentIndex)}
+                                                >
                                                     <img
                                                         // src={`http://localhost:5002${attachment.storageKey}`}
                                                         src={`https://garam.onecloud.kr:5002${attachment.storageKey}`}
                                                         className="inquiry-file-preview-image"
+                                                        alt={`Attachment ${attachmentIndex + 1}`}
                                                     />
                                                 </div>
                                             )}
@@ -760,8 +850,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
         }
 
         // 배포환경
-        // const ws = new WebSocket(`wss://garam.onecloud.kr:5002/ws/notifications?admin_id=${adminId}`);
-        const ws = new WebSocket(`wss://globalgaram.onecloud.kr:5005/ws/notifications?admin_id=${adminId}`);
+        const ws = new WebSocket(`wss://garam.onecloud.kr:5002/ws/notifications?admin_id=${adminId}`);
 
         // const ws = new WebSocket(`ws://localhost:5002/ws/notifications?admin_id=${adminId}`);
 
@@ -773,7 +862,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log("실시간 알림:", data);
+            // console.log("실시간 알림:", data);
             if (data.type === "notification_created") {
                 fetch_inquiry_list();
                 fetch_notificatoins(adminId);
@@ -782,11 +871,11 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
         };
 
         ws.onclose = () => {
-            console.log("🔴 WebSocket disconnected");
+            // console.log("🔴 WebSocket disconnected");
         };
 
         ws.onerror = (err) => {
-            console.log(err);
+            // console.log(err);
         };
 
         return () => {
@@ -803,7 +892,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
         inquiries.filter(i => i.assignee === adminName && i.status === "completed").length;
 
     const switchToAdmin = (admin) => {
-        const inputPassword = prompt(`Please enter the password for the "${admin.name}" account:`);
+        const inputPassword = prompt(`Please enter the password for "${admin.name}" account:`);
         if (!inputPassword) return;
         if (inputPassword === admin.password) {
             const newRole = admin.id === 0 ? "superadmin" : "admin";
@@ -818,19 +907,19 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
             setcurrentAdminUser(admin.name);
 
             fetch_notificatoins(admin.id);
-            setAdminId(admin.id);
+            setAdminId(admin.id); // ⭐ 여기서 WebSocket 재연결 트리거
             fetch_inquiry_list();
 
 
             showToast(`Switched to ${admin.name}.`, "info");
 
         } else {
-            alert("❌ The password is incorrect.");
+            alert("❌ Incorrect password.");
         }
     };
 
     const handleDelete = async (admin) => {
-        if (!window.confirm(`Are you sure you want to delete the "${admin.name}" user?`)) return;
+        if (!window.confirm(`Are you sure you want to delete user ${admin.name}?`)) return;
 
         try {
             const response = await fetch(
@@ -842,7 +931,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
             showToast(`Deleted successfully.`, "warning");
             fetch_admin_users();
         } catch (err) {
-            console.error("삭제 요청 오류:", err);
+            console.error("Delete request error:", err);
         }
     };
 
@@ -879,14 +968,13 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
                         <div className="admin-stats">
                             <div className="admin-stat">
                                 <div className="admin-stat-number">{assignedCount}</div>
-                                <div className="admin-stat-label">In Progress</div>
+                                <div className="admin-stat-label">Assigned</div>
                             </div>
                             <div className="admin-stat">
                                 <div className="admin-stat-number">{completedCount}</div>
                                 <div className="admin-stat-label">Completed</div>
                             </div>
                         </div>
-
 
 
                         <div className="admin-actions">
@@ -928,7 +1016,8 @@ function AddAdminModal({ setopenAddAdminModal, fetch_admin_users }) {
 
     const create_admin = () => {
         axios.post(`${process.env.REACT_APP_API_URL}/admin_users/`, NewUser).then((res) => {
-            showToast(`${NewUser.name} admin has been added.`, 'success');
+            console.log("Created admin:", res.data);
+            showToast(`Admin ${NewUser.name} has been added.`, 'success');
             setNewUser({
                 name: "",
                 email: "",
@@ -986,7 +1075,7 @@ function AddAdminModal({ setopenAddAdminModal, fetch_admin_users }) {
                         type="text"
                         className="form-input"
                         id="adminDepartment"
-                        placeholder="e.g., Customer Support Team"
+                        placeholder="e.g., Customer Support"
                         value={NewUser.department}
                         onChange={(e) =>
                             setNewUser((prev) => ({ ...prev, department: e.target.value }))
