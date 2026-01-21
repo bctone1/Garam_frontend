@@ -251,7 +251,7 @@ export default function Main() {
                     <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                     <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
                         <h5 className="chatbot-submenu-title-h5">{category.name}</h5>
-                        <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
+                        <p>클릭하여 세부 문제를 선택하세요.</p>
 
                         {faqs?.map((faq, index) => (
                             <div className="chatbot-submenu-single" key={faq.id}
@@ -372,7 +372,7 @@ export default function Main() {
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                 <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
                     <h5 className="chatbot-submenu-title-h5">자주하는 질문</h5>
-                    <p>번호를 입력하거나 클릭하여 세부 문제를 선택하세요.</p>
+                    <p>클릭하여 세부 문제를 선택하세요.</p>
 
                     {qnaList?.map((faq, index) => (
                         <div className="chatbot-submenu-single" key={faq.id}
