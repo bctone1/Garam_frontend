@@ -326,13 +326,38 @@ export default function Main() {
             ...prev,
             <div className="after-loading" key={`after-loading-${Date.now()}`}>
                 <div className="chatbot-button-grid">
-                    <div className="chatbot-button" onClick={() => getinquiryform(1)}>
+                    {/* <div className="chatbot-button" onClick={() => getinquiryform(1)}>
                         <div className="chatbot-button-icon icon-headset"></div>
                         <div>
                             <div className="chatbot-button-title ">문의하기</div>
                             <div className="chatbot-button-desc">직접 상담 및 지원 요청</div>
                         </div>
+                    </div> */}
+
+                    <div className="chatbot-button" onClick={() => selectInquiryCategory('paper_request')}>
+                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div>
+                            <div className="chatbot-button-title ">용지 요청</div>
+                            <div className="chatbot-button-desc">용지 요청</div>
+                        </div>
                     </div>
+
+                    <div className="chatbot-button" onClick={() => selectInquiryCategory('sales_report')}>
+                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div>
+                            <div className="chatbot-button-title ">매출 내역</div>
+                            <div className="chatbot-button-desc">매출 내역</div>
+                        </div>
+                    </div>
+
+                    <div className="chatbot-button" onClick={() => selectInquiryCategory('kiosk_menu_update')}>
+                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div>
+                            <div className="chatbot-button-title ">메뉴 수정 및 추가</div>
+                            <div className="chatbot-button-desc">메뉴 수정 및 추가</div>
+                        </div>
+                    </div>
+
 
                     <div className="chatbot-button" onClick={() => loadFAQList()}>
                         <div className="chatbot-button-icon icon-headset"></div>
