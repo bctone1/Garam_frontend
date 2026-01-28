@@ -326,13 +326,39 @@ export default function Main() {
             ...prev,
             <div className="after-loading" key={`after-loading-${Date.now()}`}>
                 <div className="chatbot-button-grid">
-                    <div className="chatbot-button" onClick={() => getinquiryform(1)}>
+                    {/* <div className="chatbot-button" onClick={() => getinquiryform(1)}>
                         <div className="chatbot-button-icon icon-headset"></div>
                         <div>
                             <div className="chatbot-button-title">Contact Us</div>
                             <div className="chatbot-button-desc">Request direct support or consultation</div>
                         </div>
+                    </div> */}
+
+                    <div className="chatbot-button" onClick={() => selectInquiryCategory('paper_request')}>
+                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div>
+                            <div className="chatbot-button-title">Paper Request</div>
+                            <div className="chatbot-button-desc">Paper Request</div>
+                        </div>
                     </div>
+
+                    <div className="chatbot-button" onClick={() => selectInquiryCategory('sales_report')}>
+                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div>
+                            <div className="chatbot-button-title">Sales Report</div>
+                            <div className="chatbot-button-desc">Sales Report</div>
+                        </div>
+                    </div>
+
+                    <div className="chatbot-button" onClick={() => selectInquiryCategory('kiosk_menu_update')}>
+                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div>
+                            <div className="chatbot-button-title">Kiosk Menu Update</div>
+                            <div className="chatbot-button-desc">Kiosk Menu Update</div>
+                        </div>
+                    </div>
+
+
 
                     <div className="chatbot-button" onClick={() => loadFAQList()}>
                         <div className="chatbot-button-icon icon-headset"></div>
@@ -1108,11 +1134,35 @@ export default function Main() {
                                 </p>
                             </div>
                             <div className="chatbot-button-grid">
-                                <div className="chatbot-button" onClick={() => getinquiryform(1)}>
+                                {/* <div className="chatbot-button" onClick={() => getinquiryform(1)}>
                                     <div className="chatbot-button-icon icon-headset"></div>
                                     <div>
                                         <div className="chatbot-button-title">Contact Us</div>
                                         <div className="chatbot-button-desc">Request direct support or consultation</div>
+                                    </div>
+                                </div> */}
+
+                                <div className="chatbot-button" onClick={() => selectInquiryCategory('paper_request')}>
+                                    <div className="chatbot-button-icon icon-headset"></div>
+                                    <div>
+                                        <div className="chatbot-button-title">Paper Request</div>
+                                        <div className="chatbot-button-desc">Paper Request</div>
+                                    </div>
+                                </div>
+
+                                <div className="chatbot-button" onClick={() => selectInquiryCategory('sales_report')}>
+                                    <div className="chatbot-button-icon icon-headset"></div>
+                                    <div>
+                                        <div className="chatbot-button-title">Sales Report</div>
+                                        <div className="chatbot-button-desc">Sales Report</div>
+                                    </div>
+                                </div>
+
+                                <div className="chatbot-button" onClick={() => selectInquiryCategory('kiosk_menu_update')}>
+                                    <div className="chatbot-button-icon icon-headset"></div>
+                                    <div>
+                                        <div className="chatbot-button-title">Kiosk Menu Update</div>
+                                        <div className="chatbot-button-desc">Kiosk Menu Update</div>
                                     </div>
                                 </div>
 
