@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useRef, useEffect } from 'react';
 import { showToast } from '../utill/utill';
+import * as XLSX from 'xlsx';
 
 export default function Knowledge() {
     const [Categories, setCategories] = useState([]);
@@ -13,6 +14,12 @@ export default function Knowledge() {
     const [showAddFaqModal, setshowAddFaqModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [FAQquery, setFAQquery] = useState('');
+    const [stores, setStores] = useState([]);
+    const [storeSearchQuery, setStoreSearchQuery] = useState('');
+    const [csvUploadStatus, setCsvUploadStatus] = useState(false);
+    const csvFileInputRef = useRef(null);
+    const [showAddStoreModal, setShowAddStoreModal] = useState(false);
+    const [editStore, setEditStore] = useState(null);
 
     const getCategory = () => {
         // console.log("카테고리를 불러옵니다.");
@@ -58,10 +65,89 @@ export default function Knowledge() {
         });
     }
 
+    const fetch_Stores = () => {
+        axios.get(`${process.env.REACT_APP_API_URL}/customer`, {
+            params: {
+                offset: 0,
+                limit: 50,
+            },
+        }).then((res) => {
+            setStores(res.data);
+            console.log("📌 매장 목록:", res.data);
+        }).catch((err) => {
+            if (err.response && err.response.status === 404) {
+                alert("매장 정보를 찾을 수 없습니다.");
+            } else {
+                console.error("❌ 매장 조회 실패:", err);
+            }
+        });
+    }
+
+    const handleCsvFileSelect = async (e) => {
+        e.preventDefault();
+        setCsvUploadStatus(true);
+        const files = e.target.files || e.dataTransfer?.files;
+        if (!files || files.length === 0) {
+            console.warn("No files detected");
+            setCsvUploadStatus(false);
+            return;
+        }
+
+        const selectedFile = files[0];
+        const ext = selectedFile.name.split('.').pop().toLowerCase();
+
+        let uploadFile = selectedFile;
+        if (ext === 'xlsx' || ext === 'xls') {
+            try {
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const csvString = XLSX.utils.sheet_to_csv(sheet);
+                const blob = new Blob([csvString], { type: 'text/csv' });
+                uploadFile = new File([blob], selectedFile.name.replace(/\.xlsx?$/i, '.csv'), { type: 'text/csv' });
+            } catch (err) {
+                console.error("Excel 변환 오류:", err);
+                showToast('Excel 파일 변환에 실패했습니다.', 'error');
+                setCsvUploadStatus(false);
+                if (csvFileInputRef.current) csvFileInputRef.current.value = '';
+                return;
+            }
+        }
+
+        const formData = new FormData();
+        formData.append("file", uploadFile);
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/customer/upload_csv`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            console.log(data);
+            fetch_Stores();
+            showToast('파일이 업로드되었습니다.', 'success');
+        } catch (err) {
+            console.error("Upload error:", err);
+            showToast('파일 업로드에 실패했습니다.', 'error');
+        }
+        setCsvUploadStatus(false);
+        if (csvFileInputRef.current) csvFileInputRef.current.value = '';
+    };
+
+    const handleCsvDragOver = (event) => {
+        event.preventDefault();
+    };
+
+    const handleCsvDrop = (event) => {
+        event.preventDefault();
+        handleCsvFileSelect(event);
+    };
+
     useEffect(() => {
         getCategory();
         fetch_Knowledge();
         fetch_FAQ();
+        fetch_Stores();
     }, []);
 
     const toggleFAQ = (id) => {
@@ -109,6 +195,14 @@ export default function Knowledge() {
     const filteredKnowledge = documents.filter((p) => {
         const matchesSearch = p.original_name.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesSearch;
+    });
+
+    const filteredStores = stores.filter((store) => {
+        const name = store.business_name || '';
+        const businessNumber = store.business_number || '';
+        const query = storeSearchQuery.toLowerCase();
+        return name.toLowerCase().includes(query) ||
+            businessNumber.toLowerCase().includes(query);
     });
 
     const filteredFAQ = faqs.filter((faq) => {
@@ -159,6 +253,12 @@ export default function Knowledge() {
             <div className={`modal ${showAddFaqModal ? "show" : ""}`} id="faqAddModal" style={{ display: `${showAddFaqModal ? "flex" : "none"}` }}>
                 <FaqModal setshowAddFaqModal={setshowAddFaqModal} fetch_FAQ={fetch_FAQ} Categories={Categories} />
             </div>
+            <div className={`modal ${showAddStoreModal ? "show" : ""}`} style={{ display: `${showAddStoreModal ? "flex" : "none"}` }}>
+                <AddStoreModal setShowAddStoreModal={setShowAddStoreModal} fetch_Stores={fetch_Stores} />
+            </div>
+            <div className={`modal ${editStore ? "show" : ""}`} style={{ display: `${editStore ? "flex" : "none"}` }}>
+                {editStore && <EditStoreModal store={editStore} setEditStore={setEditStore} fetch_Stores={fetch_Stores} />}
+            </div>
 
             <main className="main-content">
                 {/* 상단 헤더 */}
@@ -179,6 +279,10 @@ export default function Knowledge() {
                                 <span className="stat-label">FAQ</span>
                                 <span className="stat-value">{faqs.length}</span>
                             </div>
+                            <div className="stat-item">
+                                <span className="stat-label">매장</span>
+                                <span className="stat-value">{stores.length}</span>
+                            </div>
                         </div>
                         <div className="status-indicator">
                             <div className="status-dot"></div>
@@ -197,6 +301,10 @@ export default function Knowledge() {
                         <button className={`tab-btn ${contentTap === "faqTab" ? "active" : ""}`} data-tab="faq" onClick={() => setcontentTap("faqTab")}>
                             <i className="fas fa-question-circle"></i>
                             FAQ 관리
+                        </button>
+                        <button className={`tab-btn ${contentTap === "storeTab" ? "active" : ""}`} data-tab="store" onClick={() => setcontentTap("storeTab")}>
+                            <i className="fas fa-store"></i>
+                            매장 관리
                         </button>
                     </div>
                 </section>
@@ -462,6 +570,84 @@ export default function Knowledge() {
 
                     </div>
                 </section>
+
+                {/* 매장 관리 탭 */}
+                <section className={`tab-content ${contentTap === "storeTab" ? "active" : ""}`} id="storeTab">
+                    <div className="upload-section">
+                        <div className="upload-area" id="csvUploadArea"
+                            onDragOver={handleCsvDragOver}
+                            onDrop={handleCsvDrop}
+                        >
+                            <div className={`upload-overlay ${csvUploadStatus ? "show" : ""}`} id="csvUploadOverlay">
+                                <div className="spinner"></div>
+                                <p style={{ color: "var(--primary-color)", fontWeight: "500" }}>파일을 처리하고 있습니다...</p>
+                            </div>
+                            <div style={{ display: `${csvUploadStatus ? "none" : ""}` }}>
+                                <div className="upload-icon">
+                                    <i className="fas fa-file-excel"></i>
+                                </div>
+                                <div className="upload-text">
+                                    <h3>CSV/Excel 파일을 드래그하거나 클릭해서 업로드</h3>
+                                    <p>CSV 또는 Excel 파일로 매장 정보를 일괄 등록할 수 있습니다</p>
+                                </div>
+                                <div className="upload-buttons">
+                                    <button className="btn btn-primary" onClick={() => csvFileInputRef.current?.click()}>
+                                        <i className="fas fa-file-upload"></i>
+                                        파일 선택
+                                    </button>
+                                    <input
+                                        type="file"
+                                        ref={csvFileInputRef}
+                                        style={{ display: "none" }}
+                                        accept=".csv,.xlsx,.xls"
+                                        onChange={handleCsvFileSelect}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="documents-section">
+                        <div className="section-header">
+                            <div className="header-left">
+                                <h3>매장 목록</h3>
+                                <span className="document-count">{filteredStores.length}개 매장</span>
+                            </div>
+                            <div className="header-actions">
+                                <div className="search-box">
+                                    <i className="fas fa-search"></i>
+                                    <input type="text" placeholder="매장 검색..." id="storeSearch"
+                                        value={storeSearchQuery}
+                                        onChange={(e) => setStoreSearchQuery(e.target.value)}
+                                    />
+                                </div>
+                                <button className="btn btn-primary" onClick={() => setShowAddStoreModal(true)}>
+                                    <i className="fas fa-plus"></i> 매장 추가
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="documents-table-wrapper">
+                            <table className="documents-table">
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: "50px" }}>
+                                            <input type="checkbox" />
+                                        </th>
+                                        <th style={{ width: "auto", minWidth: "150px" }}>상호명</th>
+                                        <th style={{ width: "150px" }}>사업자번호</th>
+                                        <th style={{ width: "130px" }}>전화번호</th>
+                                        <th style={{ width: "120px" }}>등록일</th>
+                                        <th style={{ width: "100px" }}>관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <LoadStores stores={filteredStores} fetch_Stores={fetch_Stores} setEditStore={setEditStore} />
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
             </main >
         </>
     )
@@ -528,6 +714,68 @@ function LoadDocuments({ documents, fetch_Knowledge }) {
 
         </>
     )
+}
+
+function LoadStores({ stores, fetch_Stores, setEditStore }) {
+    const handleDeleteStore = async (store) => {
+        if (!window.confirm(`"${store.business_name}" 매장을 정말 삭제하시겠습니까?`)) return;
+        try {
+            await fetch(
+                `${process.env.REACT_APP_API_URL}/customer/${store.id}`,
+                { method: "DELETE" }
+            );
+            fetch_Stores();
+            showToast('매장이 삭제되었습니다.', 'success');
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    return (
+        <>
+            {stores.map(store => (
+                <tr key={store.id}>
+                    <td><input type="checkbox" className="document-checkbox" /></td>
+                    <td>
+                        <div className="document-info">
+                            <i className="fas fa-store document-icon"></i>
+                            <div className="document-details">
+                                <span className="document-name">{store.business_name}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{formatBusinessNumber(store.business_number)}</td>
+                    <td>{store.phone || '-'}</td>
+                    <td>{store.created_at ? new Date(store.created_at).toISOString().split("T")[0] : '-'}</td>
+                    <td>
+                        <div className="action-buttons">
+                            <button
+                                className="action-btn-small" title="수정"
+                                onClick={() => setEditStore(store)}
+                            >
+                                <i className="fas fa-pen"></i>
+                            </button>
+                            <button
+                                className="action-btn-small delete" title="삭제"
+                                onClick={() => handleDeleteStore(store)}
+                            >
+                                <i className="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            ))}
+        </>
+    )
+}
+
+function formatBusinessNumber(num) {
+    if (!num) return '-';
+    const digits = num.replace(/[^0-9]/g, '');
+    if (digits.length === 10) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
+    }
+    return num;
 }
 
 function formatBytes(bytes) {
@@ -733,6 +981,180 @@ function FaqModal({ setshowAddFaqModal, fetch_FAQ, Categories }) {
                         onClick={() => createFAQ()}
                     >
                         <i className="fas fa-plus"></i> FAQ 추가
+                    </button>
+                </div>
+            </div>
+        </>
+    );
+}
+
+function AddStoreModal({ setShowAddStoreModal, fetch_Stores }) {
+    const [formData, setFormData] = useState({
+        business_name: "",
+        business_number: "",
+        phone: "",
+    });
+
+    const handleSubmit = () => {
+        if (!formData.business_name.trim()) {
+            alert("상호명은 필수입니다!");
+            return;
+        }
+        axios.post(`${process.env.REACT_APP_API_URL}/customer/`, formData)
+            .then(() => {
+                setShowAddStoreModal(false);
+                fetch_Stores();
+                showToast("매장이 등록되었습니다.", "success");
+            })
+            .catch((err) => {
+                console.error(err);
+                showToast("매장 등록에 실패했습니다.", "error");
+            });
+    };
+
+    const inputStyle = {
+        width: "100%",
+        padding: "0.75rem",
+        border: "1px solid var(--border-color)",
+        borderRadius: "var(--border-radius)",
+        fontSize: "1rem",
+    };
+
+    const labelStyle = {
+        display: "block",
+        fontWeight: 600,
+        marginBottom: "0.5rem",
+        color: "var(--text-primary)",
+    };
+
+    return (
+        <>
+            <div className="modal-backdrop" onClick={() => setShowAddStoreModal(false)}></div>
+            <div className="modal-container" style={{ maxWidth: "500px" }}>
+                <div className="modal-header">
+                    <h3 className="modal-title">매장 등록</h3>
+                    <button className="modal-close" onClick={() => setShowAddStoreModal(false)}>
+                        <i className="fas fa-times"></i>
+                    </button>
+                </div>
+                <div className="modal-body">
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                        <div>
+                            <label style={labelStyle}>
+                                상호명 <span style={{ color: "var(--danger-color)" }}>*</span>
+                            </label>
+                            <input type="text" placeholder="상호명을 입력하세요" style={inputStyle}
+                                value={formData.business_name}
+                                onChange={(e) => setFormData(prev => ({ ...prev, business_name: e.target.value }))}
+                            />
+                        </div>
+                        <div>
+                            <label style={labelStyle}>사업자번호</label>
+                            <input type="text" placeholder="000-00-00000" style={inputStyle}
+                                value={formData.business_number}
+                                onChange={(e) => setFormData(prev => ({ ...prev, business_number: e.target.value }))}
+                            />
+                        </div>
+                        <div>
+                            <label style={labelStyle}>전화번호</label>
+                            <input type="text" placeholder="전화번호를 입력하세요" style={inputStyle}
+                                value={formData.phone}
+                                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="modal-footer">
+                    <button className="btn btn-secondary" onClick={() => setShowAddStoreModal(false)}>취소</button>
+                    <button className="btn btn-primary" onClick={handleSubmit}>
+                        <i className="fas fa-plus"></i> 등록
+                    </button>
+                </div>
+            </div>
+        </>
+    );
+}
+
+function EditStoreModal({ store, setEditStore, fetch_Stores }) {
+    const [formData, setFormData] = useState({
+        business_name: store.business_name || "",
+        business_number: store.business_number || "",
+        phone: store.phone || "",
+    });
+
+    const handleSubmit = () => {
+        if (!formData.business_name.trim()) {
+            alert("상호명은 필수입니다!");
+            return;
+        }
+        axios.patch(`${process.env.REACT_APP_API_URL}/customer/${store.id}`, formData)
+            .then(() => {
+                setEditStore(null);
+                fetch_Stores();
+                showToast("매장 정보가 수정되었습니다.", "success");
+            })
+            .catch((err) => {
+                console.error(err);
+                showToast("매장 수정에 실패했습니다.", "error");
+            });
+    };
+
+    const inputStyle = {
+        width: "100%",
+        padding: "0.75rem",
+        border: "1px solid var(--border-color)",
+        borderRadius: "var(--border-radius)",
+        fontSize: "1rem",
+    };
+
+    const labelStyle = {
+        display: "block",
+        fontWeight: 600,
+        marginBottom: "0.5rem",
+        color: "var(--text-primary)",
+    };
+
+    return (
+        <>
+            <div className="modal-backdrop" onClick={() => setEditStore(null)}></div>
+            <div className="modal-container" style={{ maxWidth: "500px" }}>
+                <div className="modal-header">
+                    <h3 className="modal-title">매장 수정</h3>
+                    <button className="modal-close" onClick={() => setEditStore(null)}>
+                        <i className="fas fa-times"></i>
+                    </button>
+                </div>
+                <div className="modal-body">
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                        <div>
+                            <label style={labelStyle}>
+                                상호명 <span style={{ color: "var(--danger-color)" }}>*</span>
+                            </label>
+                            <input type="text" placeholder="상호명을 입력하세요" style={inputStyle}
+                                value={formData.business_name}
+                                onChange={(e) => setFormData(prev => ({ ...prev, business_name: e.target.value }))}
+                            />
+                        </div>
+                        <div>
+                            <label style={labelStyle}>사업자번호</label>
+                            <input type="text" placeholder="000-00-00000" style={inputStyle}
+                                value={formData.business_number}
+                                onChange={(e) => setFormData(prev => ({ ...prev, business_number: e.target.value }))}
+                            />
+                        </div>
+                        <div>
+                            <label style={labelStyle}>전화번호</label>
+                            <input type="text" placeholder="전화번호를 입력하세요" style={inputStyle}
+                                value={formData.phone}
+                                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="modal-footer">
+                    <button className="btn btn-secondary" onClick={() => setEditStore(null)}>취소</button>
+                    <button className="btn btn-primary" onClick={handleSubmit}>
+                        <i className="fas fa-save"></i> 저장
                     </button>
                 </div>
             </div>

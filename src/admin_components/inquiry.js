@@ -253,6 +253,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [currentImages, setCurrentImages] = useState([]);
+    const [expandedHistoryIds, setExpandedHistoryIds] = useState(new Set());
     const sudo = role === "superadmin" ? true : false
     const statusText = {
         new: "신규",
@@ -266,6 +267,25 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
         on_hold: "status-on_hold",
         completed: "status-completed",
     };
+    const statusIcon = {
+        new: "fas fa-exclamation-circle",
+        processing: "fas fa-spinner",
+        on_hold: "fas fa-pause-circle",
+        completed: "fas fa-check-circle",
+    };
+
+    const toggleHistory = (inquiryId) => {
+        setExpandedHistoryIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(inquiryId)) {
+                newSet.delete(inquiryId);
+            } else {
+                newSet.add(inquiryId);
+            }
+            return newSet;
+        });
+    };
+
 
     const actionsReturn = (action) => {
         const actions = {
@@ -777,25 +797,38 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 }
 
                 return (
-                    <div key={inquiry.id} className="inquiry-item">
+                    <div key={inquiry.id} className={`inquiry-item inquiry-item--${inquiry.status}`}>
 
                         <div className="inquiry-header">
                             <div className="inquiry-info">
-                                <div className="inquiry-name">{inquiry.businessName}</div>
-                                <div className="inquiry-meta">
-                                    <span className="inquiry-meta-item">카테고리</span> : {labelType(inquiry.inquiryType)} | <span className="inquiry-meta-item">사업자번호</span> : {inquiry.businessNumber} | <span className="inquiry-meta-item">연락처</span> : {inquiry.phone} | <span className="inquiry-meta-item">접수일</span> : {inquiry.createdDate}
+                                <div className="inquiry-name-row">
+                                    <span className="inquiry-name">{inquiry.businessName}</span>
+                                    <span className={`status-badge ${statusClass[inquiry.status]}`}>
+                                        <i className={statusIcon[inquiry.status]}></i>
+                                        {statusText[inquiry.status]}
+                                    </span>
                                 </div>
-                            </div>
-
-                            <div className="inquiry-actions">
-                                <span className={`status-badge ${statusClass[inquiry.status]}`}>
-                                    {statusText[inquiry.status]}
-                                </span>
-                                <div className="action-buttons">
-                                    {actionButtons}
-                                    <button className="btn btn-danger btn-sm" onClick={() => deleteDetail(inquiry)} >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
+                                <div className="inquiry-meta">
+                                    <div className="inquiry-meta-chip">
+                                        <i className="fas fa-tag"></i>
+                                        <span className="inquiry-meta-label">카테고리</span>
+                                        <span className="inquiry-meta-value">{labelType(inquiry.inquiryType)}</span>
+                                    </div>
+                                    <div className="inquiry-meta-chip">
+                                        <i className="fas fa-building"></i>
+                                        <span className="inquiry-meta-label">사업자번호</span>
+                                        <span className="inquiry-meta-value">{inquiry.businessNumber}</span>
+                                    </div>
+                                    <div className="inquiry-meta-chip">
+                                        <i className="fas fa-phone"></i>
+                                        <span className="inquiry-meta-label">연락처</span>
+                                        <span className="inquiry-meta-value">{inquiry.phone}</span>
+                                    </div>
+                                    <div className="inquiry-meta-chip">
+                                        <i className="fas fa-calendar"></i>
+                                        <span className="inquiry-meta-label">접수일</span>
+                                        <span className="inquiry-meta-value">{inquiry.createdDate}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -822,11 +855,32 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                     )
                                 })}
                             </div>
-
                             {inquiry.content}
                         </div>
+
                         {processorInfo}
-                        <div className="history-timeline">{historyHtml}</div>
+
+                        {inquiry.history && inquiry.history.length > 0 && (
+                            <div className="history-section">
+                                <button className="history-toggle-btn" onClick={() => toggleHistory(inquiry.id)}>
+                                    <i className={`fas fa-chevron-${expandedHistoryIds.has(inquiry.id) ? 'up' : 'down'}`}></i>
+                                    처리 이력 ({inquiry.history.length})
+                                </button>
+                                <div className={`history-timeline ${expandedHistoryIds.has(inquiry.id) ? 'expanded' : ''}`}>
+                                    {historyHtml}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="inquiry-actions-row">
+                            <div className="action-buttons">
+                                {actionButtons}
+                            </div>
+                            <span className="action-separator"></span>
+                            <button className="btn btn-danger btn-sm" onClick={() => deleteDetail(inquiry)}>
+                                <i className="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 );
             })}
