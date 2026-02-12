@@ -426,6 +426,9 @@
     width: 36px;
     height: 36px;
     flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -859,34 +862,55 @@
    inquiry form
    ================================================ */
 
+.inquiry-form {
+    background: #FAFAFA;
+    border: 1px solid #E8E8E8;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    animation: messageSlideIn .3s ease-out;
+}
+
 .chatbot-inquiry-header {
     display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #E8E8E8;
 }
 
 .inquiry-step {
     display: flex;
-    height: 2.4375rem;
-    padding: 0.75rem 1rem;
     align-items: center;
-    border-radius: 1.21875rem;
-    background: var(--Blue-ligh-BG, #E8F5FF);
-    color: var(--Blue---BG-normal, #3B82F6);
+    gap: 2px;
+    padding: 0.375rem 0.875rem;
+    border-radius: 1.25rem;
+    background: #323232;
+    color: #fff;
     font-family: Pretendard;
-    font-size: 1rem;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 2rem;
-    margin-right: 10px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1.25rem;
+}
+
+.inquiry-step h4 {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin: 0;
+    color: #fff;
 }
 
 .inquiry-question {
     align-self: stretch;
-    color: #000;
+    color: #555;
     font-family: Pretendard;
-    font-size: 1rem;
+    font-size: 0.9375rem;
     font-style: normal;
     font-weight: 400;
-    line-height: 1.25rem;
+    line-height: 1.375rem;
+    margin-top: 0.25rem;
 }
 
 .inquiry-sky-form {
@@ -952,20 +976,134 @@
     margin-top: 20px;
 }
 
+/* 기간 선택 그리드 */
+.inquiry-period-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.625rem;
+    margin-top: 0.875rem;
+}
+
+.inquiry-period-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.875rem 0.75rem;
+    border: 1px solid #E8E8E8;
+    border-radius: 0.75rem;
+    background: #FAFAFA;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: Pretendard;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #323232;
+    text-align: center;
+}
+
+.inquiry-period-option:hover {
+    border-color: #3B82F6;
+    background: #F0F7FF;
+}
+
+.inquiry-period-sub {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #888;
+    margin-top: 0.25rem;
+}
+
+/* 날짜 범위 입력 */
+.inquiry-date-range {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.inquiry-date-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.inquiry-date-label {
+    font-family: Pretendard;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.inquiry-date-input {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #D5D5D5;
+    border-radius: 0.5rem;
+    background: #FAFAFA;
+    font-family: Pretendard;
+    font-size: 0.9375rem;
+    color: #323232;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.inquiry-date-input:focus {
+    border-color: #3B82F6;
+    background: #fff;
+}
+
+.inquiry-date-separator {
+    font-size: 1.125rem;
+    color: #888;
+    padding-bottom: 0.625rem;
+    flex-shrink: 0;
+}
+
+.inquiry-date-confirm {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: #3B82F6;
+    color: #fff;
+    font-family: Pretendard;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.inquiry-date-confirm:hover:not(:disabled) {
+    background: #2563EB;
+}
+
+.inquiry-date-confirm:disabled {
+    background: #BDBDBD;
+    cursor: not-allowed;
+}
+
 .inquiry-message {
-    margin: 1rem 0;
+    margin: 1.25rem 0 0.75rem;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border-radius: 0.75rem;
+    border-left: 3px solid #3B82F6;
 }
 
 .inquiry-file-input {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #BDBDBD;
+    border: 1px dashed #BDBDBD;
     border-radius: 0.5rem;
-    background: #FFF;
+    background: #FAFAFA;
     font-family: Pretendard;
     font-size: 0.875rem;
     cursor: pointer;
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
     color: transparent;
 }
 
@@ -1106,21 +1244,23 @@
    ================================================ */
 
 .assistant-text {
-    color: #000;
+    color: #444;
     font-family: Pretendard;
-    font-size: 1rem;
+    font-size: 0.9375rem;
     font-style: normal;
     font-weight: 400;
     line-height: 1.5rem;
+    margin-bottom: 0.375rem;
 }
 
 .assistant-text-bold {
-    color: #000;
+    color: #222;
     font-family: Pretendard;
     font-size: 1rem;
     font-style: normal;
     font-weight: 600;
     line-height: 1.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .chatbot-bottom-nav {
@@ -1548,17 +1688,23 @@ textarea::-webkit-scrollbar {
         border-radius: 1.5rem 1.5rem 1.5rem 0.25rem;
     }
 
+    .inquiry-form {
+        padding: 1.25rem;
+        margin: 0.75rem 0;
+    }
+
     .inquiry-step {
-        height: 2.4375rem;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-        line-height: 2rem;
-        margin-right: 0.625rem;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8125rem;
     }
 
     .inquiry-question {
-        font-size: 1rem;
+        font-size: 0.9375rem;
         line-height: 1.25rem;
+    }
+
+    .inquiry-message {
+        padding: 0.875rem 1rem;
     }
 
     .inquiry-sky-form {

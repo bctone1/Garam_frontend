@@ -7,6 +7,92 @@ import "../user_styles/main.css";
 
 export default function Main() {
 
+    // SVG 아이콘 정의
+    const Icons = {
+        paper: (
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 2C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2H6Z" fill="#323232" fillOpacity="0.08"/>
+                <path d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z" stroke="#323232" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+                <path d="M14 2V8H20" stroke="#323232" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+                <path d="M8 13H16M8 17H14" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+        ),
+        chart: (
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="14" width="4" height="7" rx="1" fill="#323232" fillOpacity="0.35"/>
+                <rect x="10" y="9" width="4" height="12" rx="1" fill="#323232" fillOpacity="0.6"/>
+                <rect x="17" y="4" width="4" height="17" rx="1" fill="#323232"/>
+            </svg>
+        ),
+        menuEdit: (
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H15" stroke="#323232" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M3 12H15" stroke="#323232" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M3 18H11" stroke="#323232" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="19" cy="17" r="4.5" stroke="#323232" strokeWidth="1.5" fill="none"/>
+                <path d="M19 14.5V19.5M16.5 17H21.5" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+        ),
+        faq: (
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="9" stroke="#323232" strokeWidth="1.5" fill="#323232" fillOpacity="0.06"/>
+                <path d="M9.5 9.5C9.5 8.12 10.62 7 12 7C13.38 7 14.5 8.12 14.5 9.5C14.5 10.88 13.38 12 12 12V13.5" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="12" cy="16.5" r="0.8" fill="#323232"/>
+            </svg>
+        ),
+        building: (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 21V5C4 3.9 4.9 3 6 3H14C15.1 3 16 3.9 16 5V21" stroke="#323232" strokeWidth="1.5" fill="none"/>
+                <path d="M16 10H18C19.1 10 20 10.9 20 12V21" stroke="#323232" strokeWidth="1.5" fill="none"/>
+                <path d="M3 21H21" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+                <rect x="7" y="6" width="2" height="2" rx="0.5" fill="#323232"/>
+                <rect x="11" y="6" width="2" height="2" rx="0.5" fill="#323232"/>
+                <rect x="7" y="11" width="2" height="2" rx="0.5" fill="#323232"/>
+                <rect x="11" y="11" width="2" height="2" rx="0.5" fill="#323232"/>
+                <rect x="9" y="17" width="2" height="4" fill="#323232"/>
+            </svg>
+        ),
+        store: (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9L5 3H19L21 9" stroke="#323232" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+                <path d="M3 9C3 10.66 4.34 12 6 12C7.66 12 9 10.66 9 9C9 10.66 10.34 12 12 12C13.66 12 15 10.66 15 9C15 10.66 16.34 12 18 12C19.66 12 21 10.66 21 9" stroke="#323232" strokeWidth="1.5" fill="none"/>
+                <path d="M4 12V20C4 20.55 4.45 21 5 21H19C19.55 21 20 20.55 20 20V12" stroke="#323232" strokeWidth="1.5" fill="none"/>
+                <rect x="9" y="16" width="6" height="5" rx="0.5" stroke="#323232" strokeWidth="1.2" fill="none"/>
+            </svg>
+        ),
+        phone: (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 4H9L11 9L8.5 10.5C9.57 12.67 11.33 14.43 13.5 15.5L15 13L20 15V19C20 20.1 19.1 21 18 21C10.27 21 3 13.73 3 6C3 4.9 3.9 4 5 4Z" stroke="#323232" strokeWidth="1.5" fill="#323232" fillOpacity="0.08" strokeLinejoin="round"/>
+            </svg>
+        ),
+        notepad: (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="#323232" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+                <path d="M14 2V8H20" stroke="#323232" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+                <path d="M8 13H16M8 17H12" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+        ),
+        calendar: (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke="#323232" strokeWidth="1.5" fill="none"/>
+                <path d="M3 10H21" stroke="#323232" strokeWidth="1.5"/>
+                <path d="M8 2V6M16 2V6" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+                <rect x="7" y="13" width="3" height="3" rx="0.5" fill="#323232"/>
+            </svg>
+        ),
+        paperclip: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21.44 11.05L12.25 20.24C10.12 22.37 6.7 22.37 4.57 20.24C2.44 18.11 2.44 14.69 4.57 12.56L13.76 3.37C15.11 2.02 17.31 2.02 18.66 3.37C20.01 4.72 20.01 6.92 18.66 8.27L9.47 17.46C8.79 18.14 7.7 18.14 7.02 17.46C6.34 16.78 6.34 15.69 7.02 15.01L15.19 6.84" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+        ),
+        file: (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="#323232" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+                <path d="M14 2V8H20" stroke="#323232" strokeWidth="1.5" fill="none"/>
+            </svg>
+        ),
+    };
+
     const [messageInput, setMessageInput] = useState("");
     const [topK, setTopK] = useState(5);
     const [knowledgeId, setKnowledgeId] = useState("");
@@ -29,6 +115,8 @@ export default function Main() {
     const hasRunRef = useRef(false);
     const [newSession, setnewSession] = useState(0);
     const initialized = useRef(false);
+    const categoryRef = useRef(null);
+    const salesPeriodRef = useRef(null);
 
 
     const now = new Date();
@@ -202,7 +290,8 @@ export default function Main() {
         formData.append("business_name", inquiryInfo.companyName);
         formData.append("business_number", inquiryInfo.businessNumber);
         formData.append("phone", inquiryInfo.phone ?? "");
-        formData.append("content", messageInput);
+        const periodPrefix = salesPeriodRef.current ? `[${salesPeriodRef.current}] ` : "";
+        formData.append("content", periodPrefix + messageInput);
         formData.append("inquiry_type", inquiryInfo.category);
 
         selectedFiles.forEach((file) => {
@@ -322,6 +411,9 @@ export default function Main() {
 
     const getfirstMenu = () => {
         setinquiryStatus(false);
+        categoryRef.current = null;
+        salesPeriodRef.current = null;
+        setCustomDateRange({ start: "", end: "" });
         setSectionContent(prev => [
             ...prev,
             <div className="after-loading" key={`after-loading-${Date.now()}`}>
@@ -335,7 +427,7 @@ export default function Main() {
                     </div> */}
 
                     <div className="chatbot-button" onClick={() => selectInquiryCategory('paper_request')}>
-                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div className="chatbot-button-icon">{Icons.paper}</div>
                         <div>
                             <div className="chatbot-button-title ">용지 요청</div>
                             <div className="chatbot-button-desc">용지 요청</div>
@@ -343,7 +435,7 @@ export default function Main() {
                     </div>
 
                     <div className="chatbot-button" onClick={() => selectInquiryCategory('sales_report')}>
-                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div className="chatbot-button-icon">{Icons.chart}</div>
                         <div>
                             <div className="chatbot-button-title ">매출 내역</div>
                             <div className="chatbot-button-desc">매출 내역</div>
@@ -351,7 +443,7 @@ export default function Main() {
                     </div>
 
                     <div className="chatbot-button" onClick={() => selectInquiryCategory('kiosk_menu_update')}>
-                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div className="chatbot-button-icon">{Icons.menuEdit}</div>
                         <div>
                             <div className="chatbot-button-title ">메뉴 수정 및 추가</div>
                             <div className="chatbot-button-desc">메뉴 수정 및 추가</div>
@@ -360,7 +452,7 @@ export default function Main() {
 
 
                     <div className="chatbot-button" onClick={() => loadFAQList()}>
-                        <div className="chatbot-button-icon icon-headset"></div>
+                        <div className="chatbot-button-icon">{Icons.faq}</div>
                         <div>
                             <div className="chatbot-button-title ">자주하는 질문</div>
                             <div className="chatbot-button-desc">질문 목록 보기</div>
@@ -395,7 +487,7 @@ export default function Main() {
             setSectionContent(prev => [
                 ...prev,
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
-                <div className="chatbot-submenu-wrap" key={`submenu-${Date.now()}`}>
+                <div className="chatbot-submenu-wrap faq-list" key={`submenu-${Date.now()}`}>
                     <h5 className="chatbot-submenu-title-h5">자주하는 질문</h5>
                     <p>클릭하여 세부 문제를 선택하세요.</p>
 
@@ -437,6 +529,8 @@ export default function Main() {
             ...prev,
             category: category
         }));
+        categoryRef.current = category;
+        salesPeriodRef.current = null;
 
         let content = null;
         if (category === 'paper_request') {
@@ -457,8 +551,54 @@ export default function Main() {
             </div>
         ]);
 
-        getinquiryform(2);
+        if (category === 'sales_report') {
+            getinquiryform("sales_period");
+        } else {
+            getinquiryform(2);
+        }
     }
+
+    const handlePeriodSelect = (period) => {
+        if (period === '직접입력') {
+            setinquiryStatus("custom_period");
+            setCustomDateRange({ start: "", end: "" });
+            setSectionContent(prev => [
+                ...prev,
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                    <div className="bubble-date user">{formattedTime}</div>
+                    <div className="bubble-message user">{period}</div>
+                </div>
+            ]);
+        } else {
+            salesPeriodRef.current = period;
+            setSectionContent(prev => [
+                ...prev,
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                    <div className="bubble-date user">{formattedTime}</div>
+                    <div className="bubble-message user">{period}</div>
+                </div>
+            ]);
+            getinquiryform(2);
+        }
+    }
+
+    const [customDateRange, setCustomDateRange] = useState({ start: "", end: "" });
+
+    const handleCustomDateConfirm = () => {
+        if (!customDateRange.start || !customDateRange.end) return;
+        const formatDate = (d) => d.replace(/-/g, '.');
+        const formatted = `${formatDate(customDateRange.start)} ~ ${formatDate(customDateRange.end)}`;
+        salesPeriodRef.current = formatted;
+        setSectionContent(prev => [
+            ...prev,
+            <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                <div className="bubble-date user">{formattedTime}</div>
+                <div className="bubble-message user">{formatted}</div>
+            </div>
+        ]);
+        setCustomDateRange({ start: "", end: "" });
+        getinquiryform(2);
+    };
 
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [filePreviews, setFilePreviews] = useState([]);
@@ -548,6 +688,10 @@ export default function Main() {
 
 
     const getinquiryform = (status) => {
+        const isSales = categoryRef.current === 'sales_report';
+        const totalSteps = isSales ? 5 : 4;
+        const stepOffset = isSales ? 1 : 0;
+
         setinquiryStatus(status);
         if (status === 1) {
             setSectionContent(prev => [
@@ -600,28 +744,57 @@ export default function Main() {
                     </div>
                 </div>
             ]);
+        } else if (status === "sales_period") {
+            setSectionContent(prev => [
+                ...prev,
+                <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
+                <div className="inquiry-form" key={`inquiry-period-${Date.now()}`}>
+                    <div className="chatbot-inquiry-header">
+                        <div className="inquiry-step"><h4>1</h4>/5 단계</div>
+                        <div>
+                            <h5 className="chatbot-submenu-title-h5">조회 기간</h5>
+                            <p className="inquiry-question">매출 내역 조회 기간을 선택해주세요.</p>
+                        </div>
+                    </div>
+                    <div className="inquiry-message">
+                        <p className="assistant-text-bold">조회할 기간을 선택하세요.</p>
+                        <div className="inquiry-period-grid">
+                            <div className="inquiry-period-option" onClick={() => handlePeriodSelect("상반기")}>
+                                상반기<span className="inquiry-period-sub">1월 ~ 6월</span>
+                            </div>
+                            <div className="inquiry-period-option" onClick={() => handlePeriodSelect("하반기")}>
+                                하반기<span className="inquiry-period-sub">7월 ~ 12월</span>
+                            </div>
+                            <div className="inquiry-period-option" onClick={() => handlePeriodSelect("전체")}>
+                                전체<span className="inquiry-period-sub">1월 ~ 12월</span>
+                            </div>
+                            <div className="inquiry-period-option" onClick={() => handlePeriodSelect("직접입력")}>
+                                직접입력<span className="inquiry-period-sub">기간을 직접 지정</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="chatbot-bottom-nav">
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                    </div>
+                </div>
+            ]);
         } else if (status === 2) {
             setSectionContent(prev => [
                 ...prev,
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>1</h4>/4 단계</div>
-
+                        <div className="inquiry-step"><h4>{1 + stepOffset}</h4>/{totalSteps} 단계</div>
                         <div>
                             <h5 className="chatbot-submenu-title-h5">문의 정보 수집</h5>
                             <p className="inquiry-question">사업자번호를 입력해주세요.</p>
                         </div>
                     </div>
-                    <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text">안녕하세요! 문의사항을 접수해드리겠습니다. <br />빠른 처리를 위해 몇 가지 정보를 수집하겠습니다.</p>
-                        <br />
-
-                        <p className="assistant-text-bold">첫 번째로, 사업자번호를 입력하세요. </p>
+                        <p className="assistant-text">안녕하세요! 문의사항을 접수해드리겠습니다. 빠른 처리를 위해 몇 가지 정보를 수집하겠습니다.</p>
+                        <p className="assistant-text-bold">첫 번째로, 사업자번호를 입력하세요.</p>
                         <p className="assistant-text">(예: 1234567890)</p>
-                        <br />
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
@@ -633,19 +806,16 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>2</h4>/4 단계</div>
-
+                        <div className="inquiry-step"><h4>{2 + stepOffset}</h4>/{totalSteps} 단계</div>
                         <div>
                             <h5 className="chatbot-submenu-title-h5">상호명</h5>
                             <p className="inquiry-question">상호명을 입력해주세요.</p>
                         </div>
                     </div>
-                    <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">두 번째로, 상호명을 입력하세요. </p>
+                        <p className="assistant-text-bold">두 번째로, 상호명을 입력하세요.</p>
                         <p className="assistant-text">(예: 가람포스텍)</p>
-                        <br />
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
@@ -657,17 +827,15 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>3</h4>/4 단계</div>
-
+                        <div className="inquiry-step"><h4>{3 + stepOffset}</h4>/{totalSteps} 단계</div>
                         <div>
                             <h5 className="chatbot-submenu-title-h5">전화번호</h5>
                             <p className="inquiry-question">전화번호를 입력해주세요.</p>
                         </div>
                     </div>
-                    <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">세 번째로, 전화번호를 입력하세요. </p>
+                        <p className="assistant-text-bold">세 번째로, 전화번호를 입력하세요.</p>
                         <p className="assistant-text">(예: 010-1234-5678)</p>
                     </div>
                     <div className="chatbot-bottom-nav">
@@ -681,20 +849,16 @@ export default function Main() {
                 ...prev,
                 <div className="inquiry-form" key={`inquiry-${Date.now()}`}>
                     <div className="chatbot-inquiry-header">
-                        <div className="inquiry-step"><h4>4</h4>/4 단계</div>
-
+                        <div className="inquiry-step"><h4>{4 + stepOffset}</h4>/{totalSteps} 단계</div>
                         <div>
                             <h5 className="chatbot-submenu-title-h5">문의 내용</h5>
                             <p className="inquiry-question">문의내용을 입력해주세요.</p>
                         </div>
                     </div>
-                    <br />
 
                     <div className="inquiry-message">
-                        <p className="assistant-text-bold">마지막으로, 문의내용을 입력하세요. </p>
+                        <p className="assistant-text-bold">마지막으로, 문의내용을 입력하세요.</p>
                         <p className="assistant-text">(예: 카드리더기 오류로 결제가 안됩니다, POS 용지 부족으로 용지 요청드립니다)</p>
-                        <br />
-
                         <input
                             className="inquiry-file-input"
                             type="file"
@@ -702,7 +866,6 @@ export default function Main() {
                             multiple
                             accept="image/*"
                         />
-
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
@@ -716,13 +879,13 @@ export default function Main() {
                 <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
                     <div className="bubble-date assistant">{formattedTime}</div>
                     <div className="bubble-message assistant">
-                        📝문의가 접수 되었습니다.<br />
+                        {Icons.notepad} 문의가 접수 되었습니다.<br />
                         <br />
                         접수 정보:<br />
                         • 사업자번호: {inquiryInfo.businessNumber}<br />
                         • 상호명: {inquiryInfo.companyName}<br />
                         • 연락처: {inquiryInfo.phone}<br />
-                        • 문의 내용: {messageInput}<br />
+                        • 문의 내용: {salesPeriodRef.current ? `[${salesPeriodRef.current}] ` : ""}{messageInput}<br />
 
                         {filePreviews.length > 0 && (
                             <>
@@ -748,7 +911,7 @@ export default function Main() {
                         <br />
                         긴급한 사항인 경우 1588-1234로 직접 연락주시기 바랍니다.<br />
                         <br />
-                        감사합니다! 🙏<br />
+                        감사합니다!<br />
                     </div>
                 </div>
             ]);
@@ -860,6 +1023,42 @@ export default function Main() {
                 </div>
             ]);
             setMessageInput("");
+
+            // 사업자번호로 고객 정보 자동완성 시도
+            try {
+                const cleanInput = content.replace(/[^0-9]/g, '');
+                const res = await axios.get(`${process.env.REACT_APP_API_URL}/customer/search`, {
+                    params: { q: cleanInput || content, limit: 10 }
+                });
+                const customer = res.data?.find(c => {
+                    const cleanBn = (c.business_number || '').replace(/[^0-9]/g, '');
+                    return cleanInput && cleanBn && cleanInput === cleanBn;
+                });
+                if (customer) {
+                    setInquiryInfo(prev => ({
+                        ...prev,
+                        companyName: customer.business_name || prev.companyName,
+                        phone: customer.phone || prev.phone,
+                    }));
+                    setSectionContent(prev => [
+                        ...prev,
+                        <div className="chatbot-bubble assistant" key={`autofill-${Date.now()}`}>
+                            <div className="bubble-date assistant">{formattedTime}</div>
+                            <div className="bubble-message assistant">
+                                등록된 사업자 정보를 찾았습니다.<br />
+                                • 상호명: {customer.business_name}<br />
+                                • 전화번호: {customer.phone}<br />
+                                <br />
+                                자동으로 입력되었습니다. 문의 내용을 입력해주세요.
+                            </div>
+                        </div>
+                    ]);
+                    getinquiryform(5);
+                    return;
+                }
+            } catch (err) {
+                console.log("고객 검색 실패:", err);
+            }
             getinquiryform(3);
 
         } else if (inquiryStatus === 3) {
@@ -953,7 +1152,7 @@ export default function Main() {
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
     const [isProcessing, setIsProcessing] = useState(false);
-    const STT_LANG = "Kor";
+    const STT_LANG = "ko-KR";
 
     const handleSTT = async () => {
         if (!micStatus) {
@@ -984,27 +1183,36 @@ export default function Main() {
                 const formData = new FormData();
                 formData.append("file", blob, "recording.webm");
                 formData.append("lang", STT_LANG);
+                formData.append("session_id", newSession);
+                formData.append("top_k", topK);
+                if (knowledgeId) formData.append("knowledge_id", knowledgeId);
 
                 try {
-                    const response = await fetch(`${process.env.REACT_APP_API_URL}/llm/clova_stt`, {
+                    const response = await fetch(`${process.env.REACT_APP_API_URL}/llm/stt`, {
                         method: "POST",
                         body: formData,
                     });
 
                     if (!response.ok) throw new Error(`STT 실패: ${response.statusText}`);
                     const data = await response.json();
-                    console.log("STT 결과:", data.text);
+                    const recognizedText = data.question || data.text;
+                    console.log("STT 결과:", recognizedText);
 
                     setSectionContent(prev => [
                         ...prev,
                         <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
                             <div className="bubble-date user">{formattedTime}</div>
-                            <div className="bubble-message user">{data.text}</div>
+                            <div className="bubble-message user">{recognizedText}</div>
                         </div>
                     ]);
 
-                    const answerdata = await requestAssistantAnswer(data.text);
-                    const answer = answerdata.answer?.trim?.() ? answerdata.answer.trim() : "응답을 가져올 수 없습니다.";
+                    let answer;
+                    if (data.answer) {
+                        answer = data.answer.trim();
+                    } else {
+                        const answerdata = await requestAssistantAnswer(recognizedText);
+                        answer = answerdata.answer?.trim?.() ? answerdata.answer.trim() : "응답을 가져올 수 없습니다.";
+                    }
 
                     setSectionContent(prev => [
                         ...prev,
@@ -1124,7 +1332,7 @@ export default function Main() {
                                 </div> */}
 
                                 <div className="chatbot-button" onClick={() => selectInquiryCategory('paper_request')}>
-                                    <div className="chatbot-button-icon icon-headset"></div>
+                                    <div className="chatbot-button-icon">{Icons.paper}</div>
                                     <div>
                                         <div className="chatbot-button-title ">용지 요청</div>
                                         <div className="chatbot-button-desc">용지 요청</div>
@@ -1132,7 +1340,7 @@ export default function Main() {
                                 </div>
 
                                 <div className="chatbot-button" onClick={() => selectInquiryCategory('sales_report')}>
-                                    <div className="chatbot-button-icon icon-headset"></div>
+                                    <div className="chatbot-button-icon">{Icons.chart}</div>
                                     <div>
                                         <div className="chatbot-button-title ">매출 내역</div>
                                         <div className="chatbot-button-desc">매출 내역</div>
@@ -1140,7 +1348,7 @@ export default function Main() {
                                 </div>
 
                                 <div className="chatbot-button" onClick={() => selectInquiryCategory('kiosk_menu_update')}>
-                                    <div className="chatbot-button-icon icon-headset"></div>
+                                    <div className="chatbot-button-icon">{Icons.menuEdit}</div>
                                     <div>
                                         <div className="chatbot-button-title ">메뉴 수정 및 추가</div>
                                         <div className="chatbot-button-desc">메뉴 수정 및 추가</div>
@@ -1150,7 +1358,7 @@ export default function Main() {
 
 
                                 <div className="chatbot-button" onClick={() => loadFAQList()}>
-                                    <div className="chatbot-button-icon icon-headset"></div>
+                                    <div className="chatbot-button-icon">{Icons.faq}</div>
                                     <div>
                                         <div className="chatbot-button-title ">자주하는 질문</div>
                                         <div className="chatbot-button-desc">질문 목록 보기</div>
@@ -1171,6 +1379,52 @@ export default function Main() {
                         </div>
 
                         {sectionContent.map((content) => content)}
+
+                        {/* 기간 직접입력 - 달력 선택 */}
+                        {inquiryStatus === "custom_period" && (
+                            <div className="inquiry-form">
+                                <div className="chatbot-inquiry-header">
+                                    <div className="inquiry-step"><h4>1</h4>/5 단계</div>
+                                    <div>
+                                        <h5 className="chatbot-submenu-title-h5">기간 직접입력</h5>
+                                        <p className="inquiry-question">시작일과 종료일을 선택해주세요.</p>
+                                    </div>
+                                </div>
+                                <div className="inquiry-message">
+                                    <div className="inquiry-date-range">
+                                        <div className="inquiry-date-field">
+                                            <label className="inquiry-date-label">시작일</label>
+                                            <input
+                                                type="date"
+                                                className="inquiry-date-input"
+                                                value={customDateRange.start}
+                                                onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
+                                            />
+                                        </div>
+                                        <span className="inquiry-date-separator">~</span>
+                                        <div className="inquiry-date-field">
+                                            <label className="inquiry-date-label">종료일</label>
+                                            <input
+                                                type="date"
+                                                className="inquiry-date-input"
+                                                value={customDateRange.end}
+                                                onChange={(e) => setCustomDateRange(prev => ({ ...prev, end: e.target.value }))}
+                                            />
+                                        </div>
+                                    </div>
+                                    <button
+                                        className="inquiry-date-confirm"
+                                        onClick={handleCustomDateConfirm}
+                                        disabled={!customDateRange.start || !customDateRange.end}
+                                    >
+                                        선택 완료
+                                    </button>
+                                </div>
+                                <div className="chatbot-bottom-nav">
+                                    <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* 파일 미리보기 - inquiryStatus가 4일 때만 표시 */}
                         {inquiryStatus === 5 && filePreviews.length > 0 && (
