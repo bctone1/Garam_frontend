@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import "../user_styles/main.css";
+import SecureNumberPad from "./SecureNumberPad";
 
 export default function Main() {
 
@@ -110,6 +111,7 @@ export default function Main() {
     const [micStatus, setMicStatus] = useState(false);
     const sectionEndRef = useRef(null);
     const [plusmenu, setplusmenu] = useState(false);
+    const [showNumberPad, setShowNumberPad] = useState(false);
     const [sectionContent, setSectionContent] = useState([]);
     const timerRef = useRef(null);
     const hasRunRef = useRef(false);
@@ -779,6 +781,7 @@ export default function Main() {
                 </div>
             ]);
         } else if (status === 2) {
+            setShowNumberPad(true);
             setSectionContent(prev => [
                 ...prev,
                 <div className="chatbot-underline" key={`underline-${Date.now()}`} />,
@@ -793,8 +796,8 @@ export default function Main() {
 
                     <div className="inquiry-message">
                         <p className="assistant-text">안녕하세요! 문의사항을 접수해드리겠습니다. 빠른 처리를 위해 몇 가지 정보를 수집하겠습니다.</p>
-                        <p className="assistant-text-bold">첫 번째로, 사업자번호를 입력하세요.</p>
-                        <p className="assistant-text">(예: 1234567890)</p>
+                        <p className="assistant-text-bold">첫 번째로, 보안 키패드로 사업자번호를 입력하세요.</p>
+                        <p className="assistant-text">(형식: XXX-XX-XXXXX)</p>
                     </div>
                     <div className="chatbot-bottom-nav">
                         <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
@@ -980,6 +983,61 @@ export default function Main() {
         }
     }
 
+    // 숫자패드 사업자번호 확인
+    const handleNumberPadConfirm = async (bizNum) => {
+        setShowNumberPad(false);
+        const formattedBizNum = `${bizNum.slice(0, 3)}-${bizNum.slice(3, 5)}-${bizNum.slice(5)}`;
+        const now = new Date();
+        const formattedTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        setInquiryInfo(prev => ({
+            ...prev,
+            businessNumber: bizNum
+        }));
+        setSectionContent(prev => [
+            ...prev,
+            <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                <div className="bubble-date user">{formattedTime}</div>
+                <div className="bubble-message user">{formattedBizNum}</div>
+            </div>
+        ]);
+
+        try {
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/customer/search`, {
+                params: { q: bizNum, limit: 10 }
+            });
+            const customer = res.data?.find(c => {
+                const cleanBn = (c.business_number || '').replace(/[^0-9]/g, '');
+                return cleanBn && bizNum === cleanBn;
+            });
+            if (customer) {
+                setInquiryInfo(prev => ({
+                    ...prev,
+                    companyName: customer.business_name || prev.companyName,
+                    phone: customer.phone || prev.phone,
+                }));
+                setSectionContent(prev => [
+                    ...prev,
+                    <div className="chatbot-bubble assistant" key={`autofill-${Date.now()}`}>
+                        <div className="bubble-date assistant">{formattedTime}</div>
+                        <div className="bubble-message assistant">
+                            등록된 사업자 정보를 찾았습니다.<br />
+                            • 상호명: {customer.business_name}<br />
+                            • 전화번호: {customer.phone}<br />
+                            <br />
+                            자동으로 입력되었습니다. 문의 내용을 입력해주세요.
+                        </div>
+                    </div>
+                ]);
+                getinquiryform(5);
+                return;
+            }
+        } catch (err) {
+            console.log("고객 검색 실패:", err);
+        }
+        getinquiryform(3);
+    };
+
     // 메시지 전송
     const handleSend = async () => {
         const content = messageInput.trim();
@@ -1011,55 +1069,10 @@ export default function Main() {
             getinquiryform(2);
 
         } else if (inquiryStatus === 2) {
-            setInquiryInfo(prev => ({
-                ...prev,
-                businessNumber: content
-            }));
-            setSectionContent(prev => [
-                ...prev,
-                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
-                    <div className="bubble-date user">{formattedTime}</div>
-                    <div className="bubble-message user">{content}</div>
-                </div>
-            ]);
+            // 사업자번호는 보안 키패드로 입력 (숫자패드 열기)
+            setShowNumberPad(true);
             setMessageInput("");
-
-            // 사업자번호로 고객 정보 자동완성 시도
-            try {
-                const cleanInput = content.replace(/[^0-9]/g, '');
-                const res = await axios.get(`${process.env.REACT_APP_API_URL}/customer/search`, {
-                    params: { q: cleanInput || content, limit: 10 }
-                });
-                const customer = res.data?.find(c => {
-                    const cleanBn = (c.business_number || '').replace(/[^0-9]/g, '');
-                    return cleanInput && cleanBn && cleanInput === cleanBn;
-                });
-                if (customer) {
-                    setInquiryInfo(prev => ({
-                        ...prev,
-                        companyName: customer.business_name || prev.companyName,
-                        phone: customer.phone || prev.phone,
-                    }));
-                    setSectionContent(prev => [
-                        ...prev,
-                        <div className="chatbot-bubble assistant" key={`autofill-${Date.now()}`}>
-                            <div className="bubble-date assistant">{formattedTime}</div>
-                            <div className="bubble-message assistant">
-                                등록된 사업자 정보를 찾았습니다.<br />
-                                • 상호명: {customer.business_name}<br />
-                                • 전화번호: {customer.phone}<br />
-                                <br />
-                                자동으로 입력되었습니다. 문의 내용을 입력해주세요.
-                            </div>
-                        </div>
-                    ]);
-                    getinquiryform(5);
-                    return;
-                }
-            } catch (err) {
-                console.log("고객 검색 실패:", err);
-            }
-            getinquiryform(3);
+            return;
 
         } else if (inquiryStatus === 3) {
             setInquiryInfo(prev => ({
@@ -1522,6 +1535,12 @@ export default function Main() {
                         </div>
                     </div>
                 </footer>
+
+                <SecureNumberPad
+                    visible={showNumberPad}
+                    onConfirm={handleNumberPadConfirm}
+                    onCancel={() => setShowNumberPad(false)}
+                />
             </div >
 
 

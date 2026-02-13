@@ -817,7 +817,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                                     <div className="inquiry-meta-chip">
                                         <i className="fas fa-building"></i>
                                         <span className="inquiry-meta-label">사업자번호</span>
-                                        <span className="inquiry-meta-value">{inquiry.businessNumber}</span>
+                                        <span className="inquiry-meta-value">{inquiry.businessNumber?.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}</span>
                                     </div>
                                     <div className="inquiry-meta-chip">
                                         <i className="fas fa-phone"></i>

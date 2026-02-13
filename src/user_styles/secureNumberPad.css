@@ -1,0 +1,170 @@
+.snp-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.snp-container {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 20px;
+    width: calc(100% - 48px);
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.snp-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.snp-lock-icon {
+    font-size: 22px;
+    color: #3B82F6;
+}
+
+.snp-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    margin-top: 8px;
+}
+
+.snp-subtitle {
+    font-size: 13px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.snp-display {
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.snp-digit-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+
+.snp-digit-box {
+    width: 24px;
+    height: 36px;
+    border-bottom: 2px solid #DDD;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 1px;
+}
+
+.snp-digit-box.filled {
+    border-bottom-color: #3B82F6;
+}
+
+.snp-digit-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.snp-separator {
+    font-size: 20px;
+    color: #999;
+    margin: 0 4px;
+}
+
+.snp-format-hint {
+    font-size: 13px;
+    color: #AAA;
+    margin-top: 8px;
+}
+
+.snp-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 240px;
+    margin-bottom: 0;
+}
+
+.snp-key {
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 64px;
+    max-height: 64px;
+    border-radius: 12px;
+    background: #F5F5F5;
+    border: none;
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.snp-key:active {
+    background: #E0E0E0;
+}
+
+.snp-cancel-key {
+    background: #FFF0F0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #FF4444;
+}
+
+.snp-cancel-key:active {
+    background: #FFE0E0;
+}
+
+.snp-backspace-key {
+    background: #F0F0F0;
+    font-size: 20px;
+    color: #555;
+}
+
+.snp-backspace-key:active {
+    background: #E0E0E0;
+}
+
+.snp-confirm {
+    margin-top: 16px;
+    width: 100%;
+    max-width: 240px;
+    height: 48px;
+    border-radius: 12px;
+    background: #CCC;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    cursor: not-allowed;
+    transition: background 0.2s;
+}
+
+.snp-confirm.active {
+    background: #3B82F6;
+    cursor: pointer;
+}
+
+.snp-confirm.active:active {
+    background: #2563EB;
+}
