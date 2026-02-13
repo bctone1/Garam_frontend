@@ -1539,7 +1539,10 @@ export default function Main() {
                 <SecureNumberPad
                     visible={showNumberPad}
                     onConfirm={handleNumberPadConfirm}
-                    onCancel={() => setShowNumberPad(false)}
+                    onCancel={() => {
+                        setShowNumberPad(false);
+                        getfirstMenu();
+                    }}
                 />
             </div >
 
