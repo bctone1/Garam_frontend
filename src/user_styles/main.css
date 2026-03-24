@@ -1839,3 +1839,97 @@ textarea::-webkit-scrollbar {
         padding: 0 1.25rem 0.75rem 1.25rem;
     }
 }
+
+/* ================================================
+   가맹점 확인 (예/아니오) 버튼
+   ================================================ */
+
+.confirm-store-info {
+    background: #F8F9FA;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.confirm-store-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.375rem 0;
+}
+
+.confirm-store-label {
+    font-size: 0.875rem;
+    color: #777777;
+    min-width: 3.5rem;
+    font-weight: 500;
+}
+
+.confirm-store-value {
+    font-size: 0.9375rem;
+    color: #323232;
+    font-weight: 600;
+}
+
+.confirm-store-buttons {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0 1.25rem 1rem 1.25rem;
+}
+
+.confirm-button-yes,
+.confirm-button-no {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.confirm-button-yes {
+    background: #3B82F6;
+    color: #FFFFFF;
+}
+
+.confirm-button-yes:hover {
+    background: #2563EB;
+}
+
+.confirm-button-no {
+    background: #F5F5F5;
+    color: #323232;
+}
+
+.confirm-button-no:hover {
+    background: #E5E5E5;
+}
+
+/* ================================================
+   면책 문구 / 택배마감 안내
+   ================================================ */
+
+.disclaimer-text {
+    font-size: 0.75rem;
+    color: #999999;
+    line-height: 1.4;
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: #FFF9E6;
+    border-radius: 0.5rem;
+    border-left: 3px solid #F59E0B;
+}
+
+.delivery-notice {
+    display: inline-block;
+    font-size: 0.8125rem;
+    color: #E67700;
+    font-weight: 600;
+    background: #FFF3E0;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+}

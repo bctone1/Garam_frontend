@@ -106,6 +106,8 @@ export default function Main() {
         companyName: null,
         phone: null,
         detail: null,
+        receiveMethod: null,
+        address: null,
     });
     const [welecome, setWelecome] = useState(false);
     const [micStatus, setMicStatus] = useState(false);
@@ -119,6 +121,8 @@ export default function Main() {
     const initialized = useRef(false);
     const categoryRef = useRef(null);
     const salesPeriodRef = useRef(null);
+    const confirmedStoreRef = useRef(null);
+    const isRegistrationRef = useRef(false);
 
 
     const now = new Date();
@@ -284,16 +288,24 @@ export default function Main() {
 
 
 
-    const InquiryCreate = async () => {
-        console.log(inquiryInfo);
-        console.log(selectedFiles);
-        console.log(messageInput);
+    const InquiryCreate = async (displayData) => {
+        const data = displayData || {};
         const formData = new FormData();
-        formData.append("business_name", inquiryInfo.companyName);
-        formData.append("business_number", inquiryInfo.businessNumber);
-        formData.append("phone", inquiryInfo.phone ?? "");
-        const periodPrefix = salesPeriodRef.current ? `[${salesPeriodRef.current}] ` : "";
-        formData.append("content", periodPrefix + messageInput);
+        formData.append("business_name", data.companyName || inquiryInfo.companyName);
+        formData.append("business_number", data.businessNumber || inquiryInfo.businessNumber);
+        formData.append("phone", data.phone || inquiryInfo.phone || "");
+
+        let contentValue = "";
+        if (categoryRef.current === 'paper_request') {
+            contentValue = "용지 요청";
+        } else if (categoryRef.current === 'sales_report') {
+            const periodPrefix = salesPeriodRef.current ? `[${salesPeriodRef.current}] ` : "";
+            contentValue = periodPrefix + "수신방법: " + (data.receiveMethod || inquiryInfo.receiveMethod || messageInput);
+        } else {
+            const periodPrefix = salesPeriodRef.current ? `[${salesPeriodRef.current}] ` : "";
+            contentValue = periodPrefix + (data.detail || messageInput);
+        }
+        formData.append("content", contentValue);
         formData.append("inquiry_type", inquiryInfo.category);
 
         selectedFiles.forEach((file) => {
@@ -309,6 +321,23 @@ export default function Main() {
             );
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    const customerCreate = async (data) => {
+        try {
+            await fetch(`${process.env.REACT_APP_API_URL}/customer`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    business_name: data.companyName,
+                    business_number: data.businessNumber,
+                    phone: data.phone,
+                    address: data.address,
+                }),
+            });
+        } catch (error) {
+            console.log("사업자 등록 실패:", error);
         }
     }
 
@@ -415,6 +444,8 @@ export default function Main() {
         setinquiryStatus(false);
         categoryRef.current = null;
         salesPeriodRef.current = null;
+        confirmedStoreRef.current = null;
+        isRegistrationRef.current = false;
         setCustomDateRange({ start: "", end: "" });
         setSectionContent(prev => [
             ...prev,
@@ -553,10 +584,43 @@ export default function Main() {
             </div>
         ]);
 
-        if (category === 'sales_report') {
-            getinquiryform("sales_period");
+        getinquiryform(2);
+    }
+
+    const handleStoreConfirm = (confirmed, storeData) => {
+        setSectionContent(prev => [
+            ...prev,
+            <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                <div className="bubble-date user">{formattedTime}</div>
+                <div className="bubble-message user">{confirmed ? "예" : "아니오"}</div>
+            </div>
+        ]);
+
+        if (confirmed) {
+            confirmedStoreRef.current = storeData || null;
+            switch (categoryRef.current) {
+                case 'paper_request':
+                    getinquiryform(6, storeData);
+                    break;
+                case 'kiosk_menu_update':
+                    getinquiryform(5);
+                    break;
+                case 'sales_report':
+                    getinquiryform("sales_period");
+                    break;
+                default:
+                    getinquiryform(5);
+                    break;
+            }
         } else {
-            getinquiryform(2);
+            confirmedStoreRef.current = null;
+            isRegistrationRef.current = true;
+            setInquiryInfo(prev => ({
+                ...prev,
+                companyName: null,
+                phone: null,
+            }));
+            getinquiryform("register_biz");
         }
     }
 
@@ -580,7 +644,7 @@ export default function Main() {
                     <div className="bubble-message user">{period}</div>
                 </div>
             ]);
-            getinquiryform(2);
+            getinquiryform("receive_method");
         }
     }
 
@@ -599,7 +663,7 @@ export default function Main() {
             </div>
         ]);
         setCustomDateRange({ start: "", end: "" });
-        getinquiryform(2);
+        getinquiryform("receive_method");
     };
 
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -689,7 +753,7 @@ export default function Main() {
 
 
 
-    const getinquiryform = (status) => {
+    const getinquiryform = (status, customerData) => {
         const isSales = categoryRef.current === 'sales_report';
         const totalSteps = isSales ? 5 : 4;
         const stepOffset = isSales ? 1 : 0;
@@ -876,7 +940,14 @@ export default function Main() {
                 </div>
             ]);
         } else if (status === 6) {
-            InquiryCreate();
+            const displayData = {
+                businessNumber: customerData?.businessNumber || inquiryInfo.businessNumber,
+                companyName: customerData?.companyName || inquiryInfo.companyName,
+                phone: customerData?.phone || inquiryInfo.phone,
+                receiveMethod: customerData?.receiveMethod || inquiryInfo.receiveMethod,
+                detail: customerData?.detail || messageInput,
+            };
+            InquiryCreate(displayData);
             setSectionContent(prev => [
                 ...prev,
                 <div className="chatbot-bubble assistant" key={`user-bubble-${Date.now()}`}>
@@ -885,10 +956,24 @@ export default function Main() {
                         {Icons.notepad} 문의가 접수 되었습니다.<br />
                         <br />
                         접수 정보:<br />
-                        • 사업자번호: {inquiryInfo.businessNumber}<br />
-                        • 상호명: {inquiryInfo.companyName}<br />
-                        • 연락처: {inquiryInfo.phone}<br />
-                        • 문의 내용: {salesPeriodRef.current ? `[${salesPeriodRef.current}] ` : ""}{messageInput}<br />
+                        • 사업자번호: {displayData.businessNumber}<br />
+                        • 상호명: {displayData.companyName}<br />
+                        {displayData.phone && <>• 연락처: {displayData.phone}<br /></>}
+                        {categoryRef.current === 'paper_request' && (
+                            <>• 요청 내용: 용지 요청<br /></>
+                        )}
+                        {categoryRef.current === 'kiosk_menu_update' && (
+                            <>• 수정 요청 내용: {displayData.detail}<br /></>
+                        )}
+                        {categoryRef.current === 'sales_report' && (
+                            <>
+                                {salesPeriodRef.current && <>• 조회 기간: {salesPeriodRef.current}<br /></>}
+                                • 수신 방법: {displayData.receiveMethod}<br />
+                            </>
+                        )}
+                        {categoryRef.current !== 'paper_request' && categoryRef.current !== 'kiosk_menu_update' && categoryRef.current !== 'sales_report' && (
+                            <>• 문의 내용: {salesPeriodRef.current ? `[${salesPeriodRef.current}] ` : ""}{displayData.detail}<br /></>
+                        )}
 
                         {filePreviews.length > 0 && (
                             <>
@@ -909,6 +994,9 @@ export default function Main() {
                             </>
                         )}
                         <br />
+                        {categoryRef.current === 'paper_request' && (
+                            <><span className="delivery-notice">택배마감시간 이후 요청건은 다음날 발송됩니다.</span><br /><br /></>
+                        )}
                         귀하의 문의사항이 정상적으로 접수되었습니다.<br />
                         담당자가 확인 후 영업일 기준 1-2일 내에 연락드리겠습니다.<br />
                         <br />
@@ -980,6 +1068,105 @@ export default function Main() {
                 </div>
             ]);
             setinquiryStatus(false);
+        } else if (status === "confirm_store") {
+            setSectionContent(prev => [
+                ...prev,
+                <div className="inquiry-form" key={`inquiry-confirm-${Date.now()}`}>
+                    <div className="chatbot-inquiry-header">
+                        <div>
+                            <h5 className="chatbot-submenu-title-h5">가맹점 확인</h5>
+                            <p className="inquiry-question">아래 가맹점 정보가 맞으신가요?</p>
+                        </div>
+                    </div>
+
+                    <div className="inquiry-message">
+                        <div className="confirm-store-info">
+                            <div className="confirm-store-row">
+                                <span className="confirm-store-label">상호명</span>
+                                <span className="confirm-store-value">{customerData?.companyName || inquiryInfo.companyName}</span>
+                            </div>
+                            {(customerData?.phone || inquiryInfo.phone) && (
+                                <div className="confirm-store-row">
+                                    <span className="confirm-store-label">연락처</span>
+                                    <span className="confirm-store-value">{customerData?.phone || inquiryInfo.phone}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="confirm-store-buttons">
+                        <div className="confirm-button-yes" onClick={() => handleStoreConfirm(true, customerData)}>예</div>
+                        <div className="confirm-button-no" onClick={() => handleStoreConfirm(false)}>아니오</div>
+                    </div>
+
+                    <div className="chatbot-bottom-nav">
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                    </div>
+                </div>
+            ]);
+        } else if (status === "receive_method") {
+            setSectionContent(prev => [
+                ...prev,
+                <div className="inquiry-form" key={`inquiry-receive-${Date.now()}`}>
+                    <div className="chatbot-inquiry-header">
+                        <div>
+                            <h5 className="chatbot-submenu-title-h5">자료 수신 방법</h5>
+                            <p className="inquiry-question">자료를 수신할 방법을 입력해주세요.</p>
+                        </div>
+                    </div>
+
+                    <div className="inquiry-message">
+                        <p className="assistant-text-bold">자료를 받으실 방법을 입력하세요.</p>
+                        <p className="assistant-text">(예: 이메일 abc@example.com, 팩스 02-1234-5678)</p>
+                        <p className="disclaimer-text">
+                            요청하신 자료는 입력하신 수신 방법으로 제공되며, 각 카드사 및 국세청에서 집계한 자료와 차이가 발생할 수 있습니다. 따라서 해당 자료는 단순 참고용으로만 활용하시기 바라며, 법적 효력을 갖지 않습니다.
+                        </p>
+                    </div>
+                    <div className="chatbot-bottom-nav">
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                    </div>
+                </div>
+            ]);
+        } else if (status === "register_biz") {
+            setSectionContent(prev => [
+                ...prev,
+                <div className="inquiry-form" key={`inquiry-regbiz-${Date.now()}`}>
+                    <div className="chatbot-inquiry-header">
+                        <div>
+                            <h5 className="chatbot-submenu-title-h5">사업자 등록</h5>
+                            <p className="inquiry-question">사업자 등록 절차를 시작합니다.</p>
+                        </div>
+                    </div>
+
+                    <div className="inquiry-message">
+                        <p className="assistant-text-bold">등록할 사업자번호를 입력하세요.</p>
+                        <p className="assistant-text">(형식: XXX-XX-XXXXX)</p>
+                    </div>
+                    <div className="chatbot-bottom-nav">
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                    </div>
+                </div>
+            ]);
+        } else if (status === "address") {
+            setSectionContent(prev => [
+                ...prev,
+                <div className="inquiry-form" key={`inquiry-address-${Date.now()}`}>
+                    <div className="chatbot-inquiry-header">
+                        <div>
+                            <h5 className="chatbot-submenu-title-h5">주소</h5>
+                            <p className="inquiry-question">사업장 주소를 입력해주세요.</p>
+                        </div>
+                    </div>
+
+                    <div className="inquiry-message">
+                        <p className="assistant-text-bold">사업장 주소를 입력하세요.</p>
+                        <p className="assistant-text">(예: 서울시 강남구 테헤란로 123)</p>
+                    </div>
+                    <div className="chatbot-bottom-nav">
+                        <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home" style={{ width: "20px", height: "20px" }}></i> 처음으로</div>
+                    </div>
+                </div>
+            ]);
         }
     }
 
@@ -1016,20 +1203,11 @@ export default function Main() {
                     companyName: customer.business_name || prev.companyName,
                     phone: customer.phone || prev.phone,
                 }));
-                setSectionContent(prev => [
-                    ...prev,
-                    <div className="chatbot-bubble assistant" key={`autofill-${Date.now()}`}>
-                        <div className="bubble-date assistant">{formattedTime}</div>
-                        <div className="bubble-message assistant">
-                            등록된 사업자 정보를 찾았습니다.<br />
-                            • 상호명: {customer.business_name}<br />
-                            • 전화번호: {customer.phone}<br />
-                            <br />
-                            자동으로 입력되었습니다. 문의 내용을 입력해주세요.
-                        </div>
-                    </div>
-                ]);
-                getinquiryform(5);
+                getinquiryform("confirm_store", {
+                    businessNumber: bizNum,
+                    companyName: customer.business_name,
+                    phone: customer.phone,
+                });
                 return;
             }
         } catch (err) {
@@ -1043,7 +1221,60 @@ export default function Main() {
         const content = messageInput.trim();
         if (!content) return;
 
-        if (inquiryStatus === 1) {
+        if (inquiryStatus === "register_biz") {
+            const bizNum = content.replace(/[^0-9]/g, '');
+            if (bizNum.length !== 10) {
+                setSectionContent(prev => [
+                    ...prev,
+                    <div className="chatbot-bubble assistant" key={`biz-err-${Date.now()}`}>
+                        <div className="bubble-date assistant">{formattedTime}</div>
+                        <div className="bubble-message assistant">
+                            사업자번호는 10자리 숫자입니다. 다시 입력해주세요.
+                        </div>
+                    </div>
+                ]);
+                setMessageInput("");
+                return;
+            }
+            const formattedBizNum = `${bizNum.slice(0, 3)}-${bizNum.slice(3, 5)}-${bizNum.slice(5)}`;
+            setSectionContent(prev => [
+                ...prev,
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                    <div className="bubble-date user">{formattedTime}</div>
+                    <div className="bubble-message user">{formattedBizNum}</div>
+                </div>
+            ]);
+            setMessageInput("");
+            setInquiryInfo(prev => ({ ...prev, businessNumber: bizNum }));
+
+            // 중복 체크
+            try {
+                const res = await axios.get(`${process.env.REACT_APP_API_URL}/customer/search`, {
+                    params: { q: bizNum, limit: 10 }
+                });
+                const existing = res.data?.find(c => {
+                    const cleanBn = (c.business_number || '').replace(/[^0-9]/g, '');
+                    return cleanBn && bizNum === cleanBn;
+                });
+                if (existing) {
+                    setSectionContent(prev => [
+                        ...prev,
+                        <div className="chatbot-bubble assistant" key={`dup-biz-${Date.now()}`}>
+                            <div className="bubble-date assistant">{formattedTime}</div>
+                            <div className="bubble-message assistant">
+                                이미 있는 사업자 번호입니다.<br />
+                                다른 사업자번호를 입력해주세요.
+                            </div>
+                        </div>
+                    ]);
+                    return;
+                }
+            } catch (err) {
+                console.log("고객 검색 실패:", err);
+            }
+            getinquiryform(3);
+
+        } else if (inquiryStatus === 1) {
             let category = null;
             if (content === 1) {
                 category = 'paper_request';
@@ -1102,7 +1333,58 @@ export default function Main() {
                 </div>
             ]);
             setMessageInput("");
-            getinquiryform(5);
+            getinquiryform("address");
+        } else if (inquiryStatus === "address") {
+            setInquiryInfo(prev => ({
+                ...prev,
+                address: content
+            }));
+            setSectionContent(prev => [
+                ...prev,
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                    <div className="bubble-date user">{formattedTime}</div>
+                    <div className="bubble-message user">{content}</div>
+                </div>
+            ]);
+            setMessageInput("");
+
+            // 사업자 등록
+            const regData = {
+                businessNumber: inquiryInfo.businessNumber,
+                companyName: inquiryInfo.companyName,
+                phone: inquiryInfo.phone,
+                address: content,
+            };
+            customerCreate(regData);
+            confirmedStoreRef.current = regData;
+
+            // 카테고리별 분기
+            if (categoryRef.current === 'paper_request') {
+                getinquiryform(6, regData);
+            } else if (categoryRef.current === 'sales_report') {
+                getinquiryform("sales_period");
+            } else {
+                getinquiryform(5);
+            }
+        } else if (inquiryStatus === "receive_method") {
+            setInquiryInfo(prev => ({
+                ...prev,
+                receiveMethod: content
+            }));
+            setSectionContent(prev => [
+                ...prev,
+                <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                    <div className="bubble-date user">{formattedTime}</div>
+                    <div className="bubble-message user">{content}</div>
+                </div>
+            ]);
+            setMessageInput("");
+            getinquiryform(6, {
+                businessNumber: confirmedStoreRef.current?.businessNumber || inquiryInfo.businessNumber,
+                companyName: confirmedStoreRef.current?.companyName || inquiryInfo.companyName,
+                phone: confirmedStoreRef.current?.phone || inquiryInfo.phone,
+                receiveMethod: content,
+            });
         } else if (inquiryStatus === 5) {
             setInquiryInfo(prev => ({
                 ...prev,
@@ -1116,7 +1398,12 @@ export default function Main() {
                 </div>
             ]);
             setMessageInput("");
-            getinquiryform(6);
+            getinquiryform(6, {
+                businessNumber: confirmedStoreRef.current?.businessNumber || inquiryInfo.businessNumber,
+                companyName: confirmedStoreRef.current?.companyName || inquiryInfo.companyName,
+                phone: confirmedStoreRef.current?.phone || inquiryInfo.phone,
+                detail: content,
+            });
 
         } else if (!inquiryStatus) {
             setSectionContent(prev => [
