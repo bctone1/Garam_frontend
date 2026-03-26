@@ -35,7 +35,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     }
 
     useEffect(() => {
-        if (adminId) {
+        if (adminId !== null) {
             fetch_notificatoins(adminId);
         }
     }, [adminId]);
@@ -62,11 +62,21 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         });
     }
     // const [showNotificationModal, setShowNotificationModal] = useState(false);
-    // const showNotificationDetail = (notification) => {
-    //     console.log(notification);
-    //     setShowNotificationModal(true);
-    //     setShowNotificationContent(!showNotificationContent)
-    // }
+    const formatTimeAgo = (dateStr) => {
+        const now = new Date();
+        const date = new Date(dateStr);
+        const diff = Math.floor((now - date) / 1000);
+        if (diff < 60) return "방금 전";
+        if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+        return `${Math.floor(diff / 86400)}일 전`;
+    };
+
+    const eventTypeLabel = {
+        inquiry_new: { icon: "🔔", text: "신규" },
+        inquiry_assigned: { icon: "👤", text: "할당" },
+        inquiry_completed: { icon: "✅", text: "완료" },
+    };
 
     const checkNotification = (notification) => {
         console.log(notification);
@@ -79,6 +89,21 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         setTimeout(() => {
             fetch_notificatoins(adminId);
         }, 500);
+    }
+
+    const checkAllNotifications = () => {
+        const unreadNotifications = notifications.filter(n => n.read_at === null);
+        if (unreadNotifications.length === 0) return;
+
+        Promise.all(
+            unreadNotifications.map(n =>
+                axios.post(`${process.env.REACT_APP_API_URL}/notifications/${n.id}/read`, {
+                    recipient_admin_id: adminId
+                })
+            )
+        ).then(() => {
+            fetch_notificatoins(adminId);
+        });
     }
 
     return (
@@ -128,6 +153,12 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                         ) : (
                             notifications.map((notification) => (
                                 <div className={`inquiry-notification-item ${notification.read_at !== null ? 'read' : ''}`} key={notification.id}>
+                                    <div className="inquiry-notification-item-header">
+                                        <span className={`inquiry-notification-badge-label ${notification.event_type || ''}`}>
+                                            {(eventTypeLabel[notification.event_type] || eventTypeLabel.inquiry_new).icon} {(eventTypeLabel[notification.event_type] || eventTypeLabel.inquiry_new).text}
+                                        </span>
+                                        <span className="inquiry-notification-time">{formatTimeAgo(notification.created_at)}</span>
+                                    </div>
                                     <div className="inquiry-notification-item-title">
                                         <span className="inquiry-notification-item-title-text">
                                             {notification.body}
@@ -138,10 +169,19 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                                         )}
 
                                     </div>
+                                    {notification.inquiry && (
+                                        <div className="inquiry-notification-item-meta">
+                                            {notification.inquiry.business_name} · {notification.inquiry.inquiry_type === 'paper_request' ? '용지요청' : notification.inquiry.inquiry_type === 'sales_report' ? '매출 내역' : notification.inquiry.inquiry_type === 'kiosk_menu_update' ? '메뉴 수정' : '기타'}
+                                        </div>
+                                    )}
                                 </div>
                             ))
                         )}
-
+                        {notifications.filter(n => n.read_at === null).length > 1 && (
+                            <div className="inquiry-notification-item" style={{ textAlign: 'center', borderTop: '1px solid #eee' }}>
+                                <button className="btn btn-primary notification-read-btn" onClick={checkAllNotifications}>전체확인</button>
+                            </div>
+                        )}
                     </div>
 
 
@@ -896,6 +936,15 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
     const [adminId, setAdminIdLocal] = useState(sessionStorage.getItem("admin_id") ? parseInt(sessionStorage.getItem("admin_id"), 10) : null);
     const wsRef = useRef(null);
 
+    const playNotificationSound = () => {
+        try {
+            const audio = new Audio("/Playboy Charmer.mp3");
+            audio.play().catch(() => {});
+        } catch (e) {
+            // 오디오 재생 실패 대응
+        }
+    };
+
     useEffect(() => {
         if (adminId === null) return;
 
@@ -919,6 +968,7 @@ function RenderAdminGrid({ adminUsers, currentAdminUser, setcurrentAdminUser, se
             const data = JSON.parse(event.data);
             // console.log("실시간 알림:", data);
             if (data.type === "notification_created") {
+                playNotificationSound();
                 fetch_inquiry_list();
                 fetch_notificatoins(adminId);
                 showToast(data.notification.body, "info");

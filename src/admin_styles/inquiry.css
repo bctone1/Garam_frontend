@@ -309,6 +309,43 @@
       flex: 1;
   }
 
+  .inquiry-notification-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+  }
+
+  .inquiry-notification-badge-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--primary-light);
+      color: var(--primary-color);
+  }
+
+  .inquiry-notification-badge-label.inquiry_assigned {
+      background: #fff3e0;
+      color: #e65100;
+  }
+
+  .inquiry-notification-badge-label.inquiry_completed {
+      background: #e8f5e9;
+      color: #2e7d32;
+  }
+
+  .inquiry-notification-time {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+  }
+
+  .inquiry-notification-item-meta {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+  }
+
    .page-header {
        background: var(--bg-white);
        border-radius: var(--border-radius-lg);

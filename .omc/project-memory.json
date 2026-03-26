@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1774244231114,
+  "lastScanned": 1774488053390,
   "projectRoot": "C:\\Users\\dudql\\OneDrive\\Desktop\\Garam\\garam_frontend",
   "techStack": {
     "languages": [
@@ -64,7 +64,7 @@
       "path": "build",
       "purpose": "Build output",
       "fileCount": 30,
-      "lastAccessed": 1774244231075,
+      "lastAccessed": 1774488053356,
       "keyFiles": [
         "asset-manifest.json",
         "call.png",
@@ -77,7 +77,7 @@
       "path": "public",
       "purpose": "Public files",
       "fileCount": 29,
-      "lastAccessed": 1774244231076,
+      "lastAccessed": 1774488053358,
       "keyFiles": [
         "call.png",
         "garam_logo.png",
@@ -90,7 +90,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 3,
-      "lastAccessed": 1774244231090,
+      "lastAccessed": 1774488053368,
       "keyFiles": [
         "App.js",
         "index.css",
@@ -101,7 +101,7 @@
       "path": "src\\pages",
       "purpose": "Page components",
       "fileCount": 2,
-      "lastAccessed": 1774244231091,
+      "lastAccessed": 1774488053369,
       "keyFiles": [
         "Admin.js",
         "Login.js"
@@ -110,88 +110,34 @@
   },
   "hotPaths": [
     {
-      "path": "src\\user_components\\Main.js",
-      "accessCount": 85,
-      "lastAccessed": 1774252939959,
-      "type": "file"
-    },
-    {
-      "path": "src\\user_styles\\main.css",
-      "accessCount": 4,
-      "lastAccessed": 1774247056556,
-      "type": "file"
-    },
-    {
-      "path": "package.json",
-      "accessCount": 1,
-      "lastAccessed": 1774244895613,
-      "type": "file"
-    },
-    {
-      "path": "src\\App.js",
-      "accessCount": 1,
-      "lastAccessed": 1774244898428,
-      "type": "file"
-    },
-    {
-      "path": "src\\index.js",
-      "accessCount": 1,
-      "lastAccessed": 1774244898684,
-      "type": "file"
-    },
-    {
-      "path": "src\\pages\\Login.js",
-      "accessCount": 1,
-      "lastAccessed": 1774244898978,
-      "type": "file"
-    },
-    {
-      "path": "src\\user_components\\SecureNumberPad.js",
-      "accessCount": 1,
-      "lastAccessed": 1774244901803,
-      "type": "file"
-    },
-    {
       "path": "src\\admin_components\\inquiry.js",
-      "accessCount": 1,
-      "lastAccessed": 1774244902264,
+      "accessCount": 33,
+      "lastAccessed": 1774489877862,
       "type": "file"
     },
     {
-      "path": "src\\utill\\utill.js",
-      "accessCount": 1,
-      "lastAccessed": 1774244902511,
+      "path": "src\\user_components\\Main.js",
+      "accessCount": 22,
+      "lastAccessed": 1774493603789,
       "type": "file"
     },
     {
-      "path": "src\\pages\\Admin.js",
-      "accessCount": 1,
-      "lastAccessed": 1774244907258,
-      "type": "file"
+      "path": "src\\admin_styles\\inquiry.css",
+      "accessCount": 3,
+      "lastAccessed": 1774489301790,
+      "type": "directory"
     },
     {
-      "path": "src\\admin_components\\sidebar.js",
+      "path": "",
       "accessCount": 1,
-      "lastAccessed": 1774244911042,
-      "type": "file"
+      "lastAccessed": 1774489034732,
+      "type": "directory"
     },
     {
-      "path": ".env.local",
+      "path": "src",
       "accessCount": 1,
-      "lastAccessed": 1774244921006,
-      "type": "file"
-    },
-    {
-      "path": "src\\user_styles\\secureNumberPad.css",
-      "accessCount": 1,
-      "lastAccessed": 1774244921716,
-      "type": "file"
-    },
-    {
-      "path": "README.md",
-      "accessCount": 1,
-      "lastAccessed": 1774244925348,
-      "type": "file"
+      "lastAccessed": 1774489042931,
+      "type": "directory"
     }
   ],
   "userDirectives": []

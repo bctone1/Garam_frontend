@@ -600,7 +600,7 @@ export default function Main() {
             confirmedStoreRef.current = storeData || null;
             switch (categoryRef.current) {
                 case 'paper_request':
-                    getinquiryform(6, storeData);
+                    getinquiryform("confirm_inquiry", storeData);
                     break;
                 case 'kiosk_menu_update':
                     getinquiryform(5);
@@ -621,6 +621,22 @@ export default function Main() {
                 phone: null,
             }));
             getinquiryform("register_biz");
+        }
+    }
+
+    const handleInquiryConfirm = (confirmed, displayData) => {
+        setSectionContent(prev => [
+            ...prev,
+            <div className="chatbot-bubble user" key={`user-bubble-${Date.now()}`}>
+                <div className="bubble-date user">{formattedTime}</div>
+                <div className="bubble-message user">{confirmed ? "네" : "아니오"}</div>
+            </div>
+        ]);
+
+        if (confirmed) {
+            getinquiryform(6, displayData);
+        } else {
+            getfirstMenu();
         }
     }
 
@@ -1104,6 +1120,87 @@ export default function Main() {
                     </div>
                 </div>
             ]);
+        } else if (status === "confirm_inquiry") {
+            const displayData = {
+                businessNumber: customerData?.businessNumber || inquiryInfo.businessNumber,
+                companyName: customerData?.companyName || inquiryInfo.companyName,
+                phone: customerData?.phone || inquiryInfo.phone,
+                receiveMethod: customerData?.receiveMethod || inquiryInfo.receiveMethod,
+                detail: customerData?.detail || messageInput,
+            };
+            setSectionContent(prev => [
+                ...prev,
+                <div className="inquiry-form" key={`inquiry-confirm-final-${Date.now()}`}>
+                    <div className="chatbot-inquiry-header">
+                        <div>
+                            <h5 className="chatbot-submenu-title-h5">문의 접수 확인</h5>
+                            <p className="inquiry-question">아래 내용으로 문의를 접수하시겠습니까?</p>
+                        </div>
+                    </div>
+
+                    <div className="confirm-store-info">
+                        <div className="confirm-store-row">
+                            <span className="confirm-store-label">사업자번호</span>
+                            <span className="confirm-store-value">{displayData.businessNumber}</span>
+                        </div>
+                        <div className="confirm-store-row">
+                            <span className="confirm-store-label">상호명</span>
+                            <span className="confirm-store-value">{displayData.companyName}</span>
+                        </div>
+                        {displayData.phone && (
+                            <div className="confirm-store-row">
+                                <span className="confirm-store-label">연락처</span>
+                                <span className="confirm-store-value">{displayData.phone}</span>
+                            </div>
+                        )}
+                        {categoryRef.current === 'paper_request' && (
+                            <div className="confirm-store-row">
+                                <span className="confirm-store-label">요청 내용</span>
+                                <span className="confirm-store-value">용지 요청</span>
+                            </div>
+                        )}
+                        {categoryRef.current === 'kiosk_menu_update' && displayData.detail && (
+                            <div className="confirm-store-row">
+                                <span className="confirm-store-label">문의 내용</span>
+                                <span className="confirm-store-value">{displayData.detail}</span>
+                            </div>
+                        )}
+                        {categoryRef.current === 'sales_report' && (
+                            <>
+                                {salesPeriodRef.current && (
+                                    <div className="confirm-store-row">
+                                        <span className="confirm-store-label">조회 기간</span>
+                                        <span className="confirm-store-value">{salesPeriodRef.current}</span>
+                                    </div>
+                                )}
+                                {displayData.receiveMethod && (
+                                    <div className="confirm-store-row">
+                                        <span className="confirm-store-label">수신 방법</span>
+                                        <span className="confirm-store-value">{displayData.receiveMethod}</span>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                        {categoryRef.current !== 'paper_request' && categoryRef.current !== 'kiosk_menu_update' && categoryRef.current !== 'sales_report' && displayData.detail && (
+                            <div className="confirm-store-row">
+                                <span className="confirm-store-label">문의 내용</span>
+                                <span className="confirm-store-value">{displayData.detail}</span>
+                            </div>
+                        )}
+                        {filePreviews.length > 0 && (
+                            <div className="confirm-store-row">
+                                <span className="confirm-store-label">첨부파일</span>
+                                <span className="confirm-store-value">{filePreviews.map(p => p.name).join(', ')}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="confirm-store-buttons">
+                        <div className="confirm-button-yes" onClick={() => handleInquiryConfirm(true, displayData)}>네</div>
+                        <div className="confirm-button-no" onClick={() => handleInquiryConfirm(false)}>아니오</div>
+                    </div>
+                </div>
+            ]);
         } else if (status === "receive_method") {
             setSectionContent(prev => [
                 ...prev,
@@ -1360,7 +1457,7 @@ export default function Main() {
 
             // 카테고리별 분기
             if (categoryRef.current === 'paper_request') {
-                getinquiryform(6, regData);
+                getinquiryform("confirm_inquiry", regData);
             } else if (categoryRef.current === 'sales_report') {
                 getinquiryform("sales_period");
             } else {
@@ -1379,7 +1476,7 @@ export default function Main() {
                 </div>
             ]);
             setMessageInput("");
-            getinquiryform(6, {
+            getinquiryform("confirm_inquiry", {
                 businessNumber: confirmedStoreRef.current?.businessNumber || inquiryInfo.businessNumber,
                 companyName: confirmedStoreRef.current?.companyName || inquiryInfo.companyName,
                 phone: confirmedStoreRef.current?.phone || inquiryInfo.phone,
@@ -1398,7 +1495,7 @@ export default function Main() {
                 </div>
             ]);
             setMessageInput("");
-            getinquiryform(6, {
+            getinquiryform("confirm_inquiry", {
                 businessNumber: confirmedStoreRef.current?.businessNumber || inquiryInfo.businessNumber,
                 companyName: confirmedStoreRef.current?.companyName || inquiryInfo.companyName,
                 phone: confirmedStoreRef.current?.phone || inquiryInfo.phone,
