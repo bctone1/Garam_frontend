@@ -128,6 +128,7 @@ export default function Main() {
     const [newSession, setnewSession] = useState(0);
     const [allActiveNotices, setAllActiveNotices] = useState([]);
     const [openNoticeId, setOpenNoticeId] = useState(null);
+    const [popupNotices, setPopupNotices] = useState([]);
     const initialized = useRef(false);
     const categoryRef = useRef(null);
     const salesPeriodRef = useRef(null);
@@ -210,14 +211,19 @@ export default function Main() {
     useEffect(() => {
         const all = getActiveNotices();
         setAllActiveNotices(all);
-        const importantNotices = all.filter(n => n.is_important);
-        if (importantNotices.length === 0) return;
 
         const today = new Date().toISOString().split('T')[0];
-        const dismissedUntil = localStorage.getItem('garam.notices.dismissed_until');
-        if (dismissedUntil === today) return;
+        let dismissedMap = {};
+        try {
+            dismissedMap = JSON.parse(localStorage.getItem('garam.notices.dismissed_map') || '{}');
+        } catch {
+            dismissedMap = {};
+        }
 
-        setOpenNoticeId(importantNotices[0].id);
+        const importantPending = all.filter(
+            n => n.is_important && dismissedMap[n.id] !== today
+        );
+        setPopupNotices(importantPending);
     }, []);
 
 
@@ -2003,6 +2009,71 @@ export default function Main() {
                 />
             </div >
 
+            {popupNotices.length > 0 && (
+                <div className="notice-popup-overlay">
+                    <div className="notice-popup-grid">
+                        {popupNotices.map((n) => (
+                            <div className="notice-popup-card" key={n.id}>
+                                <div className="notice-popup-card-header">
+                                    <span className="notice-popup-badge">
+                                        <i className="fas fa-bullhorn"></i> 중요 공지
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="notice-popup-x"
+                                        aria-label="닫기"
+                                        onClick={() => setPopupNotices(prev => prev.filter(x => x.id !== n.id))}
+                                    >
+                                        <i className="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div className="notice-popup-card-body">
+                                    <h3 className="notice-popup-title">{n.title}</h3>
+                                    <div className="notice-popup-content">
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            rehypePlugins={[rehypeRaw]}
+                                        >
+                                            {n.content}
+                                        </ReactMarkdown>
+                                    </div>
+                                    <div className="notice-popup-date">
+                                        {new Date(n.created_at).toLocaleDateString('ko-KR')}
+                                    </div>
+                                </div>
+                                <div className="notice-popup-card-footer">
+                                    <button
+                                        type="button"
+                                        className="notice-popup-dismiss"
+                                        onClick={() => {
+                                            const today = new Date().toISOString().split('T')[0];
+                                            let map = {};
+                                            try {
+                                                map = JSON.parse(localStorage.getItem('garam.notices.dismissed_map') || '{}');
+                                            } catch {
+                                                map = {};
+                                            }
+                                            map[n.id] = today;
+                                            localStorage.setItem('garam.notices.dismissed_map', JSON.stringify(map));
+                                            setPopupNotices(prev => prev.filter(x => x.id !== n.id));
+                                        }}
+                                    >
+                                        오늘 하루 보지 않기
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="notice-popup-close"
+                                        onClick={() => setPopupNotices(prev => prev.filter(x => x.id !== n.id))}
+                                    >
+                                        닫기
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {openNoticeId !== null && (
                 <div className="notice-banner-modal-backdrop" onClick={() => setOpenNoticeId(null)}>
                     <div className="notice-banner-modal" onClick={(e) => e.stopPropagation()}>
@@ -2032,17 +2103,6 @@ export default function Main() {
                                         </ReactMarkdown>
                                     </div>
                                     <div className="notice-modal-footer">
-                                        <button
-                                            type="button"
-                                            className="notice-dismiss-btn"
-                                            onClick={() => {
-                                                const today = new Date().toISOString().split('T')[0];
-                                                localStorage.setItem('garam.notices.dismissed_until', today);
-                                                setOpenNoticeId(null);
-                                            }}
-                                        >
-                                            오늘 하루 보지 않기
-                                        </button>
                                         <button
                                             type="button"
                                             className="notice-close-btn"
