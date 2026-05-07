@@ -140,9 +140,12 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                         onClick={() => setShowNotificationContent(!showNotificationContent)}
                     >
                         <svg className="inquiry-notification-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                        {notifications.filter(notification => notification.read_at === null).length > 0 && (
-                            <span className="inquiry-notification-badge">{notifications.filter(notification => notification.read_at === null).length}</span>
-                        )}
+                        {(() => {
+                            const unreadCount = notifications.filter(n => n.read_at === null).length;
+                            if (unreadCount === 0) return null;
+                            const display = unreadCount > 99 ? '99+' : unreadCount;
+                            return <span className="inquiry-notification-badge">{display}</span>;
+                        })()}
                     </button>
 
                     <div className={`inquiry-notification-content ${showNotificationContent ? 'show' : ''}`}>
