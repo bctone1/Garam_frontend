@@ -23,6 +23,17 @@ const SEED = [
         created_at: "2026-04-25T12:00:00.000Z",
         updated_at: "2026-04-25T12:00:00.000Z",
     },
+    {
+        id: 3,
+        title: "고객 감사 이벤트 안내",
+        content: "## 5월 이벤트\n\n- **기간**: 2026-05-10 ~ 2026-05-31\n- **대상**: 가람포스텍 키오스크 이용 고객 전원\n- 누적 사용 시 **추첨을 통해 사은품**을 드립니다.\n\n자세한 내용은 운영팀에 문의해 주세요.",
+        is_important: true,
+        starts_at: null,
+        ends_at: null,
+        created_by: "최종관리자",
+        created_at: "2026-05-03T10:30:00.000Z",
+        updated_at: "2026-05-03T10:30:00.000Z",
+    },
 ];
 
 function readRaw() {
