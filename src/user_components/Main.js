@@ -128,7 +128,6 @@ export default function Main() {
     const [newSession, setnewSession] = useState(0);
     const [allActiveNotices, setAllActiveNotices] = useState([]);
     const [openNoticeId, setOpenNoticeId] = useState(null);
-    const [showNoticeListSection, setShowNoticeListSection] = useState(false);
     const initialized = useRef(false);
     const categoryRef = useRef(null);
     const salesPeriodRef = useRef(null);
@@ -516,7 +515,7 @@ export default function Main() {
                         </div>
                     </div>
 
-                    <div className="chatbot-button" onClick={() => setShowNoticeListSection(true)}>
+                    <div className="chatbot-button" onClick={() => loadNoticeList()}>
                         <div className="chatbot-button-icon">{Icons.bullhorn}</div>
                         <div>
                             <div className="chatbot-button-title ">공지사항</div>
@@ -533,6 +532,40 @@ export default function Main() {
                             </div>
                         </div>
                     ))}
+                </div>
+            </div>
+        ]);
+    }
+
+    const loadNoticeList = () => {
+        const list = getActiveNotices();
+        setSectionContent(prev => [
+            ...prev,
+            <div className="chatbot-underline" key={`notice-underline-${Date.now()}`} />,
+            <div className="chatbot-submenu-wrap notice-list-inline" key={`notice-submenu-${Date.now()}`}>
+                <h5 className="chatbot-submenu-title-h5">공지사항</h5>
+                <p>클릭하여 자세한 내용을 확인하세요.</p>
+
+                {list.length === 0 ? (
+                    <div className="notice-empty-inline">등록된 공지사항이 없습니다.</div>
+                ) : (
+                    list.map((n, idx) => (
+                        <div className="chatbot-submenu-single" key={n.id}
+                            onClick={() => setOpenNoticeId(n.id)}
+                        >
+                            <div className="chatbot-submenu-id">{idx + 1}</div>
+                            <div>
+                                <h3>
+                                    {n.is_important && <span className="notice-inline-badge">중요</span>}
+                                    {n.title}
+                                </h3>
+                            </div>
+                        </div>
+                    ))
+                )}
+
+                <div className="chatbot-bottom-nav">
+                    <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
                 </div>
             </div>
         ]);
@@ -1794,7 +1827,7 @@ export default function Main() {
                                     </div>
                                 </div>
 
-                                <div className="chatbot-button" onClick={() => setShowNoticeListSection(true)}>
+                                <div className="chatbot-button" onClick={() => loadNoticeList()}>
                                     <div className="chatbot-button-icon">{Icons.bullhorn}</div>
                                     <div>
                                         <div className="chatbot-button-title ">공지사항</div>
@@ -1970,53 +2003,7 @@ export default function Main() {
                 />
             </div >
 
-            {showNoticeListSection && (
-                <div className="notice-list-section">
-                    <div className="notice-list-header">
-                        <button className="notice-list-back" onClick={() => { setShowNoticeListSection(false); setOpenNoticeId(null); }}>
-                            <i className="fas fa-arrow-left"></i> 처음으로
-                        </button>
-                        <h2>공지사항</h2>
-                    </div>
-                    {allActiveNotices.length === 0 ? (
-                        <div className="notice-list-empty">등록된 공지사항이 없습니다.</div>
-                    ) : (
-                        <ul className="notice-list-items">
-                            {allActiveNotices.map(n => (
-                                <li key={n.id} className={`notice-list-item ${openNoticeId === n.id ? 'open' : ''}`}>
-                                    <button
-                                        className="notice-list-item-header"
-                                        onClick={() => setOpenNoticeId(openNoticeId === n.id ? null : n.id)}
-                                    >
-                                        {n.is_important && (
-                                            <span className="notice-banner-badge">
-                                                <i className="fas fa-bullhorn"></i> 중요
-                                            </span>
-                                        )}
-                                        <span className="notice-list-item-title">{n.title}</span>
-                                        <span className="notice-list-item-date">
-                                            {new Date(n.created_at).toLocaleDateString('ko-KR')}
-                                        </span>
-                                        <i className={`fas fa-chevron-${openNoticeId === n.id ? 'up' : 'down'}`}></i>
-                                    </button>
-                                    {openNoticeId === n.id && (
-                                        <div className="notice-list-item-body">
-                                            <ReactMarkdown
-                                                remarkPlugins={[remarkGfm]}
-                                                rehypePlugins={[rehypeRaw]}
-                                            >
-                                                {n.content}
-                                            </ReactMarkdown>
-                                        </div>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-            )}
-
-            {openNoticeId !== null && !showNoticeListSection && (
+            {openNoticeId !== null && (
                 <div className="notice-banner-modal-backdrop" onClick={() => setOpenNoticeId(null)}>
                     <div className="notice-banner-modal" onClick={(e) => e.stopPropagation()}>
                         <button className="notice-banner-modal-close" onClick={() => setOpenNoticeId(null)}>
