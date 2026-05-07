@@ -2009,70 +2009,61 @@ export default function Main() {
                 />
             </div >
 
-            {popupNotices.length > 0 && (
-                <div className="notice-popup-overlay">
-                    <div className="notice-popup-grid">
-                        {popupNotices.map((n) => (
-                            <div className="notice-popup-card" key={n.id}>
-                                <div className="notice-popup-card-header">
-                                    <span className="notice-popup-badge">
-                                        <i className="fas fa-bullhorn"></i> 중요 공지
-                                    </span>
-                                    <button
-                                        type="button"
-                                        className="notice-popup-x"
-                                        aria-label="닫기"
-                                        onClick={() => setPopupNotices(prev => prev.filter(x => x.id !== n.id))}
-                                    >
-                                        <i className="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div className="notice-popup-card-body">
-                                    <h3 className="notice-popup-title">{n.title}</h3>
-                                    <div className="notice-popup-content">
-                                        <ReactMarkdown
-                                            remarkPlugins={[remarkGfm]}
-                                            rehypePlugins={[rehypeRaw]}
-                                        >
-                                            {n.content}
-                                        </ReactMarkdown>
-                                    </div>
-                                    <div className="notice-popup-date">
-                                        {new Date(n.created_at).toLocaleDateString('ko-KR')}
-                                    </div>
-                                </div>
-                                <div className="notice-popup-card-footer">
-                                    <button
-                                        type="button"
-                                        className="notice-popup-dismiss"
-                                        onClick={() => {
-                                            const today = new Date().toISOString().split('T')[0];
-                                            let map = {};
-                                            try {
-                                                map = JSON.parse(localStorage.getItem('garam.notices.dismissed_map') || '{}');
-                                            } catch {
-                                                map = {};
-                                            }
-                                            map[n.id] = today;
-                                            localStorage.setItem('garam.notices.dismissed_map', JSON.stringify(map));
-                                            setPopupNotices(prev => prev.filter(x => x.id !== n.id));
-                                        }}
-                                    >
-                                        오늘 하루 보지 않기
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="notice-popup-close"
-                                        onClick={() => setPopupNotices(prev => prev.filter(x => x.id !== n.id))}
-                                    >
-                                        닫기
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+            {popupNotices.map((n, idx) => (
+                <div
+                    className="notice-popup-card"
+                    key={n.id}
+                    style={{
+                        top: `${48 + idx * 32}px`,
+                        left: `${48 + idx * 32}px`,
+                        zIndex: 300 + idx,
+                    }}
+                >
+                    <div className="notice-popup-card-header">
+                        <h3 className="notice-popup-title">{n.title}</h3>
+                    </div>
+                    <div className="notice-popup-card-body">
+                        <div className="notice-popup-content">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                rehypePlugins={[rehypeRaw]}
+                            >
+                                {n.content}
+                            </ReactMarkdown>
+                        </div>
+                        <div className="notice-popup-date">
+                            {new Date(n.created_at).toLocaleDateString('ko-KR')}
+                        </div>
+                    </div>
+                    <div className="notice-popup-card-footer">
+                        <button
+                            type="button"
+                            className="notice-popup-dismiss"
+                            onClick={() => {
+                                const today = new Date().toISOString().split('T')[0];
+                                let map = {};
+                                try {
+                                    map = JSON.parse(localStorage.getItem('garam.notices.dismissed_map') || '{}');
+                                } catch {
+                                    map = {};
+                                }
+                                map[n.id] = today;
+                                localStorage.setItem('garam.notices.dismissed_map', JSON.stringify(map));
+                                setPopupNotices(prev => prev.filter(x => x.id !== n.id));
+                            }}
+                        >
+                            오늘 하루 보지 않기
+                        </button>
+                        <button
+                            type="button"
+                            className="notice-popup-close"
+                            onClick={() => setPopupNotices(prev => prev.filter(x => x.id !== n.id))}
+                        >
+                            닫기 ×
+                        </button>
                     </div>
                 </div>
-            )}
+            ))}
 
             {openNoticeId !== null && (
                 <div className="notice-banner-modal-backdrop" onClick={() => setOpenNoticeId(null)}>
