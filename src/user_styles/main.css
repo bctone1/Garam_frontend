@@ -1934,29 +1934,6 @@ textarea::-webkit-scrollbar {
     border-radius: 0.375rem;
 }
 
-/* ===== 공지사항 — 키오스크 ===== */
-
-.notice-chat-content {
-    line-height: 1.6;
-    word-break: break-word;
-}
-
-.notice-chat-content > *:first-child { margin-top: 0; }
-.notice-chat-content > *:last-child { margin-bottom: 0; }
-
-.notice-chat-content img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-    margin: 6px 0;
-}
-
-.notice-chat-date {
-    margin-top: 10px;
-    font-size: 12px;
-    color: #9ca3af;
-}
-
 /* ===== 공지사항 — 진입 팝업 (정형 스타일) ===== */
 
 .notice-popup-card {
