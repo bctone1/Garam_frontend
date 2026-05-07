@@ -160,7 +160,7 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
                                     checked={form.is_important}
                                     onChange={(e) => setForm(p => ({ ...p, is_important: e.target.checked }))}
                                 />
-                                <span>중요 공지 (키오스크 상단 배너에 노출)</span>
+                                <span>중요 공지 (키오스크 진입 시 팝업으로 노출)</span>
                             </label>
                         </div>
 

@@ -83,7 +83,7 @@ export default function Notice() {
                     <div className="header-left">
                         <div className="page-title">
                             <h1>공지사항 관리</h1>
-                            <p className="page-subtitle">키오스크 상단 배너 및 공지사항 메뉴에 노출됩니다</p>
+                            <p className="page-subtitle">중요 공지는 키오스크 진입 시 팝업으로, 일반 공지는 공지사항 메뉴에서 노출됩니다</p>
                         </div>
                     </div>
                     <div className="header-right">
