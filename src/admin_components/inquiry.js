@@ -279,6 +279,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                             role={role}
                             setinquiries={setinquiries}
                             fetch_inquiry_list={fetch_inquiry_list}
+                            setNotifications={setNotifications}
                         />
                     </div>
                 </div>
@@ -287,7 +288,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     )
 }
 
-function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries, fetch_inquiry_list }) {
+function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries, fetch_inquiry_list, setNotifications }) {
 
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -386,6 +387,7 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                     ],
                 } : item)
             );
+            setNotifications(prev => prev.filter(n => n.inquiry?.id !== inquiry.id));
             showToast("문의가 처리 완료되었습니다.", "info");
         } catch (error) {
             console.log(error);
