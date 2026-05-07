@@ -1954,112 +1954,25 @@ textarea::-webkit-scrollbar {
     vertical-align: middle;
 }
 
-.notice-banner-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-    padding: 1rem;
+.notice-chat-content {
+    line-height: 1.6;
+    word-break: break-word;
 }
 
-.notice-banner-modal {
-    background: #fff;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    max-width: 480px;
-    width: 100%;
-    max-height: 80vh;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-}
+.notice-chat-content > *:first-child { margin-top: 0; }
+.notice-chat-content > *:last-child { margin-bottom: 0; }
 
-.notice-banner-modal-close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    color: #6b7280;
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.notice-banner-modal-close:hover {
-    color: #111827;
-}
-
-.notice-banner-modal-header {
-    padding: 14px 40px 14px 18px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #fff;
-}
-
-.notice-banner-modal-header h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-    color: #111827;
-    line-height: 1.4;
-}
-
-.notice-banner-modal-header small {
-    display: block;
-    margin-top: 4px;
-    color: #9ca3af;
-    font-size: 12px;
-}
-
-.notice-banner-modal-body {
-    padding: 18px;
-    background: #fff;
-    color: #374151;
-    font-size: 14px;
-    line-height: 1.7;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.notice-banner-modal-body > *:first-child { margin-top: 0; }
-.notice-banner-modal-body > *:last-child { margin-bottom: 0; }
-
-.notice-banner-modal-body img {
+.notice-chat-content img {
     max-width: 100%;
     height: auto;
+    border-radius: 4px;
     margin: 6px 0;
 }
 
-.notice-modal-footer {
-    background: #2d2d2d;
-    padding: 9px 14px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
-.notice-close-btn {
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    padding: 2px 4px;
-    color: #e5e7eb;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1;
-}
-
-.notice-close-btn:hover {
-    color: #fff;
+.notice-chat-date {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #9ca3af;
 }
 
 /* ===== 공지사항 — 진입 팝업 (정형 스타일) ===== */

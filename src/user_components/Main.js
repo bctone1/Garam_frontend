@@ -126,8 +126,6 @@ export default function Main() {
     const timerRef = useRef(null);
     const hasRunRef = useRef(false);
     const [newSession, setnewSession] = useState(0);
-    const [allActiveNotices, setAllActiveNotices] = useState([]);
-    const [openNoticeId, setOpenNoticeId] = useState(null);
     const [popupNotices, setPopupNotices] = useState([]);
     const initialized = useRef(false);
     const categoryRef = useRef(null);
@@ -210,7 +208,6 @@ export default function Main() {
 
     useEffect(() => {
         const all = getActiveNotices();
-        setAllActiveNotices(all);
 
         const today = new Date().toISOString().split('T')[0];
         let dismissedMap = {};
@@ -557,7 +554,7 @@ export default function Main() {
                 ) : (
                     list.map((n, idx) => (
                         <div className="chatbot-submenu-single" key={n.id}
-                            onClick={() => setOpenNoticeId(n.id)}
+                            onClick={() => showNoticeInChat(n)}
                         >
                             <div className="chatbot-submenu-id">{idx + 1}</div>
                             <div>
@@ -572,6 +569,33 @@ export default function Main() {
 
                 <div className="chatbot-bottom-nav">
                     <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                </div>
+            </div>
+        ]);
+    }
+
+    const showNoticeInChat = (n) => {
+        const stamp = Date.now();
+        setSectionContent(prev => [
+            ...prev,
+            <div className="chatbot-bubble user" key={`notice-user-${n.id}-${stamp}`}>
+                <div className="bubble-date user">{formattedTime}</div>
+                <div className="bubble-message user">{n.title}</div>
+            </div>,
+            <div className="chatbot-bubble assistant" key={`notice-bot-${n.id}-${stamp}`}>
+                <div className="bubble-date assistant">{formattedTime}</div>
+                <div className="bubble-message assistant">
+                    <div className="notice-chat-content">
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw]}
+                        >
+                            {n.content}
+                        </ReactMarkdown>
+                    </div>
+                    <div className="notice-chat-date">
+                        {new Date(n.created_at).toLocaleDateString('ko-KR')}
+                    </div>
                 </div>
             </div>
         ]);
@@ -2064,45 +2088,6 @@ export default function Main() {
                     </div>
                 </div>
             ))}
-
-            {openNoticeId !== null && (
-                <div className="notice-banner-modal-backdrop" onClick={() => setOpenNoticeId(null)}>
-                    <div className="notice-banner-modal" onClick={(e) => e.stopPropagation()}>
-                        <button className="notice-banner-modal-close" onClick={() => setOpenNoticeId(null)}>
-                            <i className="fas fa-times"></i>
-                        </button>
-                        {(() => {
-                            const n = allActiveNotices.find(x => x.id === openNoticeId);
-                            if (!n) return null;
-                            return (
-                                <>
-                                    <div className="notice-banner-modal-header">
-                                        <h3>{n.title}</h3>
-                                        <small>{new Date(n.created_at).toLocaleString('ko-KR')}</small>
-                                    </div>
-                                    <div className="notice-banner-modal-body">
-                                        <ReactMarkdown
-                                            remarkPlugins={[remarkGfm]}
-                                            rehypePlugins={[rehypeRaw]}
-                                        >
-                                            {n.content}
-                                        </ReactMarkdown>
-                                    </div>
-                                    <div className="notice-modal-footer">
-                                        <button
-                                            type="button"
-                                            className="notice-close-btn"
-                                            onClick={() => setOpenNoticeId(null)}
-                                        >
-                                            닫기
-                                        </button>
-                                    </div>
-                                </>
-                            );
-                        })()}
-                    </div>
-                </div>
-            )}
 
         </>
     );
