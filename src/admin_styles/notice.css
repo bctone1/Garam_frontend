@@ -115,8 +115,16 @@
 }
 
 .notice-modal-container {
-    max-width: 760px;
-    width: 90%;
+    max-width: 1100px;
+    width: 92%;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.notice-modal-container .modal-body {
+    flex: 1;
+    overflow-y: auto;
 }
 
 .notice-form .form-group {
@@ -159,20 +167,20 @@
 
 .notice-textarea {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.85rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: 0.95rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     resize: vertical;
-    min-height: 240px;
+    min-height: 360px;
 }
 
 .notice-preview {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: 1rem;
-    min-height: 240px;
+    padding: 1.25rem;
+    min-height: 360px;
     background: var(--bg-light, #fafafa);
     font-size: 0.95rem;
     line-height: 1.6;
