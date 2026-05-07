@@ -2077,11 +2077,6 @@ export default function Main() {
                             return (
                                 <>
                                     <div className="notice-banner-modal-header">
-                                        {n.is_important && (
-                                            <span className="notice-banner-badge">
-                                                <i className="fas fa-bullhorn"></i> 중요 공지
-                                            </span>
-                                        )}
                                         <h3>{n.title}</h3>
                                         <small>{new Date(n.created_at).toLocaleString('ko-KR')}</small>
                                     </div>
