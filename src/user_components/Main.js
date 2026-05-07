@@ -597,6 +597,10 @@ export default function Main() {
                         {new Date(n.created_at).toLocaleDateString('ko-KR')}
                     </div>
                 </div>
+            </div>,
+            <div className="chatbot-bottom-nav" key={`notice-nav-${n.id}-${stamp}`}>
+                <div className="chatbot-submenu back" onClick={loadNoticeList}><i className="icon-back"></i> 이전 메뉴 보기</div>
+                <div className="chatbot-submenu home" onClick={getfirstMenu}><i className="icon-home"></i> 처음으로</div>
             </div>
         ]);
     }
