@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import "../user_styles/main.css";
 import SecureNumberPad from "./SecureNumberPad";
+import { getActiveNotices } from "../utill/notice_storage";
 
 export default function Main() {
 
@@ -92,6 +93,13 @@ export default function Main() {
                 <path d="M14 2V8H20" stroke="#323232" strokeWidth="1.5" fill="none"/>
             </svg>
         ),
+        bullhorn: (
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 5L6 9H3C2.45 9 2 9.45 2 10V14C2 14.55 2.45 15 3 15H6L11 19V5Z" fill="#323232" fillOpacity="0.08" stroke="#323232" strokeWidth="1.5" strokeLinejoin="round"/>
+                <path d="M14 8C15.66 8 17 9.79 17 12C17 14.21 15.66 16 14 16" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M17 5C19.76 5 22 8.13 22 12C22 15.87 19.76 19 17 19" stroke="#323232" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+        ),
     };
 
     const [messageInput, setMessageInput] = useState("");
@@ -118,6 +126,11 @@ export default function Main() {
     const timerRef = useRef(null);
     const hasRunRef = useRef(false);
     const [newSession, setnewSession] = useState(0);
+    const [bannerNotices, setBannerNotices] = useState([]);
+    const [allActiveNotices, setAllActiveNotices] = useState([]);
+    const [bannerIndex, setBannerIndex] = useState(0);
+    const [openNoticeId, setOpenNoticeId] = useState(null);
+    const [showNoticeListSection, setShowNoticeListSection] = useState(false);
     const initialized = useRef(false);
     const categoryRef = useRef(null);
     const salesPeriodRef = useRef(null);
@@ -196,6 +209,20 @@ export default function Main() {
         }, 20000);
         return () => clearTimeout(timerRef.current);
     }, [sectionContent, Categories]);
+
+    useEffect(() => {
+        const all = getActiveNotices();
+        setAllActiveNotices(all);
+        setBannerNotices(all.filter(n => n.is_important));
+    }, []);
+
+    useEffect(() => {
+        if (bannerNotices.length <= 1) return;
+        const t = setInterval(() => {
+            setBannerIndex(prev => (prev + 1) % bannerNotices.length);
+        }, 5000);
+        return () => clearInterval(t);
+    }, [bannerNotices.length]);
 
 
 
@@ -490,6 +517,17 @@ export default function Main() {
                             <div className="chatbot-button-title ">자주하는 질문</div>
                             <div className="chatbot-button-desc">질문 목록 보기</div>
                         </div>
+                    </div>
+
+                    <div className="chatbot-button notice-menu-card" onClick={() => setShowNoticeListSection(true)}>
+                        <div className="chatbot-button-icon">{Icons.bullhorn}</div>
+                        <div>
+                            <div className="chatbot-button-title ">공지사항</div>
+                            <div className="chatbot-button-desc">최신 공지 확인</div>
+                        </div>
+                        {allActiveNotices.length > 0 && (
+                            <span className="notice-menu-count">{allActiveNotices.length}</span>
+                        )}
                     </div>
 
                     {Categories.map(category => (
@@ -1677,6 +1715,22 @@ export default function Main() {
         <>
             <div className="chatbot-service">
 
+                {bannerNotices.length > 0 && (
+                    <div className="notice-banner">
+                        <div className="notice-banner-inner" onClick={() => setOpenNoticeId(bannerNotices[bannerIndex].id)}>
+                            <span className="notice-banner-badge">
+                                <i className="fas fa-bullhorn"></i> 중요 공지
+                            </span>
+                            <span className="notice-banner-title">{bannerNotices[bannerIndex].title}</span>
+                            {bannerNotices.length > 1 && (
+                                <span className="notice-banner-counter">
+                                    {bannerIndex + 1} / {bannerNotices.length}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 <header className="chatbot-header">
                     <div className="chatbot-header-inner">
                         <i className="chatbot-logo"></i>
@@ -1760,6 +1814,17 @@ export default function Main() {
                                         <div className="chatbot-button-title ">자주하는 질문</div>
                                         <div className="chatbot-button-desc">질문 목록 보기</div>
                                     </div>
+                                </div>
+
+                                <div className="chatbot-button notice-menu-card" onClick={() => setShowNoticeListSection(true)}>
+                                    <div className="chatbot-button-icon">{Icons.bullhorn}</div>
+                                    <div>
+                                        <div className="chatbot-button-title ">공지사항</div>
+                                        <div className="chatbot-button-desc">최신 공지 확인</div>
+                                    </div>
+                                    {allActiveNotices.length > 0 && (
+                                        <span className="notice-menu-count">{allActiveNotices.length}</span>
+                                    )}
                                 </div>
 
                                 {Categories.map(category => (
@@ -1930,7 +1995,86 @@ export default function Main() {
                 />
             </div >
 
+            {showNoticeListSection && (
+                <div className="notice-list-section">
+                    <div className="notice-list-header">
+                        <button className="notice-list-back" onClick={() => { setShowNoticeListSection(false); setOpenNoticeId(null); }}>
+                            <i className="fas fa-arrow-left"></i> 처음으로
+                        </button>
+                        <h2>공지사항</h2>
+                    </div>
+                    {allActiveNotices.length === 0 ? (
+                        <div className="notice-list-empty">등록된 공지사항이 없습니다.</div>
+                    ) : (
+                        <ul className="notice-list-items">
+                            {allActiveNotices.map(n => (
+                                <li key={n.id} className={`notice-list-item ${openNoticeId === n.id ? 'open' : ''}`}>
+                                    <button
+                                        className="notice-list-item-header"
+                                        onClick={() => setOpenNoticeId(openNoticeId === n.id ? null : n.id)}
+                                    >
+                                        {n.is_important && (
+                                            <span className="notice-banner-badge">
+                                                <i className="fas fa-bullhorn"></i> 중요
+                                            </span>
+                                        )}
+                                        <span className="notice-list-item-title">{n.title}</span>
+                                        <span className="notice-list-item-date">
+                                            {new Date(n.created_at).toLocaleDateString('ko-KR')}
+                                        </span>
+                                        <i className={`fas fa-chevron-${openNoticeId === n.id ? 'up' : 'down'}`}></i>
+                                    </button>
+                                    {openNoticeId === n.id && (
+                                        <div className="notice-list-item-body">
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm]}
+                                                rehypePlugins={[rehypeRaw]}
+                                            >
+                                                {n.content}
+                                            </ReactMarkdown>
+                                        </div>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            )}
 
+            {openNoticeId !== null && !showNoticeListSection && (
+                <div className="notice-banner-modal-backdrop" onClick={() => setOpenNoticeId(null)}>
+                    <div className="notice-banner-modal" onClick={(e) => e.stopPropagation()}>
+                        <button className="notice-banner-modal-close" onClick={() => setOpenNoticeId(null)}>
+                            <i className="fas fa-times"></i>
+                        </button>
+                        {(() => {
+                            const n = allActiveNotices.find(x => x.id === openNoticeId);
+                            if (!n) return null;
+                            return (
+                                <>
+                                    <div className="notice-banner-modal-header">
+                                        {n.is_important && (
+                                            <span className="notice-banner-badge">
+                                                <i className="fas fa-bullhorn"></i> 중요 공지
+                                            </span>
+                                        )}
+                                        <h3>{n.title}</h3>
+                                        <small>{new Date(n.created_at).toLocaleString('ko-KR')}</small>
+                                    </div>
+                                    <div className="notice-banner-modal-body">
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            rehypePlugins={[rehypeRaw]}
+                                        >
+                                            {n.content}
+                                        </ReactMarkdown>
+                                    </div>
+                                </>
+                            );
+                        })()}
+                    </div>
+                </div>
+            )}
 
         </>
     );
