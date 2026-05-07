@@ -7,18 +7,37 @@ import { showToast } from '../utill/utill';
 const MAX_IMAGE_BYTES = 1024 * 1024;
 
 export default function NoticeModal({ initial, onClose, onSubmit }) {
-    const [form, setForm] = useState({
+    const initialSnapshot = {
         title: initial?.title || '',
         content: initial?.content || '',
         is_important: initial?.is_important || false,
         starts_at: initial?.starts_at ? toDatetimeLocal(initial.starts_at) : '',
         ends_at: initial?.ends_at ? toDatetimeLocal(initial.ends_at) : '',
-    });
+    };
+    const [form, setForm] = useState(initialSnapshot);
     const [showPreview, setShowPreview] = useState(false);
     const textareaRef = useRef(null);
     const fileInputRef = useRef(null);
 
     const isEdit = !!initial;
+
+    const isDirty = (
+        form.title !== initialSnapshot.title ||
+        form.content !== initialSnapshot.content ||
+        form.is_important !== initialSnapshot.is_important ||
+        form.starts_at !== initialSnapshot.starts_at ||
+        form.ends_at !== initialSnapshot.ends_at
+    );
+
+    const requestClose = () => {
+        if (!isDirty) {
+            onClose();
+            return;
+        }
+        if (window.confirm('입력한 내용이 사라집니다. 닫으시겠습니까?')) {
+            onClose();
+        }
+    };
 
     const handleImagePick = (e) => {
         const file = e.target.files?.[0];
@@ -79,11 +98,11 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
 
     return (
         <>
-            <div className="modal-backdrop" onClick={onClose}></div>
+            <div className="modal-backdrop" onClick={requestClose}></div>
             <div className="modal-container notice-modal-container">
                 <div className="modal-header">
                     <h3 className="modal-title">{isEdit ? '공지사항 수정' : '공지사항 추가'}</h3>
-                    <button className="modal-close" onClick={onClose}>
+                    <button className="modal-close" onClick={requestClose}>
                         <i className="fas fa-times"></i>
                     </button>
                 </div>
@@ -189,7 +208,7 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
                     </div>
                 </div>
                 <div className="modal-footer">
-                    <button className="btn btn-secondary" onClick={onClose}>취소</button>
+                    <button className="btn btn-secondary" onClick={requestClose}>취소</button>
                     <button className="btn btn-primary" onClick={handleSubmit}>
                         <i className={`fas ${isEdit ? 'fa-save' : 'fa-plus'}`}></i>
                         {isEdit ? ' 저장' : ' 등록'}
