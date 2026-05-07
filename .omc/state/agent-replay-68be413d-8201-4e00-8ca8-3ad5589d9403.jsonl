@@ -1,0 +1,17 @@
+{"t":0,"agent":"ae9b756","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"superpowers:writing-plans"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"superpowers:executing-plans"}
+{"t":0,"agent":"system","event":"keyword_detected","keyword":"autopilot"}
+{"t":0,"agent":"system","event":"mode_change","mode_from":"none","mode_to":"autopilot"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:autopilot"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:cancel"}
+{"t":0,"agent":"a115dee","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a81b320","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a7fb925","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a10fe61","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a31de11","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"ab254c7","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a08f410","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a994d79","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a34545d","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"abbf80a","agent_type":"unknown","event":"agent_stop","success":true}
