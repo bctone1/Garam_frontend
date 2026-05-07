@@ -4,6 +4,7 @@ export default function Sidebar({ view, handleMenuClick, role, admin_email, admi
     // 메뉴 데이터 정의
     const menuItems = [
         { key: "dashboard", icon: "fas fa-tachometer-alt", label: "대시보드" },
+        { key: "notice", icon: "fas fa-bullhorn", label: "공지사항 관리" },
         { key: "knowledge", icon: "fas fa-book", label: "지식베이스 관리" },
         { key: "assistant", icon: "fas fa-robot", label: "AI 모델 설정" },
         { key: "chart", icon: "fas fa-chart-bar", label: "분석 및 보고서" },
