@@ -7,6 +7,7 @@ import Chart from '../admin_components/chart';
 import Chatbot from '../admin_components/chatbot';
 import Inquiry from '../admin_components/inquiry';
 import ChatHistory from '../admin_components/chat_history';
+import Notice from '../admin_components/notice';
 
 import "../admin_styles/dashboard.css";
 import "../admin_styles/knowledge.css";
@@ -15,6 +16,7 @@ import "../admin_styles/chart.css";
 import "../admin_styles/chatbot.css";
 import "../admin_styles/inquiry.css";
 import "../admin_styles/chat_history.css";
+import "../admin_styles/notice.css";
 
 
 
@@ -51,6 +53,8 @@ export default function Adminpage() {
         switch (view) {
             case 'dashboard':
                 return <Dashboard />;
+            case 'notice':
+                return <Notice />;
             case 'knowledge':
                 return <Knowledge />;
             case 'assistant':
