@@ -126,9 +126,7 @@ export default function Main() {
     const timerRef = useRef(null);
     const hasRunRef = useRef(false);
     const [newSession, setnewSession] = useState(0);
-    const [bannerNotices, setBannerNotices] = useState([]);
     const [allActiveNotices, setAllActiveNotices] = useState([]);
-    const [bannerIndex, setBannerIndex] = useState(0);
     const [openNoticeId, setOpenNoticeId] = useState(null);
     const [showNoticeListSection, setShowNoticeListSection] = useState(false);
     const initialized = useRef(false);
@@ -213,16 +211,15 @@ export default function Main() {
     useEffect(() => {
         const all = getActiveNotices();
         setAllActiveNotices(all);
-        setBannerNotices(all.filter(n => n.is_important));
-    }, []);
+        const importantNotices = all.filter(n => n.is_important);
+        if (importantNotices.length === 0) return;
 
-    useEffect(() => {
-        if (bannerNotices.length <= 1) return;
-        const t = setInterval(() => {
-            setBannerIndex(prev => (prev + 1) % bannerNotices.length);
-        }, 5000);
-        return () => clearInterval(t);
-    }, [bannerNotices.length]);
+        const today = new Date().toISOString().split('T')[0];
+        const dismissedUntil = localStorage.getItem('garam.notices.dismissed_until');
+        if (dismissedUntil === today) return;
+
+        setOpenNoticeId(importantNotices[0].id);
+    }, []);
 
 
 
@@ -519,15 +516,12 @@ export default function Main() {
                         </div>
                     </div>
 
-                    <div className="chatbot-button notice-menu-card" onClick={() => setShowNoticeListSection(true)}>
+                    <div className="chatbot-button" onClick={() => setShowNoticeListSection(true)}>
                         <div className="chatbot-button-icon">{Icons.bullhorn}</div>
                         <div>
                             <div className="chatbot-button-title ">공지사항</div>
                             <div className="chatbot-button-desc">최신 공지 확인</div>
                         </div>
-                        {allActiveNotices.length > 0 && (
-                            <span className="notice-menu-count">{allActiveNotices.length}</span>
-                        )}
                     </div>
 
                     {Categories.map(category => (
@@ -1715,22 +1709,6 @@ export default function Main() {
         <>
             <div className="chatbot-service">
 
-                {bannerNotices.length > 0 && (
-                    <div className="notice-banner">
-                        <div className="notice-banner-inner" onClick={() => setOpenNoticeId(bannerNotices[bannerIndex].id)}>
-                            <span className="notice-banner-badge">
-                                <i className="fas fa-bullhorn"></i> 중요 공지
-                            </span>
-                            <span className="notice-banner-title">{bannerNotices[bannerIndex].title}</span>
-                            {bannerNotices.length > 1 && (
-                                <span className="notice-banner-counter">
-                                    {bannerIndex + 1} / {bannerNotices.length}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                )}
-
                 <header className="chatbot-header">
                     <div className="chatbot-header-inner">
                         <i className="chatbot-logo"></i>
@@ -1816,15 +1794,12 @@ export default function Main() {
                                     </div>
                                 </div>
 
-                                <div className="chatbot-button notice-menu-card" onClick={() => setShowNoticeListSection(true)}>
+                                <div className="chatbot-button" onClick={() => setShowNoticeListSection(true)}>
                                     <div className="chatbot-button-icon">{Icons.bullhorn}</div>
                                     <div>
                                         <div className="chatbot-button-title ">공지사항</div>
                                         <div className="chatbot-button-desc">최신 공지 확인</div>
                                     </div>
-                                    {allActiveNotices.length > 0 && (
-                                        <span className="notice-menu-count">{allActiveNotices.length}</span>
-                                    )}
                                 </div>
 
                                 {Categories.map(category => (
@@ -2068,6 +2043,26 @@ export default function Main() {
                                         >
                                             {n.content}
                                         </ReactMarkdown>
+                                    </div>
+                                    <div className="notice-modal-footer">
+                                        <button
+                                            type="button"
+                                            className="notice-dismiss-btn"
+                                            onClick={() => {
+                                                const today = new Date().toISOString().split('T')[0];
+                                                localStorage.setItem('garam.notices.dismissed_until', today);
+                                                setOpenNoticeId(null);
+                                            }}
+                                        >
+                                            오늘 하루 보지 않기
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="notice-close-btn"
+                                            onClick={() => setOpenNoticeId(null)}
+                                        >
+                                            닫기
+                                        </button>
                                     </div>
                                 </>
                             );
