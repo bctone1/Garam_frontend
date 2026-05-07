@@ -545,27 +545,20 @@ export default function Main() {
         setSectionContent(prev => [
             ...prev,
             <div className="chatbot-underline" key={`notice-underline-${Date.now()}`} />,
-            <div className="chatbot-submenu-wrap notice-list-inline" key={`notice-submenu-${Date.now()}`}>
+            <div className="chatbot-submenu-wrap faq-list" key={`notice-submenu-${Date.now()}`}>
                 <h5 className="chatbot-submenu-title-h5">공지사항</h5>
                 <p>클릭하여 자세한 내용을 확인하세요.</p>
 
-                {list.length === 0 ? (
-                    <div className="notice-empty-inline">등록된 공지사항이 없습니다.</div>
-                ) : (
-                    list.map((n, idx) => (
-                        <div className="chatbot-submenu-single" key={n.id}
-                            onClick={() => showNoticeInChat(n)}
-                        >
-                            <div className="chatbot-submenu-id">{idx + 1}</div>
-                            <div>
-                                <h3>
-                                    {n.is_important && <span className="notice-inline-badge">중요</span>}
-                                    {n.title}
-                                </h3>
-                            </div>
+                {list.map((n, index) => (
+                    <div className="chatbot-submenu-single" key={n.id}
+                        onClick={() => showNoticeInChat(n)}
+                    >
+                        <div className="chatbot-submenu-id">{index + 1}</div>
+                        <div>
+                            <h3>{n.title}</h3>
                         </div>
-                    ))
-                )}
+                    </div>
+                ))}
 
                 <div className="chatbot-bottom-nav">
                     <div className="chatbot-submenu back" onClick={getfirstMenu}><i className="icon-back"></i> 이전 메뉴 보기</div>

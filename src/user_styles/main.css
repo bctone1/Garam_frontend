@@ -1936,24 +1936,6 @@ textarea::-webkit-scrollbar {
 
 /* ===== 공지사항 — 키오스크 ===== */
 
-.notice-list-inline .notice-empty-inline {
-    text-align: center;
-    color: #9ca3af;
-    padding: 1.5rem 1rem;
-    font-size: 0.95rem;
-}
-
-.notice-inline-badge {
-    background: #fef3c7;
-    color: #92400e;
-    padding: 0.1rem 0.45rem;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    margin-right: 0.4rem;
-    vertical-align: middle;
-}
-
 .notice-chat-content {
     line-height: 1.6;
     word-break: break-word;
