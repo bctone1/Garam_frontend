@@ -27,8 +27,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
 
     const fetch_notificatoins = (admin_id) => {
         axios.get(`${process.env.REACT_APP_API_URL}/notifications?recipient_admin_id=${admin_id}&unread_only=false&limit=10`).then((res) => {
-            // console.log(res.data);
-            setNotifications(res.data);
+            setNotifications(res.data.filter(n => n.event_type !== 'inquiry_completed'));
         }).catch((err) => {
             console.log(err);
         });
