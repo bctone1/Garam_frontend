@@ -15,10 +15,27 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     const [showNotificationContent, setShowNotificationContent] = useState(false);
     const admin_name = sessionStorage.getItem("admin_name");
     const [adminId, setAdminId] = useState(sessionStorage.getItem("admin_id") ? parseInt(sessionStorage.getItem("admin_id"), 10) : null);
+    const notificationButtonRef = useRef(null);
+    const notificationContentRef = useRef(null);
 
     useEffect(() => {
         setcurrentAdminUser(admin_name);
     }, [admin_name]);
+
+    useEffect(() => {
+        if (!showNotificationContent) return;
+
+        const handleClickOutside = (event) => {
+            const inButton = notificationButtonRef.current && notificationButtonRef.current.contains(event.target);
+            const inContent = notificationContentRef.current && notificationContentRef.current.contains(event.target);
+            if (!inButton && !inContent) {
+                setShowNotificationContent(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showNotificationContent]);
 
     useEffect(() => {
         fetch_admin_users();
@@ -141,6 +158,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
             <main className="inquiry-main-content">
                 <div className="inquiry-page-header">
                     <button
+                        ref={notificationButtonRef}
                         className="inquiry-notification-btn"
                         title="알림"
                         onClick={() => setShowNotificationContent(!showNotificationContent)}
@@ -154,7 +172,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                         })()}
                     </button>
 
-                    <div className={`inquiry-notification-content ${showNotificationContent ? 'show' : ''}`}>
+                    <div ref={notificationContentRef} className={`inquiry-notification-content ${showNotificationContent ? 'show' : ''}`}>
                         <div className="inquiry-notification-header">
                             <h4>알림</h4>
                             <span className="inquiry-notification-header-count">
