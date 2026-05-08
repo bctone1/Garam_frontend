@@ -1939,6 +1939,7 @@ textarea::-webkit-scrollbar {
 .notice-popup-card {
     position: fixed;
     width: 340px;
+    max-height: calc(100vh - 96px);
     background: #fff;
     border: 1px solid #d1d5db;
     border-radius: 4px;
@@ -1968,16 +1969,15 @@ textarea::-webkit-scrollbar {
 .notice-popup-card-body {
     padding: 16px;
     background: #fff;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .notice-popup-content {
     color: #374151;
     font-size: 14px;
     line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 6;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
     word-break: break-word;
 }
 
