@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import "../user_styles/main.css";
 import SecureNumberPad from "./SecureNumberPad";
-import { getActiveNotices } from "../utill/notice_storage";
+import { getActiveNotices, getDismissedMap, dismissNoticeForToday } from "../utill/notice_storage";
 
 export default function Main() {
 
@@ -207,20 +207,20 @@ export default function Main() {
     }, [sectionContent, Categories]);
 
     useEffect(() => {
-        const all = getActiveNotices();
-
-        const today = new Date().toISOString().split('T')[0];
-        let dismissedMap = {};
-        try {
-            dismissedMap = JSON.parse(localStorage.getItem('garam.notices.dismissed_map') || '{}');
-        } catch {
-            dismissedMap = {};
-        }
-
-        const importantPending = all.filter(
-            n => n.is_important && dismissedMap[n.id] !== today
-        );
-        setPopupNotices(importantPending);
+        let cancelled = false;
+        (async () => {
+            try {
+                const list = await getActiveNotices(true);
+                if (cancelled) return;
+                const map = getDismissedMap();
+                const today = new Date().toISOString().split('T')[0];
+                const pending = list.filter(n => map[n.id] !== today);
+                setPopupNotices(pending);
+            } catch (err) {
+                console.error('공지 로드 실패:', err);
+            }
+        })();
+        return () => { cancelled = true; };
     }, []);
 
 
@@ -540,8 +540,13 @@ export default function Main() {
         ]);
     }
 
-    const loadNoticeList = () => {
-        const list = getActiveNotices();
+    const loadNoticeList = async () => {
+        let list = [];
+        try {
+            list = await getActiveNotices();
+        } catch (err) {
+            console.error('공지 목록 로드 실패:', err);
+        }
         setSectionContent(prev => [
             ...prev,
             <div className="chatbot-underline" key={`notice-underline-${Date.now()}`} />,
@@ -2058,15 +2063,7 @@ export default function Main() {
                             type="button"
                             className="notice-popup-dismiss"
                             onClick={() => {
-                                const today = new Date().toISOString().split('T')[0];
-                                let map = {};
-                                try {
-                                    map = JSON.parse(localStorage.getItem('garam.notices.dismissed_map') || '{}');
-                                } catch {
-                                    map = {};
-                                }
-                                map[n.id] = today;
-                                localStorage.setItem('garam.notices.dismissed_map', JSON.stringify(map));
+                                dismissNoticeForToday(n.id);
                                 setPopupNotices(prev => prev.filter(x => x.id !== n.id));
                             }}
                         >

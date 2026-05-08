@@ -3,19 +3,21 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { showToast } from '../utill/utill';
+import { uploadNoticeImage, resolveNoticeAssetUrl } from '../utill/notice_storage';
 
-const MAX_IMAGE_BYTES = 1024 * 1024;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 export default function NoticeModal({ initial, onClose, onSubmit }) {
     const initialSnapshot = {
         title: initial?.title || '',
         content: initial?.content || '',
         is_important: initial?.is_important || false,
-        starts_at: initial?.starts_at ? toDatetimeLocal(initial.starts_at) : '',
-        ends_at: initial?.ends_at ? toDatetimeLocal(initial.ends_at) : '',
+        start_at: initial?.start_at ? toDatetimeLocal(initial.start_at) : '',
+        end_at: initial?.end_at ? toDatetimeLocal(initial.end_at) : '',
     };
     const [form, setForm] = useState(initialSnapshot);
     const [showPreview, setShowPreview] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const textareaRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -25,8 +27,8 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
         form.title !== initialSnapshot.title ||
         form.content !== initialSnapshot.content ||
         form.is_important !== initialSnapshot.is_important ||
-        form.starts_at !== initialSnapshot.starts_at ||
-        form.ends_at !== initialSnapshot.ends_at
+        form.start_at !== initialSnapshot.start_at ||
+        form.end_at !== initialSnapshot.end_at
     );
 
     const requestClose = () => {
@@ -39,7 +41,7 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
         }
     };
 
-    const handleImagePick = (e) => {
+    const handleImagePick = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) {
@@ -47,16 +49,21 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
             return;
         }
         if (file.size > MAX_IMAGE_BYTES) {
-            showToast('이미지는 1MB 이하만 첨부할 수 있습니다 (mock 환경 한계).', 'warning');
+            showToast('이미지는 5MB 이하만 첨부할 수 있습니다.', 'warning');
             return;
         }
-        const reader = new FileReader();
-        reader.onload = () => {
-            const dataUrl = reader.result;
-            insertAtCursor(`![](${dataUrl})\n`);
-        };
-        reader.readAsDataURL(file);
-        e.target.value = '';
+        setUploading(true);
+        try {
+            const { url } = await uploadNoticeImage(file);
+            const absolute = resolveNoticeAssetUrl(url);
+            insertAtCursor(`![](${absolute})\n`);
+        } catch (err) {
+            console.error(err);
+            showToast('이미지 업로드에 실패했습니다.', 'error');
+        } finally {
+            setUploading(false);
+            e.target.value = '';
+        }
     };
 
     const insertAtCursor = (text) => {
@@ -83,7 +90,7 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
             showToast('내용은 필수입니다.', 'error');
             return;
         }
-        if (form.starts_at && form.ends_at && new Date(form.starts_at) >= new Date(form.ends_at)) {
+        if (form.start_at && form.end_at && new Date(form.start_at) >= new Date(form.end_at)) {
             showToast('종료일은 시작일 이후여야 합니다.', 'error');
             return;
         }
@@ -91,8 +98,8 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
             title: form.title.trim(),
             content: form.content,
             is_important: form.is_important,
-            starts_at: form.starts_at ? new Date(form.starts_at).toISOString() : null,
-            ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : null,
+            start_at: form.start_at ? new Date(form.start_at).toISOString() : null,
+            end_at: form.end_at ? new Date(form.end_at).toISOString() : null,
         });
     };
 
@@ -132,8 +139,9 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
                                         type="button"
                                         className="btn btn-sm btn-secondary"
                                         onClick={() => fileInputRef.current?.click()}
+                                        disabled={uploading}
                                     >
-                                        <i className="fas fa-image"></i> 이미지 삽입
+                                        <i className="fas fa-image"></i> {uploading ? '업로드 중...' : '이미지 삽입'}
                                     </button>
                                     <button
                                         type="button"
@@ -189,8 +197,8 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
                                 <input
                                     type="datetime-local"
                                     className="form-input"
-                                    value={form.starts_at}
-                                    onChange={(e) => setForm(p => ({ ...p, starts_at: e.target.value }))}
+                                    value={form.start_at}
+                                    onChange={(e) => setForm(p => ({ ...p, start_at: e.target.value }))}
                                 />
                                 <small className="form-help">비워두면 즉시 게시</small>
                             </div>
@@ -199,8 +207,8 @@ export default function NoticeModal({ initial, onClose, onSubmit }) {
                                 <input
                                     type="datetime-local"
                                     className="form-input"
-                                    value={form.ends_at}
-                                    onChange={(e) => setForm(p => ({ ...p, ends_at: e.target.value }))}
+                                    value={form.end_at}
+                                    onChange={(e) => setForm(p => ({ ...p, end_at: e.target.value }))}
                                 />
                                 <small className="form-help">비워두면 무기한</small>
                             </div>

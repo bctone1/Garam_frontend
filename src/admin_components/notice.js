@@ -5,7 +5,6 @@ import {
     createNotice,
     updateNotice,
     deleteNotice,
-    classifyNotice,
 } from '../utill/notice_storage';
 import NoticeModal from './notice_modal';
 
@@ -14,16 +13,29 @@ export default function Notice() {
     const [search, setSearch] = useState('');
     const [editTarget, setEditTarget] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const adminName = sessionStorage.getItem('admin_name') || '관리자';
+    const [loading, setLoading] = useState(false);
+    const adminId = sessionStorage.getItem('admin_id')
+        ? parseInt(sessionStorage.getItem('admin_id'), 10)
+        : null;
 
-    const reload = () => setNotices(getNotices());
+    const reload = async () => {
+        setLoading(true);
+        try {
+            const list = await getNotices({ limit: 100 });
+            setNotices(list);
+        } catch (err) {
+            console.error(err);
+            showToast('공지사항을 불러오지 못했습니다.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => { reload(); }, []);
 
     const counts = notices.reduce((acc, n) => {
-        const k = classifyNotice(n);
         acc.total += 1;
-        acc[k] = (acc[k] || 0) + 1;
+        acc[n.status] = (acc[n.status] || 0) + 1;
         return acc;
     }, { total: 0, active: 0, scheduled: 0, expired: 0 });
 
@@ -36,28 +48,38 @@ export default function Notice() {
     const openEdit = (notice) => { setEditTarget(notice); setShowModal(true); };
     const closeModal = () => { setShowModal(false); setEditTarget(null); };
 
-    const handleSubmit = (input) => {
-        if (editTarget) {
-            updateNotice(editTarget.id, input);
-            showToast('공지사항이 수정되었습니다.', 'success');
-        } else {
-            createNotice({ ...input, created_by: adminName });
-            showToast('공지사항이 등록되었습니다.', 'success');
+    const handleSubmit = async (input) => {
+        try {
+            if (editTarget) {
+                await updateNotice(editTarget.id, input);
+                showToast('공지사항이 수정되었습니다.', 'success');
+            } else {
+                await createNotice({ ...input, author_admin_id: adminId });
+                showToast('공지사항이 등록되었습니다.', 'success');
+            }
+            closeModal();
+            await reload();
+        } catch (err) {
+            console.error(err);
+            showToast('공지사항 저장에 실패했습니다.', 'error');
         }
-        closeModal();
-        reload();
     };
 
-    const handleDelete = (notice) => {
+    const handleDelete = async (notice) => {
         if (!window.confirm(`"${notice.title}" 공지를 삭제하시겠습니까?`)) return;
-        deleteNotice(notice.id);
-        showToast('공지사항이 삭제되었습니다.', 'warning');
-        reload();
+        try {
+            await deleteNotice(notice.id);
+            showToast('공지사항이 삭제되었습니다.', 'warning');
+            await reload();
+        } catch (err) {
+            console.error(err);
+            showToast('공지사항 삭제에 실패했습니다.', 'error');
+        }
     };
 
     const formatDate = (iso) => iso ? new Date(iso).toLocaleString('ko-KR') : '-';
     const previewText = (md) => {
-        const stripped = md
+        const stripped = (md || '')
             .replace(/!\[[^\]]*\]\([^)]+\)/g, '[이미지]')
             .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
             .replace(/[#*_`>~-]/g, '')
@@ -130,7 +152,9 @@ export default function Notice() {
                         </div>
                     </div>
 
-                    {filtered.length === 0 ? (
+                    {loading ? (
+                        <div className="empty-state"><p>불러오는 중...</p></div>
+                    ) : filtered.length === 0 ? (
                         <div className="empty-state">
                             <div className="empty-icon">
                                 <i className="fas fa-bullhorn"></i>
@@ -140,7 +164,7 @@ export default function Notice() {
                     ) : (
                         <div className="notice-list">
                             {filtered.map((notice) => {
-                                const status = classifyNotice(notice);
+                                const status = notice.status;
                                 return (
                                     <div key={notice.id} className={`notice-card notice-card--${status}`}>
                                         <div className="notice-card-header">
@@ -174,10 +198,9 @@ export default function Notice() {
                                         </div>
                                         <div className="notice-card-preview">{previewText(notice.content)}</div>
                                         <div className="notice-card-meta">
-                                            <span><i className="fas fa-user"></i> {notice.created_by}</span>
                                             <span><i className="fas fa-calendar-plus"></i> 등록 {formatDate(notice.created_at)}</span>
-                                            <span><i className="fas fa-play-circle"></i> 시작 {formatDate(notice.starts_at)}</span>
-                                            <span><i className="fas fa-stop-circle"></i> 종료 {formatDate(notice.ends_at)}</span>
+                                            <span><i className="fas fa-play-circle"></i> 시작 {formatDate(notice.start_at)}</span>
+                                            <span><i className="fas fa-stop-circle"></i> 종료 {formatDate(notice.end_at)}</span>
                                         </div>
                                     </div>
                                 );

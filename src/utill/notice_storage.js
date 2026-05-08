@@ -1,117 +1,77 @@
-const KEY = 'garam.notices';
+import axios from 'axios';
 
-const SEED = [
-    {
-        id: 1,
-        title: "시스템 점검 안내",
-        content: "## 점검 일정\n\n- **일시**: 2026-05-15 02:00 ~ 04:00\n- **영향**: 키오스크 일시 중단\n\n양해 부탁드립니다.",
-        is_important: true,
-        starts_at: null,
-        ends_at: null,
-        created_by: "최종관리자",
-        created_at: "2026-05-01T09:00:00.000Z",
-        updated_at: "2026-05-01T09:00:00.000Z",
-    },
-    {
-        id: 2,
-        title: "신규 메뉴 등록 절차 안내",
-        content: "메뉴 수정·추가 요청은 **메뉴 수정 및 추가** 메뉴를 통해 접수해주세요.",
-        is_important: false,
-        starts_at: null,
-        ends_at: null,
-        created_by: "최종관리자",
-        created_at: "2026-04-25T12:00:00.000Z",
-        updated_at: "2026-04-25T12:00:00.000Z",
-    },
-    {
-        id: 3,
-        title: "고객 감사 이벤트 안내",
-        content: "## 5월 이벤트\n\n- **기간**: 2026-05-10 ~ 2026-05-31\n- **대상**: 가람포스텍 키오스크 이용 고객 전원\n- 누적 사용 시 **추첨을 통해 사은품**을 드립니다.\n\n자세한 내용은 운영팀에 문의해 주세요.",
-        is_important: true,
-        starts_at: null,
-        ends_at: null,
-        created_by: "최종관리자",
-        created_at: "2026-05-03T10:30:00.000Z",
-        updated_at: "2026-05-03T10:30:00.000Z",
-    },
-];
+const API = process.env.REACT_APP_API_URL;
 
-function readRaw() {
+export async function getNotices(params = {}) {
+    const { offset = 0, limit = 50, status = 'all', importantOnly = false, q } = params;
+    const res = await axios.get(`${API}/notices/`, {
+        params: {
+            offset,
+            limit,
+            status,
+            important_only: importantOnly,
+            ...(q ? { q } : {}),
+        },
+    });
+    return res.data;
+}
+
+export async function getActiveNotices(importantOnly = false) {
+    return getNotices({ status: 'active', importantOnly, limit: 100 });
+}
+
+export async function getNoticeSummary() {
+    const res = await axios.get(`${API}/notices/summary`);
+    return res.data;
+}
+
+export async function createNotice(payload) {
+    const res = await axios.post(`${API}/notices/`, payload);
+    return res.data;
+}
+
+export async function updateNotice(id, patch) {
+    const res = await axios.patch(`${API}/notices/${id}`, patch);
+    return res.data;
+}
+
+export async function deleteNotice(id) {
+    await axios.delete(`${API}/notices/${id}`);
+}
+
+export async function uploadNoticeImage(file) {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await axios.post(`${API}/notices/images`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+}
+
+export function resolveNoticeAssetUrl(url) {
+    if (!url) return url;
+    if (/^https?:\/\//i.test(url) || url.startsWith('data:')) return url;
+    return `${API}${url}`;
+}
+
+const DISMISS_KEY = 'garam.notices.dismissed_map';
+
+export function getDismissedMap() {
     try {
-        const raw = localStorage.getItem(KEY);
-        if (raw === null) {
-            localStorage.setItem(KEY, JSON.stringify(SEED));
-            return [...SEED];
-        }
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
+        return JSON.parse(localStorage.getItem(DISMISS_KEY) || '{}');
     } catch {
-        return [];
+        return {};
     }
 }
 
-function writeRaw(notices) {
-    localStorage.setItem(KEY, JSON.stringify(notices));
+export function dismissNoticeForToday(id) {
+    const today = new Date().toISOString().split('T')[0];
+    const map = getDismissedMap();
+    map[id] = today;
+    localStorage.setItem(DISMISS_KEY, JSON.stringify(map));
 }
 
-export function getNotices() {
-    return readRaw().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-}
-
-export function getActiveNotices() {
-    const now = new Date();
-    return readRaw()
-        .filter(n => !n.starts_at || new Date(n.starts_at) <= now)
-        .filter(n => !n.ends_at || new Date(n.ends_at) > now)
-        .sort((a, b) => {
-            if (a.is_important !== b.is_important) return a.is_important ? -1 : 1;
-            return new Date(b.created_at) - new Date(a.created_at);
-        });
-}
-
-export function createNotice(input) {
-    const notices = readRaw();
-    const now = new Date().toISOString();
-    const next = {
-        id: Date.now(),
-        title: input.title,
-        content: input.content,
-        is_important: !!input.is_important,
-        starts_at: input.starts_at || null,
-        ends_at: input.ends_at || null,
-        created_by: input.created_by || "관리자",
-        created_at: now,
-        updated_at: now,
-    };
-    notices.push(next);
-    writeRaw(notices);
-    return next;
-}
-
-export function updateNotice(id, patch) {
-    const notices = readRaw();
-    const idx = notices.findIndex(n => n.id === id);
-    if (idx === -1) return null;
-    const merged = {
-        ...notices[idx],
-        ...patch,
-        id: notices[idx].id,
-        created_at: notices[idx].created_at,
-        updated_at: new Date().toISOString(),
-    };
-    notices[idx] = merged;
-    writeRaw(notices);
-    return merged;
-}
-
-export function deleteNotice(id) {
-    const next = readRaw().filter(n => n.id !== id);
-    writeRaw(next);
-}
-
-export function classifyNotice(notice) {
-    const now = new Date();
-    if (notice.starts_at && new Date(notice.starts_at) > now) return 'scheduled';
-    if (notice.ends_at && new Date(notice.ends_at) <= now) return 'expired';
-    return 'active';
+export function isDismissedToday(id) {
+    const today = new Date().toISOString().split('T')[0];
+    return getDismissedMap()[id] === today;
 }
