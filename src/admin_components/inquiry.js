@@ -1,6 +1,6 @@
 import axios from "axios";
 import { showToast } from '../utill/utill';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }) {
 
@@ -25,13 +25,13 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         fetch_inquiry_list();
     }, []);
 
-    const fetch_notificatoins = (admin_id) => {
+    const fetch_notificatoins = useCallback((admin_id) => {
         axios.get(`${process.env.REACT_APP_API_URL}/notifications?recipient_admin_id=${admin_id}&unread_only=false&limit=10`).then((res) => {
-            setNotifications(res.data.filter(n => n.event_type !== 'inquiry_completed'));
+            setNotifications(res.data.filter(n => n.event_type !== 'inquiry_completed' && n.read_at === null));
         }).catch((err) => {
             console.log(err);
         });
-    }
+    }, []);
 
     useEffect(() => {
         if (adminId !== null) {
@@ -52,14 +52,14 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         });
     }
 
-    const fetch_inquiry_list = () => {
+    const fetch_inquiry_list = useCallback(() => {
         axios.get(`${process.env.REACT_APP_API_URL}/inquiries/get_inquiry_list`).then((res) => {
             setinquiries(res.data);
             // console.log(res.data);
         }).catch((err) => {
             console.log(err);
         });
-    }
+    }, []);
     // const [showNotificationModal, setShowNotificationModal] = useState(false);
     const formatTimeAgo = (dateStr) => {
         const now = new Date();
@@ -320,6 +320,8 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                             setinquiries={setinquiries}
                             fetch_inquiry_list={fetch_inquiry_list}
                             setNotifications={setNotifications}
+                            fetch_notificatoins={fetch_notificatoins}
+                            adminId={adminId}
                         />
                     </div>
                 </div>
@@ -328,7 +330,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     )
 }
 
-function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries, fetch_inquiry_list, setNotifications }) {
+function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinquiries, fetch_inquiry_list, setNotifications, fetch_notificatoins, adminId }) {
 
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -445,6 +447,10 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/assign`, {
                     admin_id: admin.id,
                     actor_admin: superadmin_id
+                }).then(() => {
+                    if (adminId !== null && adminId !== undefined) {
+                        fetch_notificatoins(adminId);
+                    }
                 });
                 setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?
                     {
@@ -484,6 +490,10 @@ function RenderInquiries({ inquiries, adminUsers, currentAdminUser, role, setinq
                 axios.post(`${process.env.REACT_APP_API_URL}/inquiries/${inquiry.id}/transfer`, {
                     to_admin_id: admin.id,
                     actor_admin: superadmin_id
+                }).then(() => {
+                    if (adminId !== null && adminId !== undefined) {
+                        fetch_notificatoins(adminId);
+                    }
                 });
 
                 setinquiries((prevInquiries) => prevInquiries.map((item) => item.id === inquiry.id ?

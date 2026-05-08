@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1778127254227,
+  "lastScanned": 1778215458175,
   "projectRoot": "C:\\Users\\dudql\\OneDrive\\Desktop\\Garam\\garam_frontend",
   "techStack": {
     "languages": [
@@ -50,6 +50,7 @@
     "isMonorepo": false,
     "workspaces": [],
     "mainDirectories": [
+      "docs",
       "public",
       "src"
     ],
@@ -64,7 +65,7 @@
       "path": "build",
       "purpose": "Build output",
       "fileCount": 31,
-      "lastAccessed": 1778127254186,
+      "lastAccessed": 1778215458134,
       "keyFiles": [
         "asset-manifest.json",
         "call.png",
@@ -73,11 +74,18 @@
         "icon - Close.png"
       ]
     },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1778215458136,
+      "keyFiles": []
+    },
     "public": {
       "path": "public",
       "purpose": "Public files",
       "fileCount": 30,
-      "lastAccessed": 1778127254187,
+      "lastAccessed": 1778215458147,
       "keyFiles": [
         "call.png",
         "garam_logo.png",
@@ -90,7 +98,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 3,
-      "lastAccessed": 1778127254198,
+      "lastAccessed": 1778215458148,
       "keyFiles": [
         "App.js",
         "index.css",
@@ -101,7 +109,7 @@
       "path": "src\\pages",
       "purpose": "Page components",
       "fileCount": 2,
-      "lastAccessed": 1778127254200,
+      "lastAccessed": 1778215458150,
       "keyFiles": [
         "Admin.js",
         "Login.js"
@@ -110,117 +118,39 @@
   },
   "hotPaths": [
     {
-      "path": "src\\user_components\\Main.js",
-      "accessCount": 52,
-      "lastAccessed": 1778134907249,
-      "type": "directory"
-    },
-    {
-      "path": "src\\user_styles\\main.css",
-      "accessCount": 13,
-      "lastAccessed": 1778134914843,
-      "type": "file"
-    },
-    {
-      "path": "src\\admin_components\\notice_modal.js",
-      "accessCount": 6,
-      "lastAccessed": 1778135246736,
-      "type": "file"
-    },
-    {
       "path": "src\\admin_components\\inquiry.js",
-      "accessCount": 5,
-      "lastAccessed": 1778130043259,
-      "type": "file"
-    },
-    {
-      "path": "docs\\superpowers\\specs\\2026-05-07-notice-and-notification-improvements-design.md",
-      "accessCount": 4,
-      "lastAccessed": 1778128534019,
-      "type": "file"
-    },
-    {
-      "path": "src\\pages\\Admin.js",
-      "accessCount": 4,
-      "lastAccessed": 1778129711697,
+      "accessCount": 15,
+      "lastAccessed": 1778217234104,
       "type": "file"
     },
     {
       "path": "src\\admin_styles\\inquiry.css",
-      "accessCount": 3,
-      "lastAccessed": 1778130059094,
+      "accessCount": 8,
+      "lastAccessed": 1778216533724,
       "type": "directory"
     },
     {
-      "path": "src\\admin_styles\\notice.css",
+      "path": "src\\admin_styles\\knowledge.css",
       "accessCount": 3,
-      "lastAccessed": 1778135391804,
+      "lastAccessed": 1778216536690,
       "type": "file"
     },
     {
-      "path": "src\\admin_components\\sidebar.js",
+      "path": "src\\user_components\\Main.js",
       "accessCount": 2,
-      "lastAccessed": 1778129691231,
+      "lastAccessed": 1778215687717,
       "type": "file"
     },
     {
-      "path": "src\\utill\\notice_storage.js",
+      "path": "src\\user_styles\\main.css",
       "accessCount": 2,
-      "lastAccessed": 1778132676076,
+      "lastAccessed": 1778215701369,
       "type": "file"
-    },
-    {
-      "path": "src\\admin_components\\notice.js",
-      "accessCount": 2,
-      "lastAccessed": 1778135095222,
-      "type": "file"
-    },
-    {
-      "path": "package.json",
-      "accessCount": 1,
-      "lastAccessed": 1778127566445,
-      "type": "file"
-    },
-    {
-      "path": "README.md",
-      "accessCount": 1,
-      "lastAccessed": 1778127567372,
-      "type": "file"
-    },
-    {
-      "path": "src\\App.js",
-      "accessCount": 1,
-      "lastAccessed": 1778127572468,
-      "type": "file"
-    },
-    {
-      "path": "src\\admin_components\\dashboard.js",
-      "accessCount": 1,
-      "lastAccessed": 1778127572726,
-      "type": "file"
-    },
-    {
-      "path": "src\\admin_components\\knowledge.js",
-      "accessCount": 1,
-      "lastAccessed": 1778127580731,
-      "type": "file"
-    },
-    {
-      "path": "src",
-      "accessCount": 1,
-      "lastAccessed": 1778127589750,
-      "type": "directory"
     },
     {
       "path": "src\\utill\\utill.js",
       "accessCount": 1,
-      "lastAccessed": 1778128882694,
-      "type": "file"
-    },
-    {
-      "path": "docs\\superpowers\\plans\\2026-05-07-notice-and-notification-improvements.md",
-      "accessCount": 1,
-      "lastAccessed": 1778129100924,
+      "lastAccessed": 1778216512982,
       "type": "file"
     }
   ],

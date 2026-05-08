@@ -656,13 +656,11 @@
        background: var(--bg-white);
        border-radius: var(--border-radius-lg);
        box-shadow: var(--shadow-sm);
-       overflow: hidden;
+       overflow: visible;
    }
 
    .inquiry-list {
-       max-height: 1200px;
-       overflow-y: auto;
-       overflow-x: hidden;
+       overflow: visible;
        padding: 0.5rem 0;
    }
 
@@ -1200,20 +1198,21 @@
    .toast {
        position: fixed;
        top: 20px;
-       right: 20px;
+       left: 50%;
        padding: 1rem 1.5rem;
        border-radius: var(--border-radius);
        color: white;
        font-weight: 500;
        z-index: 10000;
-       transform: translateX(100%);
+       transform: translate(-50%, -200%);
        transition: transform 0.3s ease;
        max-width: 400px;
        box-shadow: var(--shadow-md);
+       text-align: center;
    }
 
    .toast.show {
-       transform: translateX(0);
+       transform: translate(-50%, 0);
    }
 
    .toast.success {
