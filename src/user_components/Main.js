@@ -2048,9 +2048,6 @@ export default function Main() {
                                 {n.content}
                             </ReactMarkdown>
                         </div>
-                        <div className="notice-popup-date">
-                            {new Date(n.created_at).toLocaleDateString('ko-KR')}
-                        </div>
                     </div>
                     <div className="notice-popup-card-footer">
                         <button
