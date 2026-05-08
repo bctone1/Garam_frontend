@@ -583,12 +583,14 @@ export default function Main() {
             <div className="chatbot-guide" key={`notice-guide-${n.id}-${stamp}`}>
                 <div className="chatbot-bubble assistant" style={{ margin: "10px 0px" }}>
                     <div className="bubble-message assistant">
-                        <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            rehypePlugins={[rehypeRaw]}
-                        >
-                            {n.content}
-                        </ReactMarkdown>
+                        <div className="notice-md">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                rehypePlugins={[rehypeRaw]}
+                            >
+                                {n.content}
+                            </ReactMarkdown>
+                        </div>
                     </div>
                 </div>
 
@@ -2040,7 +2042,7 @@ export default function Main() {
                         <h3 className="notice-popup-title">{n.title}</h3>
                     </div>
                     <div className="notice-popup-card-body">
-                        <div className="notice-popup-content">
+                        <div className="notice-popup-content notice-md">
                             <ReactMarkdown
                                 remarkPlugins={[remarkGfm]}
                                 rehypePlugins={[rehypeRaw]}
