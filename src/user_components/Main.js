@@ -2032,16 +2032,10 @@ export default function Main() {
                 />
             </div >
 
-            {popupNotices.map((n, idx) => (
-                <div
-                    className="notice-popup-card"
-                    key={n.id}
-                    style={{
-                        top: `${48 + idx * 32}px`,
-                        left: `${48 + idx * 32}px`,
-                        zIndex: 300 + idx,
-                    }}
-                >
+            {popupNotices.length > 0 && (
+                <div className="notice-popup-stack">
+            {popupNotices.map((n) => (
+                <div className="notice-popup-card" key={n.id}>
                     <div className="notice-popup-card-header">
                         <h3 className="notice-popup-title">{n.title}</h3>
                     </div>
@@ -2079,6 +2073,8 @@ export default function Main() {
                     </div>
                 </div>
             ))}
+                </div>
+            )}
 
         </>
     );
