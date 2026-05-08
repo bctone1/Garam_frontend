@@ -73,9 +73,16 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     };
 
     const eventTypeLabel = {
-        inquiry_new: { icon: "🔔", text: "신규" },
-        inquiry_assigned: { icon: "👤", text: "할당" },
-        inquiry_completed: { icon: "✅", text: "완료" },
+        inquiry_new: "신규 문의",
+        inquiry_assigned: "담당 배정",
+        inquiry_completed: "처리 완료",
+    };
+
+    const inquiryTypeLabel = {
+        paper_request: "용지 요청",
+        sales_report: "매출 내역",
+        kiosk_menu_update: "메뉴 수정",
+        other: "기타",
     };
 
     const checkNotification = (notification) => {
@@ -149,40 +156,71 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                     </button>
 
                     <div className={`inquiry-notification-content ${showNotificationContent ? 'show' : ''}`}>
-                        {notifications.length === 0 ? (
-                            <div className="inquiry-notification-item">
-                                새로운 알람이 없습니다
-                            </div>
-                        ) : (
-                            notifications.map((notification) => (
-                                <div className={`inquiry-notification-item ${notification.read_at !== null ? 'read' : ''}`} key={notification.id}>
-                                    <div className="inquiry-notification-item-header">
-                                        <span className={`inquiry-notification-badge-label ${notification.event_type || ''}`}>
-                                            {(eventTypeLabel[notification.event_type] || eventTypeLabel.inquiry_new).icon} {(eventTypeLabel[notification.event_type] || eventTypeLabel.inquiry_new).text}
-                                        </span>
-                                        <span className="inquiry-notification-time">{formatTimeAgo(notification.created_at)}</span>
-                                    </div>
-                                    <div className="inquiry-notification-item-title">
-                                        <span className="inquiry-notification-item-title-text">
-                                            {notification.body}
-                                        </span>
+                        <div className="inquiry-notification-header">
+                            <h4>알림</h4>
+                            <span className="inquiry-notification-header-count">
+                                미확인 {notifications.filter(n => n.read_at === null).length}건
+                            </span>
+                        </div>
 
-                                        {notification.read_at === null && (
-                                            <button className="btn btn-primary notification-read-btn" onClick={() => checkNotification(notification)}>확인</button>
-                                        )}
-
-                                    </div>
-                                    {notification.inquiry && (
-                                        <div className="inquiry-notification-item-meta">
-                                            {notification.inquiry.business_name} · {notification.inquiry.inquiry_type === 'paper_request' ? '용지요청' : notification.inquiry.inquiry_type === 'sales_report' ? '매출 내역' : notification.inquiry.inquiry_type === 'kiosk_menu_update' ? '메뉴 수정' : '기타'}
-                                        </div>
-                                    )}
+                        <div className="inquiry-notification-list">
+                            {notifications.length === 0 ? (
+                                <div className="inquiry-notification-empty">
+                                    <p>새로운 알림이 없습니다</p>
                                 </div>
-                            ))
-                        )}
+                            ) : (
+                                notifications.map((notification) => {
+                                    const isUnread = notification.read_at === null;
+                                    const labelText = eventTypeLabel[notification.event_type] || eventTypeLabel.inquiry_new;
+                                    const inquiryTypeText = notification.inquiry
+                                        ? (inquiryTypeLabel[notification.inquiry.inquiry_type] || '기타')
+                                        : null;
+                                    return (
+                                        <div
+                                            className={`inquiry-notification-item ${isUnread ? 'unread' : 'read'}`}
+                                            key={notification.id}
+                                        >
+                                            <div className="inquiry-notification-item-row">
+                                                <span className={`inquiry-notification-badge-label ${notification.event_type || ''}`}>
+                                                    {labelText}
+                                                </span>
+                                                <span className="inquiry-notification-time">
+                                                    {formatTimeAgo(notification.created_at)}
+                                                </span>
+                                            </div>
+                                            <div className="inquiry-notification-body">
+                                                {notification.body}
+                                            </div>
+                                            {notification.inquiry && (
+                                                <div className="inquiry-notification-item-meta">
+                                                    {notification.inquiry.business_name}
+                                                    {inquiryTypeText ? ` · ${inquiryTypeText}` : ''}
+                                                </div>
+                                            )}
+                                            {isUnread && (
+                                                <div className="inquiry-notification-actions">
+                                                    <button
+                                                        className="notification-read-btn"
+                                                        onClick={() => checkNotification(notification)}
+                                                    >
+                                                        확인 처리
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+
                         {notifications.filter(n => n.read_at === null).length > 1 && (
-                            <div className="inquiry-notification-item" style={{ textAlign: 'center', borderTop: '1px solid #eee' }}>
-                                <button className="btn btn-primary notification-read-btn" onClick={checkAllNotifications}>전체확인</button>
+                            <div className="inquiry-notification-footer">
+                                <button
+                                    className="notification-read-all-btn"
+                                    onClick={checkAllNotifications}
+                                >
+                                    전체 확인 처리
+                                </button>
                             </div>
                         )}
                     </div>

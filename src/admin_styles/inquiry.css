@@ -247,22 +247,24 @@
 
    .inquiry-notification-content {
        position: absolute;
-       top: calc(100% + 0.5rem);
+       top: calc(100% + 0.75rem);
        right: 0;
-       background: var(--bg-white);
-       border: 1px solid var(--border-color);
-       border-radius: var(--border-radius-lg);
-       box-shadow: var(--shadow-md);
-       min-width: 320px;
-       max-width: 500px;
-       max-height: 400px;
-       overflow-y: auto;
+       background: #ffffff;
+       border: 1px solid #e5e7eb;
+       border-radius: 14px;
+       box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+       width: 460px;
+       max-width: calc(100vw - 2rem);
+       max-height: 580px;
        z-index: 1000;
        opacity: 0;
-       transform: translateY(-10px);
+       transform: translateY(-8px);
        visibility: hidden;
        pointer-events: none;
-       transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+       transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+       display: flex;
+       flex-direction: column;
+       overflow: hidden;
    }
 
    .inquiry-notification-content.show {
@@ -272,11 +274,53 @@
        pointer-events: auto;
    }
 
+   .inquiry-notification-header {
+       display: flex;
+       align-items: baseline;
+       justify-content: space-between;
+       padding: 16px 20px;
+       border-bottom: 1px solid #eef2f7;
+       background: #f8fafc;
+       flex-shrink: 0;
+   }
+
+   .inquiry-notification-header h4 {
+       margin: 0;
+       font-size: 16px;
+       font-weight: 700;
+       color: #0f172a;
+       letter-spacing: -0.01em;
+   }
+
+   .inquiry-notification-header-count {
+       font-size: 12px;
+       font-weight: 600;
+       color: #2563eb;
+   }
+
+   .inquiry-notification-list {
+       overflow-y: auto;
+       flex: 1;
+       background: #ffffff;
+   }
+
+   .inquiry-notification-empty {
+       padding: 64px 20px;
+       text-align: center;
+       color: #94a3b8;
+       font-size: 14px;
+   }
+
+   .inquiry-notification-empty p {
+       margin: 0;
+   }
+
    .inquiry-notification-item {
-       padding: 1rem;
-       border-bottom: 1px solid var(--border-color);
-       transition: var(--transition);
-       cursor: pointer;
+       position: relative;
+       padding: 16px 20px;
+       border-bottom: 1px solid #f1f5f9;
+       background: #ffffff;
+       transition: background 0.15s ease;
    }
 
    .inquiry-notification-item:last-child {
@@ -284,67 +328,126 @@
    }
 
    .inquiry-notification-item:hover {
-       background: var(--secondary-color);
+       background: #f8fafc;
+   }
+
+   .inquiry-notification-item.unread::before {
+       content: '';
+       position: absolute;
+       left: 0;
+       top: 16px;
+       bottom: 16px;
+       width: 3px;
+       border-radius: 0 3px 3px 0;
+       background: #2563eb;
    }
 
    .inquiry-notification-item.read {
-       opacity: 0.5;
+       background: #fafbfc;
    }
 
-   .inquiry-notification-item.read .inquiry-notification-item-title-text {
-       color: var(--text-secondary);
+   .inquiry-notification-item-row {
+       display: flex;
+       align-items: center;
+       justify-content: space-between;
+       gap: 8px;
+       margin-bottom: 8px;
    }
 
-  .inquiry-notification-item-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-  }
+   .inquiry-notification-badge-label {
+       display: inline-flex;
+       align-items: center;
+       padding: 3px 10px;
+       border-radius: 999px;
+       font-size: 11px;
+       font-weight: 700;
+       letter-spacing: 0.01em;
+       background: #eff6ff;
+       color: #1d4ed8;
+       border: 1px solid #bfdbfe;
+   }
 
-  .inquiry-notification-item-title-text {
-      font-size: 0.875rem;
-      color: var(--text-primary);
-      line-height: 1.5;
-      flex: 1;
-  }
+   .inquiry-notification-badge-label.inquiry_assigned {
+       background: #eef2ff;
+       color: #4338ca;
+       border-color: #c7d2fe;
+   }
 
-  .inquiry-notification-item-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.4rem;
-  }
+   .inquiry-notification-badge-label.inquiry_completed {
+       background: #f1f5f9;
+       color: #475569;
+       border-color: #cbd5e1;
+   }
 
-  .inquiry-notification-badge-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 10px;
-      background: var(--primary-light);
-      color: var(--primary-color);
-  }
+   .inquiry-notification-time {
+       font-size: 12px;
+       color: #94a3b8;
+       font-weight: 500;
+   }
 
-  .inquiry-notification-badge-label.inquiry_assigned {
-      background: #fff3e0;
-      color: #e65100;
-  }
+   .inquiry-notification-body {
+       font-size: 14px;
+       color: #0f172a;
+       line-height: 1.55;
+       word-break: break-word;
+   }
 
-  .inquiry-notification-badge-label.inquiry_completed {
-      background: #e8f5e9;
-      color: #2e7d32;
-  }
+   .inquiry-notification-item.read .inquiry-notification-body {
+       color: #64748b;
+   }
 
-  .inquiry-notification-time {
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-  }
+   .inquiry-notification-item-meta {
+       margin-top: 8px;
+       font-size: 12px;
+       color: #64748b;
+   }
 
-  .inquiry-notification-item-meta {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      margin-top: 0.3rem;
-  }
+   .inquiry-notification-actions {
+       margin-top: 12px;
+       display: flex;
+       justify-content: flex-end;
+   }
+
+   .notification-read-btn {
+       background: #2563eb;
+       color: #fff;
+       border: 0;
+       padding: 7px 14px;
+       border-radius: 8px;
+       font-size: 13px;
+       font-weight: 600;
+       cursor: pointer;
+       transition: background 0.15s ease;
+   }
+
+   .notification-read-btn:hover {
+       background: #1d4ed8;
+   }
+
+   .inquiry-notification-footer {
+       padding: 12px 16px;
+       border-top: 1px solid #eef2f7;
+       background: #f8fafc;
+       flex-shrink: 0;
+   }
+
+   .notification-read-all-btn {
+       width: 100%;
+       background: #ffffff;
+       color: #2563eb;
+       border: 1px solid #bfdbfe;
+       padding: 10px 14px;
+       border-radius: 10px;
+       font-size: 13px;
+       font-weight: 600;
+       cursor: pointer;
+       transition: background 0.15s ease, border-color 0.15s ease;
+   }
+
+   .notification-read-all-btn:hover {
+       background: #eff6ff;
+       border-color: #93c5fd;
+   }
 
    .page-header {
        background: var(--bg-white);
