@@ -43,8 +43,8 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
     }, []);
 
     const fetch_notificatoins = useCallback((admin_id) => {
-        axios.get(`${process.env.REACT_APP_API_URL}/notifications?recipient_admin_id=${admin_id}&unread_only=false&limit=10`).then((res) => {
-            setNotifications(res.data.filter(n => n.event_type !== 'inquiry_completed' && n.read_at === null));
+        axios.get(`${process.env.REACT_APP_API_URL}/notifications?recipient_admin_id=${admin_id}&unread_only=false&limit=200`).then((res) => {
+            setNotifications(res.data);
         }).catch((err) => {
             console.log(err);
         });
@@ -101,20 +101,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         other: "기타",
     };
 
-    const checkNotification = (notification) => {
-        console.log(notification);
-        console.log(adminId);
-        axios.post(`${process.env.REACT_APP_API_URL}/notifications/${notification.id}/read`, {
-            recipient_admin_id: adminId
-        });
-        setShowNotificationContent(!showNotificationContent)
-
-        setTimeout(() => {
-            fetch_notificatoins(adminId);
-        }, 500);
-    }
-
-    const checkAllNotifications = () => {
+    const markAllNotificationsRead = () => {
         const unreadNotifications = notifications.filter(n => n.read_at === null);
         if (unreadNotifications.length === 0) return;
 
@@ -127,6 +114,14 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         ).then(() => {
             fetch_notificatoins(adminId);
         });
+    }
+
+    const handleToggleNotificationContent = () => {
+        const willOpen = !showNotificationContent;
+        setShowNotificationContent(willOpen);
+        if (willOpen) {
+            markAllNotificationsRead();
+        }
     }
 
     return (
@@ -160,10 +155,10 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                     <button
                         ref={notificationButtonRef}
                         className="inquiry-notification-btn"
-                        title="알림"
-                        onClick={() => setShowNotificationContent(!showNotificationContent)}
+                        title="문의접수"
+                        onClick={handleToggleNotificationContent}
                     >
-                        <svg className="inquiry-notification-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span className="inquiry-notification-label">문의접수</span>
                         {(() => {
                             const unreadCount = notifications.filter(n => n.read_at === null).length;
                             if (unreadCount === 0) return null;
@@ -214,32 +209,11 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                                                     {inquiryTypeText ? ` · ${inquiryTypeText}` : ''}
                                                 </div>
                                             )}
-                                            {isUnread && (
-                                                <div className="inquiry-notification-actions">
-                                                    <button
-                                                        className="notification-read-btn"
-                                                        onClick={() => checkNotification(notification)}
-                                                    >
-                                                        확인 처리
-                                                    </button>
-                                                </div>
-                                            )}
                                         </div>
                                     );
                                 })
                             )}
                         </div>
-
-                        {notifications.filter(n => n.read_at === null).length > 1 && (
-                            <div className="inquiry-notification-footer">
-                                <button
-                                    className="notification-read-all-btn"
-                                    onClick={checkAllNotifications}
-                                >
-                                    전체 확인 처리
-                                </button>
-                            </div>
-                        )}
                     </div>
 
 

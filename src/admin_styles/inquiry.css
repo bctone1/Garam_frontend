@@ -196,17 +196,16 @@
 
    .inquiry-notification-btn {
        position: relative;
-       display: flex;
+       display: inline-flex;
        align-items: center;
        justify-content: center;
-       width: 40px;
        height: 40px;
+       padding: 0 16px;
        background: var(--bg-white);
        border: 1px solid var(--border-color);
-       border-radius: 50%;
+       border-radius: 8px;
        cursor: pointer;
        transition: var(--transition);
-       padding: 0;
    }
 
    .inquiry-notification-btn:hover {
@@ -215,16 +214,15 @@
        transform: scale(1.05);
    }
 
-   .inquiry-notification-icon {
-       width: 20px;
-       height: 20px;
-       fill: var(--text-primary);
-       stroke: var(--text-primary);
+   .inquiry-notification-label {
+       font-size: 0.95rem;
+       font-weight: 600;
+       color: var(--text-primary);
+       white-space: nowrap;
    }
 
-   .inquiry-notification-btn:hover .inquiry-notification-icon {
-       fill: var(--primary-color);
-       stroke: var(--primary-color);
+   .inquiry-notification-btn:hover .inquiry-notification-label {
+       color: var(--primary-color);
    }
 
    .inquiry-notification-badge {
@@ -253,9 +251,9 @@
        border: 1px solid #e5e7eb;
        border-radius: 14px;
        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
-       width: 460px;
+       width: 920px;
        max-width: calc(100vw - 2rem);
-       max-height: 580px;
+       max-height: 870px;
        z-index: 1000;
        opacity: 0;
        transform: translateY(-8px);

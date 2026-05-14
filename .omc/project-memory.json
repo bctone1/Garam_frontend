@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1778215458175,
+  "lastScanned": 1778731418126,
   "projectRoot": "C:\\Users\\dudql\\OneDrive\\Desktop\\Garam\\garam_frontend",
   "techStack": {
     "languages": [
@@ -65,7 +65,7 @@
       "path": "build",
       "purpose": "Build output",
       "fileCount": 31,
-      "lastAccessed": 1778215458134,
+      "lastAccessed": 1778731418033,
       "keyFiles": [
         "asset-manifest.json",
         "call.png",
@@ -78,14 +78,14 @@
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 0,
-      "lastAccessed": 1778215458136,
+      "lastAccessed": 1778731418037,
       "keyFiles": []
     },
     "public": {
       "path": "public",
       "purpose": "Public files",
       "fileCount": 30,
-      "lastAccessed": 1778215458147,
+      "lastAccessed": 1778731418055,
       "keyFiles": [
         "call.png",
         "garam_logo.png",
@@ -98,7 +98,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 3,
-      "lastAccessed": 1778215458148,
+      "lastAccessed": 1778731418056,
       "keyFiles": [
         "App.js",
         "index.css",
@@ -109,7 +109,7 @@
       "path": "src\\pages",
       "purpose": "Page components",
       "fileCount": 2,
-      "lastAccessed": 1778215458150,
+      "lastAccessed": 1778731418058,
       "keyFiles": [
         "Admin.js",
         "Login.js"
@@ -119,39 +119,15 @@
   "hotPaths": [
     {
       "path": "src\\admin_components\\inquiry.js",
-      "accessCount": 22,
-      "lastAccessed": 1778218282280,
+      "accessCount": 9,
+      "lastAccessed": 1778733856339,
       "type": "file"
     },
     {
       "path": "src\\admin_styles\\inquiry.css",
-      "accessCount": 8,
-      "lastAccessed": 1778216533724,
+      "accessCount": 4,
+      "lastAccessed": 1778733715657,
       "type": "directory"
-    },
-    {
-      "path": "src\\admin_styles\\knowledge.css",
-      "accessCount": 3,
-      "lastAccessed": 1778216536690,
-      "type": "file"
-    },
-    {
-      "path": "src\\user_components\\Main.js",
-      "accessCount": 2,
-      "lastAccessed": 1778215687717,
-      "type": "file"
-    },
-    {
-      "path": "src\\user_styles\\main.css",
-      "accessCount": 2,
-      "lastAccessed": 1778215701369,
-      "type": "file"
-    },
-    {
-      "path": "src\\utill\\utill.js",
-      "accessCount": 1,
-      "lastAccessed": 1778216512982,
-      "type": "file"
     }
   ],
   "userDirectives": []
