@@ -101,8 +101,10 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
         other: "기타",
     };
 
+    const visibleNotifications = notifications.filter(n => n.event_type !== 'inquiry_completed');
+
     const markAllNotificationsRead = () => {
-        const unreadNotifications = notifications.filter(n => n.read_at === null);
+        const unreadNotifications = visibleNotifications.filter(n => n.read_at === null);
         if (unreadNotifications.length === 0) return;
 
         Promise.all(
@@ -160,7 +162,7 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                     >
                         <span className="inquiry-notification-label">문의접수</span>
                         {(() => {
-                            const unreadCount = notifications.filter(n => n.read_at === null).length;
+                            const unreadCount = visibleNotifications.filter(n => n.read_at === null).length;
                             if (unreadCount === 0) return null;
                             const display = unreadCount > 99 ? '99+' : unreadCount;
                             return <span className="inquiry-notification-badge">{display}</span>;
@@ -171,17 +173,17 @@ export default function Inquiry({ setRole, role, setadmin_email, setadmin_name }
                         <div className="inquiry-notification-header">
                             <h4>알림</h4>
                             <span className="inquiry-notification-header-count">
-                                미확인 {notifications.filter(n => n.read_at === null).length}건
+                                미확인 {visibleNotifications.filter(n => n.read_at === null).length}건
                             </span>
                         </div>
 
                         <div className="inquiry-notification-list">
-                            {notifications.length === 0 ? (
+                            {visibleNotifications.length === 0 ? (
                                 <div className="inquiry-notification-empty">
                                     <p>새로운 알림이 없습니다</p>
                                 </div>
                             ) : (
-                                notifications.map((notification) => {
+                                visibleNotifications.map((notification) => {
                                     const isUnread = notification.read_at === null;
                                     const labelText = eventTypeLabel[notification.event_type] || eventTypeLabel.inquiry_new;
                                     const inquiryTypeText = notification.inquiry
